@@ -272,7 +272,7 @@
     state.cur.slot = slot;
     state.cur.tokens = state.market[slot].slice();
     state.market[slot] = [];
-    state.cur.actions.push({ a: 'take', tokens: state.cur.tokens.slice() });
+    state.cur.actions.push({ a: 'take', slot, tokens: state.cur.tokens.slice() });
   }
   function placeToken(state, handIdx, cellIdx) {
     const cur = state.cur;
@@ -304,7 +304,7 @@
     state.display[displayIdx] = null;
     current(state).hand.push({ id, left: card.pts.length });
     state.cur.cardTaken = true;
-    state.cur.actions.push({ a: 'card', id });
+    state.cur.actions.push({ a: 'card', id, slot: displayIdx });
   }
   function chooseSpirit(state, id) {
     const p = current(state);
