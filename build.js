@@ -19,7 +19,7 @@ const SUPABASE_KEY = 'sb_publishable_kTn0yH1LO-vQ7cpjMx8-hQ_ydhfxLDx';
 let html = read('index.html');
 html = between(html, 'css', '<style>\n' + read('src/styles.css') + '\n</style>');
 html = between(html, 'config', '<script>window.HARMONIES_CONFIG = { url: "' + SUPABASE_URL + '", key: "' + SUPABASE_KEY + '" };</script>');
-const js = ['src/cards.js', 'src/animals.js', 'src/icons.js', 'src/engine.js', 'src/render.js', 'src/net.js', 'src/app.js'].map(f => '<script>\n' + read(f) + '\n</script>').join('\n');
+const js = ['src/cards.js', 'src/animals.js', 'src/icons.js', 'src/engine.js', 'src/bot.js', 'src/render.js', 'src/net.js', 'src/app.js'].map(f => '<script>\n' + read(f) + '\n</script>').join('\n');
 html = between(html, 'js', js);
 html = html.replace('<title>Harmonies</title>', '<title>Harmonies</title>\n<link rel="manifest" href="manifest.webmanifest">\n<link rel="apple-touch-icon" href="icon-192.png">\n<link rel="icon" href="icon-192.png">');
 

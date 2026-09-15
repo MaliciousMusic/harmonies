@@ -161,8 +161,6 @@ body.in-game { overflow: hidden; height: 100vh; height: 100dvh; }
 .slot-empty { color: var(--muted); font-size: 12px; font-family: var(--display); }
 .choose-animals { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 2px; }
 .choose-animals .cards-strip { flex: 1; min-height: 0; align-items: center; padding: 6px 2px 8px; overflow-y: hidden; }
-.choose-animals .deck-wrap { width: 50px; }
-.choose-animals .deck-wrap .deck { width: 50px; height: 70px; }
 
 /* vue « plateau » : plateau perso + cartes possédées */
 .stage-play { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -191,6 +189,20 @@ body.in-game { overflow: hidden; height: 100vh; height: 100dvh; }
 .board.readonly .hex { cursor: default; }
 @keyframes pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
 .board .hex.legal, .board .hex.target { animation: pulse 1.4s ease-in-out infinite; }
+.stage-play { position: relative; }
+.drawer { position: absolute; left: 4px; right: 4px; bottom: 0; background: var(--paper); border-radius: 22px 22px 0 0; box-shadow: 0 -8px 24px rgba(30,42,90,.22), 0 0 0 1px var(--line); padding: 6px 8px 4px; display: flex; flex-direction: column; gap: 2px; z-index: 3; }
+.drawer:not(.open) { background: transparent; box-shadow: none; padding: 0; height: 0; }
+.drawer-toggle { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; border-radius: 50%; border: 3px solid #fff; background: linear-gradient(135deg, var(--teal-l), var(--teal)); color: #fff; display: grid; place-items: center; cursor: pointer; box-shadow: 0 4px 12px rgba(30,42,90,.3); z-index: 4; }
+.drawer:not(.open) .drawer-toggle { top: auto; bottom: 6px; background: linear-gradient(135deg, #f4a55c, var(--orange)); }
+.drawer-toggle .ic { width: 22px; height: 22px; }
+.drawer .stage-head { min-height: 32px; }
+.drawer .cards-strip { padding: 4px 2px 6px; }
+.deck-wrap.mini { width: auto; }
+.deck-wrap.mini .deck { width: 28px; height: 39px; }
+.prow { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.prow input[type=text] { flex: 1; min-width: 0; }
+.sel, .prow select { font: inherit; font-family: var(--display); padding: 9px 10px; border-radius: 12px; border: 2px solid var(--line); background: #fff; color: var(--ink); }
+.prow select { flex: 0 0 auto; max-width: 46%; }
 .my-cards { flex: none; display: flex; flex-direction: column; gap: 2px; }
 .my-cards .stage-head .btn.small { padding: 4px 8px; min-height: 30px; }
 .my-cards .minis { display: flex; gap: 8px; align-items: center; min-height: 54px; padding: 2px 4px 6px; overflow-x: auto; }
@@ -255,12 +267,14 @@ body.in-game { overflow: hidden; height: 100vh; height: 100dvh; }
 .footer.folded .view-tabs button span { display: none; }
 .footer.folded .foot-hand { background: transparent; padding: 0; flex: 1; }
 .footer.folded .tokens { min-height: 46px; gap: 4px; justify-content: center; }
-.footer.folded .tok { width: 44px; height: 44px; }
-.footer.folded .tok svg { width: 38px; height: 38px; }
+.footer.folded .tok { width: 42px; height: 42px; }
+.footer.folded .tok svg { width: 36px; height: 36px; }
 .footer.folded .foot-actions { flex: none; gap: 6px; }
 .footer.folded .foot-actions .btn { flex: none; min-height: 44px; padding: 8px 12px; }
 .footer.folded .foot-actions .btn.icon { padding: 8px 10px; }
 .footer.folded .foot-actions .btn .lbl { font-size: 14px; }
+.footer.folded .foot-actions #undo .lbl { display: none; }
+.footer.folded .foot-actions #undo { padding: 8px 11px; }
 @media (max-width: 400px) { .footer.folded .foot-actions .btn .lbl { display: none; } .footer.folded .tokens .placeholder { font-size: 12px; } }
 /* barres de défilement colorées (bandes de cartes) */
 .cards-strip, .minis, .board-tabs { scrollbar-width: thin; scrollbar-color: var(--teal) #eee6d4; }

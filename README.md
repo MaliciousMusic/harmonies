@@ -14,6 +14,9 @@ depuis un téléphone, en ligne ou en « passe le téléphone ».
 | --- | --- |
 | `src/cards.js` | Données des cartes (motif = chaîne d'emplacements + directions, valeurs, cube). |
 | `src/engine.js` | Moteur de règles pur (plateau hexagonal, pose, motifs, score, tours, fin de partie). Testé sous Node. |
+| `src/bot.js` | Joueurs artificiels (3 niveaux : hasard, score immédiat, préparation des habitats). Joués par l'appareil hôte en ligne. |
+| `src/animals.js` | Sprite SVG des 42 animaux (généré par `tools/build-animals.py` à partir d'OpenMoji). |
+| `src/icons.js` | Icônes d'interface au trait. |
 | `src/render.js` | Rendu SVG : jetons, plateaux, miniatures de motifs. |
 | `src/net.js` | Transport : Supabase (en ligne, verrou optimiste + temps réel) ou `localStorage` (même appareil). |
 | `src/app.js` | Écrans (accueil, salle d'attente, partie), interactions, synchronisation, annulation dans le tour. |
@@ -26,7 +29,7 @@ depuis un téléphone, en ligne ou en « passe le téléphone ».
 ## Développement
 
 ```bash
-node --test test/engine.test.js   # tests du moteur
+node --test test/engine.test.js test/bot.test.js   # tests du moteur et des bots
 python dev-server.py 8765         # puis http://localhost:8765/index.html (nécessite config.js, voir ci-dessous)
 node build.js                     # régénère docs/
 ```

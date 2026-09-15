@@ -1,7 +1,7 @@
 // Application Harmonies : écrans, interactions, animations, sons, synchronisation.
 (function (root) {
   'use strict';
-  const E = root.Engine, R = root.Render, esc = R.esc, I = root.Icons;
+  const E = root.Engine, R = root.Render, esc = R.esc, I = root.Icons, Bot = root.Bot;
   const ic = (name, cls) => I.svg(name, cls);
   const $ = sel => document.querySelector(sel);
   const $$ = sel => [...document.querySelectorAll(sel)];
@@ -9,6 +9,8 @@
   const ONLINE_OK = !!(CFG.url && CFG.key && !CFG.url.startsWith('__') && root.supabase);
   const SEAT_COLORS = ['#2a8f8a', '#e8873a', '#6b4fa0', '#d96a8e'];
   const SIDE_LABEL = { A: 'Face A · rivière', B: 'Face B · îles' };
+  const BOT_LABEL = { 1: 'Bot débutant', 2: 'Bot confirmé', 3: 'Bot expert' };
+  const botName = (players, level) => { const used = new Set(players.map(p => p.name)); const base = Bot.NAMES.find(n => !used.has(n)) || 'Bot'; return base; };
   const BANNER = ['#f2c94c', '#e8873a', '#5cc2b7', '#2a8f8a', '#2c4a8a', '#1e2a5a'];
   const wait = ms => new Promise(r => setTimeout(r, ms));
 
@@ -228,19 +230,20 @@
     screen: 'home', net: null, mode: null, gameId: null, version: 0,
     committed: null, work: null, undo: [], viewSeat: 0, selToken: null, cubeMode: null,
     unsub: null, poll: null, rtOk: false, endShown: false, spiritPrompted: false, lastLogLen: 0,
-    replay: null, busy: false, stage: 'play', stageManual: false, cardsOpen: null, headerOpen: false,
+    replay: null, busy: false, stage: 'play', stageManual: false, cardsOpen: ls.get('harmonies.cardsOpen', true), headerOpen: false, botRunning: false,
   };
   const view = () => (app.replay ? app.replay.state : (app.work || app.committed));
   const isMine = () => {
     const s = app.committed;
     if (!s || s.status !== 'playing' || app.replay) return false;
+    if (E.current(s).bot) return false;
     if (app.mode === 'local') return true;
     return E.current(s).pid === myPid();
   };
   const mySeat = () => {
     const s = app.committed;
     if (!s) return -1;
-    if (app.mode === 'local') return s.turn;
+    if (app.mode === 'local') return s.players[s.turn].bot ? s.players.findIndex(p => !p.bot) : s.turn;
     return s.players.findIndex(p => p.pid === myPid());
   };
 
@@ -395,33 +398,41 @@
     });
   }
 
+  function playerRow(pl, i) {
+    return '<div class="prow"><span class="dot" style="background:' + SEAT_COLORS[i] + '"></span><input type="text" maxlength="16" value="' + esc(pl.name) + '" data-i="' + i + '">' +
+      '<select class="ptype" data-i="' + i + '">' + [[0, 'Humain'], [1, 'Bot débutant'], [2, 'Bot confirmé'], [3, 'Bot expert']].map(([v, l]) => '<option value="' + v + '"' + (pl.bot === v ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>';
+  }
   function localSetup(opts) {
-    const names = ls.get('harmonies.localNames', [myName() || 'Joueur 1', 'Joueur 2']);
-    modal('<h2>' + ic('phone', 'h') + 'Partie sur ce téléphone</h2><p class="note">Les joueurs se passent le téléphone à chaque tour.</p>' +
-      '<div id="names">' + names.map((n, i) => '<div class="field"><label>Joueur ' + (i + 1) + '</label><input type="text" maxlength="16" value="' + esc(n) + '"></div>').join('') + '</div>' +
+    let players = ls.get('harmonies.localPlayers', null);
+    if (!players) { const old = ls.get('harmonies.localNames', null); players = old ? old.map(n => ({ name: n, bot: 0 })) : [{ name: myName() || 'Joueur 1', bot: 0 }, { name: 'Bot Fennec', bot: 2 }]; }
+    modal('<h2>' + ic('phone', 'h') + 'Partie sur ce téléphone</h2><p class="note">Humains et bots ; les humains se passent le téléphone. Trois niveaux de bot : débutant (au hasard), confirmé (vise le score immédiat), expert (prépare ses habitats).</p>' +
+      '<div id="prows">' + players.map(playerRow).join('') + '</div>' +
       '<div class="row"><button class="btn secondary small" id="m-add">' + ic('plus') + 'joueur</button><button class="btn secondary small" id="m-del">' + ic('minus') + 'joueur</button></div>' +
       '<div class="actions"><button class="btn secondary" id="m-cancel">Annuler</button><button class="btn primary" id="m-go">Commencer</button></div>');
-    const getNames = () => $$('#names input').map(i => i.value.trim());
-    $('#m-add').onclick = () => { const ns = getNames(); if (ns.length < 4) { ns.push('Joueur ' + (ns.length + 1)); ls.set('harmonies.localNames', ns); localSetup(opts); } };
-    $('#m-del').onclick = () => { const ns = getNames(); if (ns.length > 2) { ns.pop(); ls.set('harmonies.localNames', ns); localSetup(opts); } };
+    const read = () => $$('#prows .prow').map((row, i) => ({ name: row.querySelector('input').value.trim(), bot: +row.querySelector('select').value }));
+    const rerender = pl => { ls.set('harmonies.localPlayers', pl); localSetup(opts); };
+    $('#m-add').onclick = () => { const pl = read(); if (pl.length < 4) { pl.push({ name: 'Bot ' + botName(pl, 2), bot: 2 }); rerender(pl); } };
+    $('#m-del').onclick = () => { const pl = read(); if (pl.length > 2) { pl.pop(); rerender(pl); } };
+    $$('#prows select').forEach(sel => { sel.onchange = () => { const row = sel.closest('.prow'); const inp = row.querySelector('input'); const lvl = +sel.value; if (lvl && (!inp.value.trim() || /^Joueur \d|^Bot /.test(inp.value))) inp.value = 'Bot ' + botName(read().filter((_, k) => k !== +sel.dataset.i), lvl); }; });
     $('#m-cancel').onclick = closeModal;
     $('#m-go').onclick = () => {
-      const ns = getNames().map((n, i) => n || 'Joueur ' + (i + 1));
-      ls.set('harmonies.localNames', ns);
+      const pl = read().map((p, i) => ({ name: p.name || (p.bot ? 'Bot ' + (i + 1) : 'Joueur ' + (i + 1)), bot: p.bot }));
+      if (pl.every(p => p.bot)) { toast('Il faut au moins un joueur humain', true); return; }
+      ls.set('harmonies.localPlayers', pl);
       closeModal();
-      startLocal(opts, ns);
+      startLocal(opts, pl);
     };
   }
 
   // ---------- Création / ouverture ----------
-  async function startLocal(opts, names) {
+  async function startLocal(opts, players) {
     app.net = root.Net.makeLocal(); app.mode = 'local';
     const id = randomId(6);
-    const state = E.newGame(opts, names.map((name, i) => ({ token: 'local' + i, name })));
+    const state = E.newGame(opts, players.map((pl, i) => ({ token: 'local' + i, name: pl.name, bot: pl.bot || 0 })));
     state.players.forEach((p, i) => { p.pid = 'local' + i; });
     state.id = id; state.mode = 'local';
     await app.net.createGame(id, state);
-    rememberGame({ id, mode: 'local', label: names.join(', ') + ' · ' + SIDE_LABEL[opts.side] });
+    rememberGame({ id, mode: 'local', label: players.map(p => p.name).join(', ') + ' · ' + SIDE_LABEL[opts.side] });
     enterGame(id, state, 1);
   }
   async function openLocal(id) {
@@ -461,6 +472,7 @@
     }
     render();
     if (isMine() && state.status === 'playing') announceMyTurn();
+    maybeRunBot();
   }
   let refreshing = false;
   async function refresh() {
@@ -474,7 +486,7 @@
     const wasMine = isMine();
     app.committed = rec.state; app.version = rec.version;
     if (app.replay) app.replay.abort = true;
-    if (!wasMine || !isMine()) { app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.stageManual = false; app.cardsOpen = null; ls.del('harmonies.draft.' + app.gameId); }
+    if (!wasMine || !isMine()) { app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.stageManual = false; ls.del('harmonies.draft.' + app.gameId); }
     // rejeu animé du tour adverse si l'on dispose de l'état exact qui le précédait
     const s = app.committed;
     const entry = s.log && s.log.length > app.lastLogLen ? s.log[s.log.length - 1] : null;
@@ -486,6 +498,7 @@
     if (remote) toast(esc(who.name) + ' : ' + (actionsHTML(entry.actions) || 'a joué'));
     render();
     if (isMine() && s.status === 'playing' && !wasMine) announceMyTurn();
+    maybeRunBot();
   }
   function announceMyTurn() {
     const me = E.current(app.committed);
@@ -494,6 +507,28 @@
   }
 
   // ---------- Rejeu animé du tour d'un autre joueur ----------
+  // Joue visuellement une action (rejeu d'un adversaire ou tour d'un bot) sur `state`.
+  async function performAction(state, a, name, token) {
+    const goStage = async st => { if (app.stage !== st) { app.stage = st; renderGame(); await wait(450); } };
+    if (a.a === 'take') {
+      let slot = a.slot;
+      if (slot === undefined) slot = state.market.findIndex(m => m.length === a.tokens.length && m.every((t, i) => t === a.tokens[i]));
+      if (slot >= 0) { await goStage('choose'); await animatedTake(state, slot); }
+    } else if (a.a === 'place') {
+      const idx = state.cur.tokens.indexOf(a.color);
+      if (idx >= 0) { await goStage('play'); await animatedPlace(state, idx, a.cell); }
+    } else if (a.a === 'card') {
+      const idx = a.slot !== undefined && state.display[a.slot] === a.id ? a.slot : state.display.indexOf(a.id);
+      if (idx >= 0) { await goStage('choose'); await animatedCard(state, idx); }
+    } else if (a.a === 'cube') {
+      await goStage('play'); await animatedCube(state, a.id, a.cell);
+    } else if (a.a === 'spirit') {
+      E.chooseSpirit(state, a.id); renderGame(); toast(esc(name) + ' choisit l\'esprit ' + esc(E.CARD_BY_ID.get(a.id).fr));
+    } else if (a.a === 'discard') {
+      const idx = state.cur.tokens.indexOf(a.color); if (idx >= 0) E.discardToken(state, idx); renderGame();
+    }
+    void token;
+  }
   async function replayTurn(prev, entry, next) {
     const state = E.clone(prev);
     const token = { state, seat: entry.p, abort: false };
@@ -504,28 +539,9 @@
     renderGame();
     showBanner(ic('film', 'inl') + ' ' + esc(name) + ' joue son tour…', () => { token.abort = true; }, ic('skip') + 'Passer');
     await wait(500);
-    const goStage = async st => { if (app.stage !== st) { app.stage = st; renderGame(); await wait(450); } };
     for (const a of entry.actions) {
       if (token.abort) break;
-      try {
-        if (a.a === 'take') {
-          let slot = a.slot;
-          if (slot === undefined) slot = state.market.findIndex(m => m.length === a.tokens.length && m.every((t, i) => t === a.tokens[i]));
-          if (slot >= 0) { await goStage('choose'); await animatedTake(state, slot); }
-        } else if (a.a === 'place') {
-          const idx = state.cur.tokens.indexOf(a.color);
-          if (idx >= 0) { await goStage('play'); await animatedPlace(state, idx, a.cell); }
-        } else if (a.a === 'card') {
-          const idx = a.slot !== undefined && state.display[a.slot] === a.id ? a.slot : state.display.indexOf(a.id);
-          if (idx >= 0) { await goStage('choose'); await animatedCard(state, idx); }
-        } else if (a.a === 'cube') {
-          await goStage('play'); await animatedCube(state, a.id, a.cell);
-        } else if (a.a === 'spirit') {
-          E.chooseSpirit(state, a.id); renderGame(); toast(esc(name) + ' choisit l\'esprit ' + esc(E.CARD_BY_ID.get(a.id).fr));
-        } else if (a.a === 'discard') {
-          const idx = state.cur.tokens.indexOf(a.color); if (idx >= 0) E.discardToken(state, idx); renderGame();
-        }
-      } catch (e) { break; }
+      try { await performAction(state, a, name, token); } catch (e) { break; }
       if (token.abort) break;
       await wait(350);
     }
@@ -544,6 +560,60 @@
     renderGame();
     if (mineNow && next.status === 'playing') announceMyTurn();
     if (next.status === 'finished' && !app.endShown) { app.endShown = true; showResults(); }
+    maybeRunBot();
+  }
+
+  // ---------- Bots : joués par l'appareil hôte (ou en local) ----------
+  function botsHere() { return app.mode === 'local' || (app.committed && app.committed.host === myPid()); }
+  function maybeRunBot() {
+    const s = app.committed;
+    if (!s || s.status !== 'playing' || app.replay || app.botRunning || !botsHere()) return;
+    const p = E.current(s);
+    if (!p.bot) return;
+    app.botRunning = true;
+    setTimeout(runBotTurn, 700);
+  }
+  async function runBotTurn() {
+    const s = app.committed;
+    if (!s || s.status !== 'playing' || app.replay) { app.botRunning = false; return; }
+    const p = E.current(s);
+    if (!p.bot) { app.botRunning = false; return; }
+    const version = app.version;
+    const planned = E.clone(s);
+    const actions = Bot.playTurn(planned, p.bot);
+    const vis = E.clone(s);
+    const token = { state: vis, seat: s.turn, abort: false, bot: true };
+    app.replay = token; app.viewSeat = s.turn; app.stage = 'choose'; app.stageManual = false;
+    renderGame();
+    showBanner(ic('dice', 'inl') + ' ' + esc(p.name) + ' (' + BOT_LABEL[p.bot].toLowerCase() + ') joue…', () => { token.abort = true; }, ic('skip') + 'Passer');
+    await wait(600);
+    for (const a of actions) {
+      if (token.abort) break;
+      try { await performAction(vis, a, p.name, token); } catch (e) { break; }
+      if (token.abort) break;
+      await wait(300);
+    }
+    const aborted = token.abort;
+    E.endTurn(planned);
+    let saved = null;
+    try { saved = await app.net.saveGame(app.gameId, planned, version); }
+    catch (e) { if (app.replay === token) app.replay = null; hideBanner(); app.botRunning = false; await refresh(); render(); return; }
+    if (app.replay === token) app.replay = null;
+    hideBanner();
+    const prevDisplay = s.display;
+    app.committed = planned; app.version = saved.version; app.lastLogLen = planned.log.length;
+    app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.spiritPrompted = false; app.stageManual = false;
+    if (planned.status === 'finished') { app.botRunning = false; render(); return; }
+    const take = actions.find(x => x.a === 'take');
+    const newDisplay = [];
+    planned.display.forEach((id, i) => { if (id && prevDisplay[i] !== id) newDisplay.push(i); });
+    if (!aborted) await animateRefill(take ? take.slot : undefined, newDisplay);
+    app.botRunning = false;
+    app.viewSeat = isMine() ? planned.turn : (mySeat() >= 0 ? mySeat() : planned.turn);
+    app.stage = autoStage();
+    render();
+    if (isMine()) announceMyTurn();
+    maybeRunBot();
   }
 
   // ---------- Lobby ----------
@@ -576,7 +646,9 @@
       '<p class="note center">' + esc(SIDE_LABEL[s.opts.side]) + (s.opts.spirits ? ' · Esprits de la Nature' : '') + '</p>' +
       '<div class="row"><button class="btn primary" id="share">' + ic('send') + 'Envoyer le lien</button><button class="btn secondary" id="copy">' + ic('copy') + 'Copier</button></div></div>' +
       '<div class="panel"><h2>' + ic('users', 'h') + 'Joueurs (' + s.players.length + '/4)</h2><ul class="players-list">' + s.players.map((p, i) =>
-        '<li>' + seatDot(i) + '<b>' + esc(p.name) + '</b>' + (p.pid === s.host ? ' <span class="note">· hôte</span>' : '') + (p.pid === myPid() ? ' <span class="note">· toi</span>' : '') + '</li>').join('') + '</ul>' +
+        '<li>' + seatDot(i) + '<b>' + esc(p.name) + '</b>' + (p.bot ? ' <span class="note">· ' + BOT_LABEL[p.bot] + '</span>' : '') + (p.pid === s.host ? ' <span class="note">· hôte</span>' : '') + (p.pid === myPid() ? ' <span class="note">· toi</span>' : '') +
+        (host && p.bot ? '<span class="spacer"></span><button class="btn small secondary icon" data-rmbot="' + i + '" title="Retirer">' + ic('x') + '</button>' : '') + '</li>').join('') + '</ul>' +
+      (host && s.players.length < 4 ? '<div class="row" style="margin-top:8px"><select id="botlvl" class="sel"><option value="1">Bot débutant</option><option value="2" selected>Bot confirmé</option><option value="3">Bot expert</option></select><button class="btn secondary small" id="addbot">' + ic('plus') + 'Ajouter un bot</button></div>' : '') +
       (inGame ? '' : '<div class="field" style="margin-top:10px"><label>Ton prénom</label><input type="text" id="jname" maxlength="16" value="' + esc(myName()) + '"></div><button class="btn primary block" id="joinbtn">Rejoindre la partie</button>') +
       '</div>' +
       (host ? '<button class="btn primary block big" id="start" ' + (s.players.length >= 2 ? '' : 'disabled') + '>' + ic('play') + 'Commencer la partie (' + s.players.length + ' joueur' + (s.players.length > 1 ? 's' : '') + ')</button>' +
@@ -595,9 +667,21 @@
       ls.set('harmonies.name', n); Sfx.unlock();
       try { await joinLobby(n); render(); } catch (e) { toast('Impossible de rejoindre : ' + e.message, true); }
     };
+    async function saveLobby(mut) {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const rec = await app.net.loadGame(app.gameId);
+        if (!rec || rec.state.status !== 'lobby') return;
+        const st = rec.state; mut(st);
+        try { const r = await app.net.saveGame(app.gameId, st, rec.version); app.committed = st; app.version = r.version; render(); return; }
+        catch (e) { if (e.code !== 'conflict') { toast('Échec : ' + e.message, true); return; } }
+      }
+    }
+    const ab = $('#addbot'); if (ab) ab.onclick = () => { const lvl = +$('#botlvl').value; saveLobby(st => { if (st.players.length < 4) st.players.push({ pid: 'bot-' + randomId(6, 'abcdefghijklmnopqrstuvwxyz0123456789'), name: 'Bot ' + botName(st.players, lvl), bot: lvl }); }); };
+    $$('[data-rmbot]').forEach(b => { b.onclick = () => { const i = +b.dataset.rmbot; saveLobby(st => { if (st.players[i] && st.players[i].bot) st.players.splice(i, 1); }); }; });
     if (host) $('#start').onclick = async () => {
       Sfx.unlock();
-      const st = E.newGame(s.opts, s.players.map(p => ({ token: p.pid, name: p.name })));
+      if (s.players.every(p => p.bot)) { toast('Il faut au moins un joueur humain', true); return; }
+      const st = E.newGame(s.opts, s.players.map(p => ({ token: p.pid, name: p.name, bot: p.bot || 0 })));
       st.players.forEach((p, i) => { p.pid = s.players[i].pid; });
       st.id = s.id; st.host = s.host; st.mode = 'online';
       try {
@@ -605,6 +689,7 @@
         app.committed = st; app.version = r.version; app.lastLogLen = 0;
         render();
         if (isMine()) announceMyTurn();
+        maybeRunBot();
       } catch (e) { toast('Lancement impossible : ' + e.message, true); refresh(); }
     };
   }
@@ -660,6 +745,7 @@
     if (!isMine()) return 'play';
     const cur = s.cur;
     if (cur.slot === null && !s.market.every(m => !m.length)) return 'choose';
+    if (!cur.actions.some(a => a.a === 'place') && !cur.cardTaken && E.canTakeCard(s)) return 'choose';
     return 'play';
   }
   function setStage(st, manual) {
@@ -680,7 +766,10 @@
     const box = $('.board-fit'), svg = $('.board-fit .board');
     if (!box || !svg) return;
     const ratio = 10.09 / 8.5; // hauteur / largeur de la viewBox du plateau
-    const w = Math.min(box.clientWidth, Math.max(120, box.clientHeight) / ratio);
+    const drawer = $('#drawer');
+    const reserved = drawer ? (drawer.classList.contains('open') ? drawer.offsetHeight + 6 : 30) : 0;
+    box.style.paddingBottom = reserved + 'px';
+    const w = Math.min(box.clientWidth, Math.max(120, box.clientHeight - reserved) / ratio);
     svg.style.width = Math.floor(w) + 'px';
     svg.style.height = Math.floor(w * ratio) + 'px';
   }
@@ -772,8 +861,9 @@
           return '<div class="slot' + (takeable ? ' takeable' : '') + (m.length ? '' : ' empty') + '" data-slot="' + i + '">' + (m.length ? R.slotSVG(m, arriving) : (cur && cur.slot === i ? '<span class="slot-empty">pris</span>' : '')) + '</div>';
         }).join('') + '</div></div>' +
         '<div class="choose-animals"><div class="stage-head">' + secTitle('orange', 'star', 'Animaux') +
-        '<span class="hint' + (canTake ? '' : ' muted') + '">' + (canTake ? 'tu peux en prendre une' : (mine && cur.cardTaken ? 'carte prise ce tour' : (mine ? 'limite de 4 atteinte' : 'une par tour, 4 max'))) + '</span></div>' +
-        '<div class="cards-strip compact"><div class="deck-wrap" title="Pioche">' + R.deckSVG(s.deck.length) + '</div>' +
+        '<span class="hint' + (canTake ? '' : ' muted') + '">' + (canTake ? 'tu peux en prendre une' : (mine && cur.cardTaken ? 'carte prise ce tour' : (mine ? 'limite de 4 atteinte' : 'une par tour, 4 max'))) + '</span>' +
+        '<span class="spacer"></span><span class="deck-wrap mini" title="Pioche">' + R.deckSVG(s.deck.length) + '</span></div>' +
+        '<div class="cards-strip compact">' +
         s.display.map((id, i) => {
           if (!id) return '<div class="card empty" data-display="' + i + '"></div>';
           const card = E.CARD_BY_ID.get(id);
@@ -789,23 +879,18 @@
       for (const h of p2.hand) items.push(cardHTML(E.CARD_BY_ID.get(h.id), { left: h.left, cls: (pcOf(h.id) ? 'placeable' : '') + (anim.arrivingCard === h.id ? ' arriving' : ''), badge: pcOf(h.id) ? ic('cube') + 'Poser' : '', attrs: 'data-mine="1"' }));
       for (const d of p2.done) items.push(cardHTML(E.CARD_BY_ID.get(d.id), { left: 0, cls: 'done', done: true, badge: ic('check'), badgeCls: 'teal', attrs: 'data-mine="1"' }));
       html += '<div class="stage-play"><div class="board-tabs">' + s.players.map((p, i) =>
-        '<button data-seat="' + i + '" class="' + (i === app.viewSeat ? 'on' : '') + '" style="--seat:' + SEAT_COLORS[i] + '">' + seatDot(i) + esc(p.name) + (i === me && app.mode === 'online' ? ' (toi)' : '') + (i === s.turn && s.status === 'playing' ? ic('dice', 'inl') : '') + '<b>' + scores[i].total + '</b></button>').join('') +
+        '<button data-seat="' + i + '" class="' + (i === app.viewSeat ? 'on' : '') + '" style="--seat:' + SEAT_COLORS[i] + '">' + seatDot(i) + esc(p.name) + (p.bot ? ic('cpu', 'inl') : '') + (i === me && app.mode === 'online' ? ' (toi)' : '') + (i === s.turn && s.status === 'playing' ? ic('dice', 'inl') : '') + '<b>' + scores[i].total + '</b></button>').join('') +
         '<span class="spacer"></span><span class="board-info">' + E.emptyCount(p2.board) + ' vides</span></div>' +
         '<div class="board-fit">' + R.boardSVG(p2.board, { legal, targets, last, readonly: !viewingMine, newTop: anim.newTop, newCube: anim.newCube }) + '</div>' +
         cardsBlock();
-      // cartes possédées : repliées pendant la pose des jetons (sauf cube posable), dépliables d'un tap
+      // tiroir des cartes possédées : ouvert par défaut, bouton rond central pour l'ouvrir (+) / le fermer (×)
       function cardsBlock() {
-          const open = app.cardsOpen !== null ? app.cardsOpen : (!(mine && step === 2) || placeable.length > 0);
-          const minis = [];
-          if (p2.spiritChoices && viewingMine) minis.push('<button class="mini spirit choose" id="spirit-choose-mini">' + ic('sparkles') + '<span class="lbl">Esprit ?</span></button>');
-          if (p2.spirit) minis.push(miniCardHTML(E.CARD_BY_ID.get(p2.spirit.id), 1, { placeable: !!pcOf(p2.spirit.id), done: p2.spirit.placed }));
-          for (const h of p2.hand) minis.push(miniCardHTML(E.CARD_BY_ID.get(h.id), h.left, { placeable: !!pcOf(h.id) }));
-          for (const d of p2.done) minis.push(miniCardHTML(E.CARD_BY_ID.get(d.id), 0, { done: true }));
-          return '<div class="my-cards' + (open ? '' : ' folded') + '"><div class="stage-head" id="cards-head">' + secTitle('teal', 'layers', viewingMine ? 'Tes cartes' : 'Cartes de ' + esc(p2.name)) +
-            '<span class="hint muted">' + E.activeCount(p2) + '/4' + (p2.done.length ? ' · ' + p2.done.length + ' finie' + (p2.done.length > 1 ? 's' : '') : '') + '</span><span class="spacer"></span>' +
-            '<button class="btn small secondary" id="cards-sheet" title="Voir en grand">' + ic('layers') + '</button><button class="btn small secondary" id="cards-fold" title="' + (open ? 'Replier' : 'Déplier') + '">' + ic(open ? 'minus' : 'plus') + '</button></div>' +
-            (open ? '<div class="cards-strip compact">' + (items.length ? items.join('') : '<div class="card empty"><div class="empty-text">aucune carte</div></div>') + '</div>' :
-              '<div class="minis">' + (minis.length ? minis.join('') : '<span class="placeholder">aucune carte</span>') + '</div>') + '</div>';
+          const open = app.cardsOpen !== false;
+          return '<div class="drawer' + (open ? ' open' : '') + '" id="drawer"><button class="drawer-toggle" id="drawer-toggle" title="' + (open ? 'Fermer les cartes' : 'Ouvrir les cartes') + '">' + ic(open ? 'x' : 'plus') + '</button>' +
+            (open ? '<div class="stage-head">' + secTitle('teal', 'layers', viewingMine ? 'Tes cartes' : 'Cartes de ' + esc(p2.name)) +
+              '<span class="hint muted">' + E.activeCount(p2) + '/4' + (p2.done.length ? ' · ' + p2.done.length + ' finie' + (p2.done.length > 1 ? 's' : '') : '') + '</span><span class="spacer"></span>' +
+              '<button class="btn small secondary icon" id="cards-sheet" title="Voir en grand">' + ic('layers') + '</button></div>' +
+              '<div class="cards-strip compact">' + (items.length ? items.join('') : '<div class="card empty"><div class="empty-text">aucune carte</div></div>') + '</div>' : '') + '</div>';
       }
       html += '</div>';
     }
@@ -870,16 +955,7 @@
     const reload = $('#reload'); if (reload) reload.onclick = () => { refresh(); toast('Mise à jour…'); };
     const results = $('#results'); if (results) results.onclick = showResults;
     const cs = $('#cards-sheet'); if (cs) cs.onclick = () => showCardsSheet(app.viewSeat, mine, viewingMine, placeable);
-    const cf = $('#cards-fold'); if (cf) cf.onclick = () => { app.cardsOpen = !!$('.my-cards.folded'); renderGame(); };
-    $$('.my-cards .mini[data-card]').forEach(m => {
-      m.onclick = () => {
-        const id = +m.dataset.card;
-        const pc = mine && viewingMine && !app.busy ? placeable.find(x => x.id === id) : null;
-        if (pc) { startCube(pc); return; }
-        cardDetail(E.CARD_BY_ID.get(id), '');
-      };
-    });
-    const spm = $('#spirit-choose-mini'); if (spm) spm.onclick = () => showSpiritChoice();
+    const dt = $('#drawer-toggle'); if (dt) dt.onclick = () => { app.cardsOpen = app.cardsOpen === false; ls.set('harmonies.cardsOpen', app.cardsOpen); renderGame(); };
     $$('.stage .card[data-mine]').forEach(c => {
       c.onclick = ev => {
         const id = +c.dataset.card;
@@ -975,8 +1051,7 @@
     const from = $$('.slot[data-slot="' + slot + '"] .disc').map(rectOf);
     const colors = state.market[slot].slice();
     E.takeTokens(state, slot);
-    if (state === app.work) { app.selToken = 0; app.stageManual = false; }
-    app.stage = 'play';
+    if (state === app.work) { app.selToken = 0; app.stageManual = false; app.stage = autoStage(); }
     renderGame({ arrivingHand: true });
     Sfx.take();
     const toks = $$('.footer .tok');
@@ -1085,7 +1160,7 @@
     app.busy = true;
     try {
       const r = await app.net.saveGame(app.gameId, w, app.version);
-      app.committed = w; app.version = r.version; app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.spiritPrompted = false; app.stageManual = false; app.cardsOpen = null;
+      app.committed = w; app.version = r.version; app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.spiritPrompted = false; app.stageManual = false;
       app.lastLogLen = w.log.length;
       ls.del('harmonies.draft.' + app.gameId);
       app.busy = false;
@@ -1095,11 +1170,11 @@
       if (app.mode === 'local') app.viewSeat = w.turn;
       await animateRefill(slot, newDisplay);
       app.stage = autoStage();
-      if (app.mode === 'local') {
+      if (app.mode === 'local' && !E.current(w).bot) {
         renderGame();
         modal('<h2>' + ic('phone', 'h') + 'Au tour de ' + esc(E.current(w).name) + '</h2><p>Passe le téléphone à ' + esc(E.current(w).name) + '.</p><div class="actions"><button class="btn primary" id="m-ok">C\'est parti</button></div>', { sticky: true });
         $('#m-ok').onclick = () => { closeModal(); render(); announceMyTurn(); };
-      } else render();
+      } else { render(); maybeRunBot(); }
     } catch (e) {
       app.busy = false;
       if (e.code === 'conflict') { toast('La partie a changé entre-temps, rechargement…', true); app.work = null; await refresh(); render(); }
@@ -1147,7 +1222,7 @@
   async function rematch() {
     const s = app.committed;
     closeModal();
-    if (app.mode === 'local') { startLocal(s.opts, s.players.map(p => p.name)); return; }
+    if (app.mode === 'local') { startLocal(s.opts, s.players.map(p => ({ name: p.name, bot: p.bot || 0 }))); return; }
     if (s.rematch) { openOnline(s.rematch); return; }
     try {
       const id = randomId(5);

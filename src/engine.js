@@ -239,7 +239,7 @@
       status: 'playing',
       opts: { side: opts.side === 'B' ? 'B' : 'A', spirits: !!opts.spirits },
       players: players.map((p, i) => ({
-        token: p.token, name: p.name, seat: i,
+        token: p.token, name: p.name, seat: i, bot: p.bot || 0,
         board: emptyBoard(), hand: [], done: [], cubes: 0,
         spirit: null,
         spiritChoices: opts.spirits ? spiritDeck.splice(-2, 2) : null,
