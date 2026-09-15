@@ -398,7 +398,8 @@
   // ---------- Rejeu animé du tour d'un autre joueur ----------
   async function replayTurn(prev, entry, next) {
     const state = E.clone(prev);
-    app.replay = { state, seat: entry.p, abort: false };
+    const token = { state, seat: entry.p, abort: false };
+    app.replay = token;
     app.viewSeat = entry.p;
     const name = next.players[entry.p].name;
     renderGame();
@@ -428,7 +429,8 @@
       if (!app.replay || app.replay.abort) break;
       await wait(350);
     }
-    const aborted = !app.replay || app.replay.abort;
+    const aborted = token.abort;
+    if (app.replay !== token) return; // remplacé par un rejeu plus récent
     app.replay = null;
     hideBanner();
     if (app.committed !== next) { render(); return; } // un état plus récent est arrivé entre-temps
