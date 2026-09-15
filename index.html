@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#4e351d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Harmonies">
+<title>Harmonies</title>
+<!-- build:css --><link rel="stylesheet" href="src/styles.css?t=dev"><!-- /build:css -->
+</head>
+<body>
+<div id="app"></div>
+<!-- build:config --><script src="config.js"></script><!-- /build:config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.min.js"></script>
+<!-- build:js -->
+<script>
+// dev uniquement : chargement sans cache ; le build remplace ce bloc par le code inline.
+['src/cards.js', 'src/engine.js', 'src/render.js', 'src/net.js', 'src/app.js'].forEach(function (f) {
+  document.write('<script src="' + f + '?t=' + Date.now() + '"><\/script>');
+});
+</script>
+<!-- /build:js -->
+</body>
+</html>

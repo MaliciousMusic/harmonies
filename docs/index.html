@@ -1,0 +1,1688 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#4e351d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Harmonies">
+<title>Harmonies</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root {
+  --sand: #f4ead6;
+  --sand-2: #eadcbd;
+  --earth: #6b4a2b;
+  --earth-2: #4e351d;
+  --ink: #2f2418;
+  --muted: #7a6650;
+  --teal: #1f8a80;
+  --teal-2: #17706a;
+  --orange: #e0743d;
+  --orange-2: #c45d2a;
+  --red: #c9433f;
+  --card: #fffaf0;
+  --line: #d9c9a8;
+  --shadow: 0 2px 6px rgba(60, 40, 20, .18);
+  --water: #3d8fc4; --water-d: #2a6a95;
+  --mountain: #8f9498; --mountain-d: #5f6468;
+  --trunk: #7d4b2a; --trunk-d: #52301a;
+  --leaf: #6aa83c; --leaf-d: #467527;
+  --field: #e8b526; --field-d: #b58816;
+  --building: #cf4540; --building-d: #922c29;
+  --hex: #f0dfbc; --hex-line: #c9b08a;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--sand);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.35;
+  overscroll-behavior-y: contain;
+  -webkit-user-select: none; user-select: none;
+}
+button { font: inherit; }
+h1, h2, h3 { margin: 0; font-weight: 700; }
+.hidden { display: none !important; }
+
+/* ---------- Boutons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 16px; border-radius: 12px; border: 0; cursor: pointer;
+  background: var(--teal); color: #fff; font-weight: 700; box-shadow: var(--shadow);
+  min-height: 42px;
+}
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .45; cursor: default; box-shadow: none; }
+.btn.secondary { background: #fff; color: var(--earth); border: 1.5px solid var(--line); box-shadow: none; }
+.btn.warn { background: var(--orange); }
+.btn.ghost { background: transparent; color: var(--teal); box-shadow: none; padding: 6px 10px; min-height: 0; }
+.btn.small { padding: 6px 10px; min-height: 34px; border-radius: 10px; font-size: 14px; }
+.btn.block { width: 100%; }
+
+/* ---------- Écrans ---------- */
+.screen { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+.home { padding: 24px 18px 40px; max-width: 480px; margin: 0 auto; width: 100%; gap: 18px; }
+.home .logo { text-align: center; padding: 14px 0 4px; }
+.home .logo h1 { font-size: 34px; letter-spacing: 3px; color: var(--earth-2); font-family: Georgia, "Times New Roman", serif; }
+.home .logo p { margin: 4px 0 0; color: var(--muted); }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); }
+.panel h2 { font-size: 17px; margin-bottom: 10px; color: var(--earth-2); }
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.field label { font-size: 13px; color: var(--muted); font-weight: 600; }
+input[type=text] {
+  font: inherit; padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--line); background: #fff; width: 100%;
+  -webkit-user-select: text; user-select: text;
+}
+input[type=text]:focus { outline: 2px solid var(--teal); border-color: transparent; }
+.seg { display: flex; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+.seg button { flex: 1; border: 0; background: transparent; padding: 9px 6px; color: var(--muted); font-weight: 600; cursor: pointer; }
+.seg button.on { background: var(--teal); color: #fff; }
+.row { display: flex; gap: 10px; align-items: center; }
+.row > * { flex: 1; }
+.check { display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; }
+.check input { width: 20px; height: 20px; }
+.recent { list-style: none; padding: 0; margin: 0; }
+.recent li { display: flex; align-items: center; gap: 10px; padding: 10px 4px; border-top: 1px solid var(--line); }
+.recent li:first-child { border-top: 0; }
+.recent .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 700; letter-spacing: 2px; color: var(--earth-2); }
+.recent .meta { flex: 1; font-size: 13px; color: var(--muted); }
+.note { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+.code-big { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 36px; letter-spacing: 8px; text-align: center; color: var(--earth-2); padding: 8px 0; }
+.players-list { list-style: none; margin: 0; padding: 0; }
+.players-list li { padding: 8px 0; border-top: 1px solid var(--line); display: flex; gap: 8px; align-items: center; }
+.players-list li:first-child { border-top: 0; }
+.dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+/* ---------- Partie ---------- */
+.game { padding-bottom: calc(92px + var(--safe-bottom)); }
+.topbar {
+  position: sticky; top: 0; z-index: 20; background: var(--earth-2); color: #f6e9cf;
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px; box-shadow: 0 2px 6px rgba(0,0,0,.25);
+}
+.topbar .title { font-family: Georgia, serif; letter-spacing: 2px; font-weight: 700; }
+.topbar .code { font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: 2px; font-size: 13px; opacity: .85; }
+.topbar .spacer { flex: 1; }
+.topbar .icon-btn { background: rgba(255,255,255,.12); border: 0; color: inherit; border-radius: 10px; padding: 6px 10px; font-size: 18px; line-height: 1; cursor: pointer; }
+.status {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--sand-2); border-bottom: 1px solid var(--line);
+  font-weight: 600; flex-wrap: wrap;
+}
+.status .msg { flex: 1; min-width: 160px; }
+.status.mine .msg { color: var(--teal-2); }
+.scores { display: flex; gap: 6px; flex-wrap: wrap; }
+.score-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 999px; background: #fff; border: 1.5px solid var(--line);
+  font-size: 13px; cursor: pointer;
+}
+.score-chip.active { border-color: var(--teal); box-shadow: 0 0 0 2px rgba(31,138,128,.2); }
+.score-chip b { font-size: 14px; }
+
+.section { padding: 10px 12px 4px; }
+.section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.section h3 .hint { text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--orange-2); }
+
+/* Plateau central */
+.market { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.slot {
+  background: var(--earth); border-radius: 14px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  border: 2px solid transparent; min-height: 84px; justify-content: center; position: relative;
+}
+.slot.takeable { cursor: pointer; border-color: #f3c86b; box-shadow: 0 0 0 3px rgba(243,200,107,.35); }
+.slot.takeable:active { transform: scale(.97); }
+.slot.empty { background: rgba(107,74,43,.35); }
+.slot svg { width: 100%; height: auto; display: block; }
+
+/* Plateau perso */
+.board-wrap { padding: 4px 8px 0; }
+.board-tabs { display: flex; gap: 6px; padding: 0 12px 6px; overflow-x: auto; }
+.board-tabs button {
+  border: 1.5px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; font-weight: 600; color: var(--muted); cursor: pointer; white-space: nowrap;
+}
+.board-tabs button.on { background: var(--earth-2); color: #fff; border-color: var(--earth-2); }
+.board {
+  width: 100%; max-width: 440px; margin: 0 auto; display: block;
+  background: radial-gradient(ellipse at 50% 40%, #a8865a 0%, #8b6a42 70%, #6e5232 100%);
+  border-radius: 24px; box-shadow: inset 0 0 0 4px rgba(255,235,200,.15), var(--shadow);
+}
+.board .hex { fill: var(--hex); stroke: var(--hex-line); stroke-width: .06; cursor: pointer; transition: fill .15s; }
+.board .hex.legal { stroke: var(--teal); stroke-width: .12; fill: #dff2ec; }
+.board .hex.target { stroke: var(--orange); stroke-width: .14; fill: #ffe7d2; }
+.board .hex.last { stroke: #fff; stroke-width: .1; }
+.board .legal-dot { fill: var(--teal); opacity: .55; pointer-events: none; }
+.board .target-dot { fill: var(--orange); opacity: .8; pointer-events: none; }
+.board g.stack { pointer-events: none; }
+.board .cube { pointer-events: none; }
+.board.readonly .hex { cursor: default; }
+@keyframes pulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+.board .hex.legal, .board .hex.target { animation: pulse 1.4s ease-in-out infinite; }
+
+/* Barre de jeu (bas) */
+.handbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  background: var(--card); border-top: 1px solid var(--line); padding: 8px 12px calc(8px + var(--safe-bottom));
+  display: flex; align-items: center; gap: 10px; box-shadow: 0 -4px 12px rgba(60,40,20,.12);
+}
+.handbar .tokens { display: flex; gap: 8px; flex: 1; align-items: center; min-height: 48px; }
+.handbar .tokens .placeholder { color: var(--muted); font-size: 14px; }
+.tok {
+  width: 46px; height: 46px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; padding: 0; background: transparent;
+  display: grid; place-items: center;
+}
+.tok svg { width: 40px; height: 40px; display: block; }
+.tok.sel { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(31,138,128,.25); }
+.tok.dead { opacity: .5; }
+.handbar .actions { display: flex; gap: 8px; }
+.handbar .actions .btn { white-space: nowrap; padding: 10px 14px; }
+
+/* Cartes */
+.cards-strip { display: flex; gap: 10px; overflow-x: auto; padding: 4px 12px 10px; scroll-snap-type: x proximity; }
+.card {
+  flex: 0 0 auto; width: 128px; background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 8px 8px 6px;
+  box-shadow: var(--shadow); position: relative; scroll-snap-align: start; cursor: pointer; display: flex; flex-direction: column; gap: 4px;
+}
+.card.spirit { background: #fdf3df; border-color: #e5c06a; }
+.card.takeable { border-color: var(--teal); }
+.card.placeable { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(224,116,61,.25), var(--shadow); }
+.card.done { opacity: .75; }
+.card .head { display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 13px; line-height: 1.15; }
+.card .head .emoji { font-size: 18px; }
+.card .pattern { width: 100%; height: 70px; display: block; }
+.card .track { display: flex; gap: 3px; justify-content: center; align-items: flex-end; min-height: 22px; }
+.card .track .step {
+  min-width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-size: 12px; font-weight: 700;
+  background: #efe5cf; color: var(--muted); padding: 0 4px;
+}
+.card .track .step.cube { background: #2b2118; color: #2b2118; }
+.card .track .step.cur { background: var(--teal); color: #fff; }
+.card .track .step.got { background: #cde9e3; color: var(--teal-2); }
+.card .stripe { position: absolute; left: 0; top: 10px; bottom: 10px; width: 5px; border-radius: 0 4px 4px 0; }
+.card .badge {
+  position: absolute; right: -4px; top: -6px; background: var(--orange); color: #fff; border-radius: 999px; font-size: 12px; font-weight: 700; padding: 3px 8px;
+  box-shadow: var(--shadow);
+}
+.card .badge.teal { background: var(--teal); }
+.card .rule { font-size: 11px; color: var(--muted); line-height: 1.2; }
+.card .cubes-left { font-size: 12px; color: var(--muted); text-align: center; }
+.card.empty { border-style: dashed; background: transparent; box-shadow: none; cursor: default; min-height: 150px; }
+
+/* Journal */
+.log { list-style: none; padding: 0 12px 12px; margin: 0; font-size: 13px; color: var(--muted); }
+.log li { padding: 4px 0; border-top: 1px dashed var(--line); }
+.log li b { color: var(--ink); }
+
+/* ---------- Modales & toasts ---------- */
+.modal-bg { position: fixed; inset: 0; background: rgba(30,20,10,.55); z-index: 50; display: flex; align-items: flex-end; justify-content: center; }
+.modal { background: var(--card); border-radius: 20px 20px 0 0; width: 100%; max-width: 520px; max-height: 88vh; overflow-y: auto; padding: 18px 16px calc(18px + var(--safe-bottom)); box-shadow: 0 -6px 30px rgba(0,0,0,.3); }
+@media (min-width: 600px) { .modal-bg { align-items: center; } .modal { border-radius: 20px; } }
+.modal h2 { font-size: 20px; margin-bottom: 8px; color: var(--earth-2); }
+.modal .actions { display: flex; gap: 10px; margin-top: 14px; }
+.modal .actions .btn { flex: 1; }
+.modal p { margin: 6px 0; }
+.choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.choice-grid .card { width: auto; }
+.card.big { width: 100%; cursor: default; }
+.card.big .pattern { height: 120px; }
+table.scores { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.scores th, table.scores td { padding: 5px 6px; text-align: right; border-bottom: 1px solid var(--line); }
+table.scores th:first-child, table.scores td:first-child { text-align: left; }
+table.scores tr.total td { font-weight: 800; font-size: 16px; border-bottom: 0; }
+.winner { text-align: center; font-size: 20px; font-weight: 800; color: var(--orange-2); margin: 6px 0 10px; }
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(100px + var(--safe-bottom)); z-index: 60;
+  background: var(--earth-2); color: #fff; padding: 10px 16px; border-radius: 12px; box-shadow: var(--shadow); max-width: 92vw; font-weight: 600;
+  animation: toast-in .2s ease-out;
+}
+.toast.err { background: var(--red); }
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.banner {
+  position: fixed; left: 10px; right: 10px; top: 96px; z-index: 40; background: var(--orange); color: #fff; padding: 10px 14px; border-radius: 12px;
+  box-shadow: var(--shadow); font-weight: 700; display: flex; gap: 10px; align-items: center; justify-content: space-between;
+}
+.banner span { flex: 1; }
+.banner button { background: rgba(255,255,255,.2); border: 0; color: #fff; border-radius: 8px; padding: 4px 8px; cursor: pointer; font-weight: 700; }
+.menu { list-style: none; margin: 0; padding: 0; }
+.menu li { padding: 12px 4px; border-top: 1px solid var(--line); cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+.menu li:first-child { border-top: 0; }
+.legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; font-size: 13px; }
+.legend div { display: flex; align-items: center; gap: 8px; }
+.legend svg { width: 26px; height: 26px; flex: none; }
+.rules p { font-size: 14px; }
+.rules ul { padding-left: 18px; font-size: 14px; }
+.rules ul li { margin-bottom: 4px; }
+.conn { width: 9px; height: 9px; border-radius: 50%; background: #9aa; display: inline-block; }
+.conn.on { background: #6fdc8c; }
+.conn.off { background: #e06d6d; }
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>window.HARMONIES_CONFIG = { url: "https://jeqdtpuoufapovxvwtwa.supabase.co", key: "sb_publishable_kTn0yH1LO-vQ7cpjMx8-hQ_ydhfxLDx" };</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.min.js"></script>
+<script>
+// Données des 32 cartes Animaux (1-32) et 10 cartes Esprit de la Nature (33-42).
+// Couleurs : 1 eau/bleu, 2 montagne/gris, 3 tronc/marron, 4 feuillage/vert, 5 champ/jaune, 6 bâtiment/rouge, 7 = base quelconque d'un bâtiment.
+// pat : chaîne d'emplacements ; s = pile attendue (du haut vers le bas), d = direction depuis l'emplacement précédent (0-5), cube = emplacement du cube.
+// pts : valeur de la carte selon le nombre de cubes posés (1er cube -> pts[0], etc.).
+const CARDS = [
+  {"id": 1, "fr": "Crocodile", "en": "Crocodile", "emoji": "🐊", "pts": [4, 9, 15], "pat": [{"s": [4, 3, 3], "d": 0, "cube": false}, {"s": [1], "d": 3, "cube": false}, {"s": [1], "d": 3, "cube": true}], "spirit": false},
+  {"id": 2, "fr": "Raie", "en": "Ray", "emoji": "🐟", "pts": [4, 10, 16], "pat": [{"s": [2], "d": 0, "cube": false}, {"s": [2], "d": 4, "cube": false}, {"s": [1], "d": 2, "cube": true}], "spirit": false},
+  {"id": 3, "fr": "Saumon", "en": "Salmon", "emoji": "🐠", "pts": [3, 6, 10, 16], "pat": [{"s": [2, 2, 2], "d": 0, "cube": false}, {"s": [1], "d": 3, "cube": true}], "spirit": false},
+  {"id": 4, "fr": "Loutre", "en": "Otter", "emoji": "🦦", "pts": [5, 10, 16], "pat": [{"s": [4], "d": 0, "cube": false}, {"s": [4], "d": 3, "cube": false}, {"s": [1], "d": 3, "cube": true}], "spirit": false},
+  {"id": 5, "fr": "Grenouille", "en": "Frog", "emoji": "🐸", "pts": [2, 4, 6, 10, 15], "pat": [{"s": [4], "d": 0, "cube": false}, {"s": [1], "d": 3, "cube": true}], "spirit": false},
+  {"id": 6, "fr": "Canard", "en": "Duck", "emoji": "🦆", "pts": [2, 4, 8, 13], "pat": [{"s": [6, 7], "d": 0, "cube": false}, {"s": [1], "d": 3, "cube": true}], "spirit": false},
+  {"id": 7, "fr": "Flamant rose", "en": "Flamingo", "emoji": "🦩", "pts": [4, 10, 16], "pat": [{"s": [5], "d": 0, "cube": false}, {"s": [1], "d": 3, "cube": true}, {"s": [5], "d": 5, "cube": false}], "spirit": false},
+  {"id": 8, "fr": "Gecko", "en": "Gecko", "emoji": "🦎", "pts": [5, 10, 16], "pat": [{"s": [5], "d": 0, "cube": false}, {"s": [5], "d": 3, "cube": false}, {"s": [6, 7], "d": 3, "cube": true}], "spirit": false},
+  {"id": 9, "fr": "Musaraigne", "en": "Shrew", "emoji": "🐭", "pts": [5, 10, 17], "pat": [{"s": [5], "d": 0, "cube": false}, {"s": [6, 7], "d": 2, "cube": true}, {"s": [5], "d": 3, "cube": false}], "spirit": false},
+  {"id": 10, "fr": "Paon", "en": "Peacock", "emoji": "🦚", "pts": [5, 10, 17], "pat": [{"s": [1], "d": 0, "cube": false}, {"s": [6, 7], "d": 2, "cube": true}, {"s": [1], "d": 3, "cube": false}], "spirit": false},
+  {"id": 11, "fr": "Écureuil", "en": "Squirrel", "emoji": "🐿️", "pts": [4, 9, 15], "pat": [{"s": [4, 3, 3], "d": 0, "cube": false}, {"s": [6, 7], "d": 3, "cube": true}], "spirit": false},
+  {"id": 12, "fr": "Hérisson", "en": "Hedgehog", "emoji": "🦔", "pts": [5, 12], "pat": [{"s": [4, 3], "d": 0, "cube": false}, {"s": [6, 7], "d": 3, "cube": true}, {"s": [4, 3], "d": 5, "cube": false}], "spirit": false},
+  {"id": 13, "fr": "Abeille", "en": "Bee", "emoji": "🐝", "pts": [8, 18], "pat": [{"s": [5], "d": 0, "cube": false}, {"s": [4, 3], "d": 2, "cube": true}, {"s": [5], "d": 4, "cube": false}, {"s": [5], "d": 2, "cube": false}], "spirit": false},
+  {"id": 14, "fr": "Ours", "en": "Bear", "emoji": "🐻", "pts": [5, 11], "pat": [{"s": [2, 2], "d": 0, "cube": false}, {"s": [4], "d": 3, "cube": true}, {"s": [2, 2], "d": 5, "cube": false}], "spirit": false},
+  {"id": 15, "fr": "Lapin", "en": "Rabbit", "emoji": "🐰", "pts": [5, 10, 17], "pat": [{"s": [6, 7], "d": 0, "cube": false}, {"s": [4], "d": 3, "cube": false}, {"s": [4], "d": 3, "cube": true}], "spirit": false},
+  {"id": 16, "fr": "Ara", "en": "Macaw", "emoji": "🦜", "pts": [4, 9, 14], "pat": [{"s": [1], "d": 0, "cube": false}, {"s": [4, 3], "d": 3, "cube": true}, {"s": [1], "d": 5, "cube": false}], "spirit": false},
+  {"id": 17, "fr": "Sanglier", "en": "Boar", "emoji": "🐗", "pts": [4, 8, 13], "pat": [{"s": [6, 7], "d": 0, "cube": false}, {"s": [4, 3], "d": 3, "cube": true}], "spirit": false},
+  {"id": 18, "fr": "Koala", "en": "Koala", "emoji": "🐨", "pts": [3, 6, 10, 15], "pat": [{"s": [4], "d": 0, "cube": false}, {"s": [4, 3], "d": 3, "cube": true}], "spirit": false},
+  {"id": 19, "fr": "Loup", "en": "Wolf", "emoji": "🐺", "pts": [4, 10, 16], "pat": [{"s": [5], "d": 0, "cube": false}, {"s": [4, 3, 3], "d": 3, "cube": true}, {"s": [5], "d": 5, "cube": false}], "spirit": false},
+  {"id": 20, "fr": "Martin-pêcheur", "en": "Kingfisher", "emoji": "🐦", "pts": [5, 11, 18], "pat": [{"s": [1], "d": 0, "cube": false}, {"s": [4, 3, 3], "d": 2, "cube": true}, {"s": [1], "d": 3, "cube": false}], "spirit": false},
+  {"id": 21, "fr": "Manchot", "en": "Penguin", "emoji": "🐧", "pts": [4, 10, 16], "pat": [{"s": [1], "d": 0, "cube": false}, {"s": [2], "d": 2, "cube": true}, {"s": [1], "d": 3, "cube": false}], "spirit": false},
+  {"id": 22, "fr": "Chauve-souris", "en": "Bat", "emoji": "🦇", "pts": [3, 6, 10, 15], "pat": [{"s": [4, 3, 3], "d": 0, "cube": false}, {"s": [2], "d": 3, "cube": true}], "spirit": false},
+  {"id": 23, "fr": "Fennec", "en": "Fennec", "emoji": "🦊", "pts": [4, 9, 16], "pat": [{"s": [5], "d": 0, "cube": false}, {"s": [2], "d": 3, "cube": false}, {"s": [2], "d": 3, "cube": true}], "spirit": false},
+  {"id": 24, "fr": "Macaque", "en": "Macaque", "emoji": "🐒", "pts": [5, 11], "pat": [{"s": [1], "d": 0, "cube": false}, {"s": [2, 2], "d": 3, "cube": true}, {"s": [1], "d": 5, "cube": false}], "spirit": false},
+  {"id": 25, "fr": "Bateleur", "en": "Bateleur", "emoji": "🦅", "pts": [5, 11], "pat": [{"s": [5], "d": 0, "cube": false}, {"s": [2, 2, 2], "d": 3, "cube": true}], "spirit": false},
+  {"id": 26, "fr": "Suricate", "en": "Meerkat", "emoji": "🐾", "pts": [2, 5, 9, 14], "pat": [{"s": [5], "d": 0, "cube": false}, {"s": [2], "d": 3, "cube": true}], "spirit": false},
+  {"id": 27, "fr": "Corbeau", "en": "Crow", "emoji": "🐦‍⬛", "pts": [4, 9], "pat": [{"s": [6, 7], "d": 0, "cube": false}, {"s": [5], "d": 2, "cube": true}, {"s": [6, 7], "d": 3, "cube": false}], "spirit": false},
+  {"id": 28, "fr": "Alpaga", "en": "Alpaca", "emoji": "🦙", "pts": [5, 12], "pat": [{"s": [2, 2], "d": 0, "cube": false}, {"s": [5], "d": 3, "cube": false}, {"s": [5], "d": 3, "cube": true}], "spirit": false},
+  {"id": 29, "fr": "Renard polaire", "en": "Arctic fox", "emoji": "❄️", "pts": [5, 10, 17], "pat": [{"s": [4, 3], "d": 0, "cube": false}, {"s": [5], "d": 2, "cube": true}, {"s": [4, 3], "d": 3, "cube": false}], "spirit": false},
+  {"id": 30, "fr": "Raton laveur", "en": "Raccoon", "emoji": "🦝", "pts": [6, 12], "pat": [{"s": [1], "d": 0, "cube": false}, {"s": [5], "d": 2, "cube": true}, {"s": [1], "d": 4, "cube": false}, {"s": [1], "d": 2, "cube": false}], "spirit": false},
+  {"id": 31, "fr": "Coccinelle", "en": "Ladybug", "emoji": "🐞", "pts": [2, 5, 8, 12, 17], "pat": [{"s": [4], "d": 0, "cube": false}, {"s": [5], "d": 3, "cube": true}], "spirit": false},
+  {"id": 32, "fr": "Panthère", "en": "Panther", "emoji": "🐆", "pts": [5, 11], "pat": [{"s": [4, 3], "d": 0, "cube": false}, {"s": [4, 3], "d": 3, "cube": false}, {"s": [5], "d": 3, "cube": true}], "spirit": false},
+  {"id": 33, "fr": "Lion", "en": "Lion", "emoji": "🦁", "pts": [], "pat": [{"s": [4, 3], "d": 0, "cube": false}, {"s": [5], "d": 3, "cube": true}, {"s": [5], "d": 3, "cube": false}], "spirit": true, "rule": "10 pts par groupe de 3 jetons jaunes ou plus, 2 pts par groupe de 1 ou 2"},
+  {"id": 34, "fr": "Papillon", "en": "Butterfly", "emoji": "🦋", "pts": [], "pat": [{"s": [5], "d": 0, "cube": false}, {"s": [1], "d": 2, "cube": false}, {"s": [1], "d": 4, "cube": false}, {"s": [5], "d": 2, "cube": true}], "spirit": true, "rule": "5 pts par groupe de jetons jaunes (taille quelconque)"},
+  {"id": 35, "fr": "Élan", "en": "Elk", "emoji": "🫎", "pts": [], "pat": [{"s": [4, 3, 3], "d": 0, "cube": false}, {"s": [4, 3], "d": 3, "cube": true}, {"s": [4], "d": 3, "cube": false}], "spirit": true, "rule": "4 pts par arbre de hauteur 2 ou 3"},
+  {"id": 36, "fr": "Hibou", "en": "Owl", "emoji": "🦉", "pts": [], "pat": [{"s": [4], "d": 0, "cube": false}, {"s": [4, 3, 3], "d": 3, "cube": true}, {"s": [4], "d": 5, "cube": false}], "spirit": true, "rule": "3 pts par arbre de hauteur 1 ou 2, 1 pt par arbre de hauteur 3"},
+  {"id": 37, "fr": "Chat", "en": "Cat", "emoji": "🐈", "pts": [], "pat": [{"s": [6, 7], "d": 0, "cube": false}, {"s": [4], "d": 3, "cube": false}, {"s": [6, 7], "d": 3, "cube": true}], "spirit": true, "rule": "4 pts par groupe de bâtiments (taille quelconque)"},
+  {"id": 38, "fr": "Cigogne", "en": "Stork", "emoji": "🕊️", "pts": [], "pat": [{"s": [5], "d": 0, "cube": false}, {"s": [6, 7], "d": 3, "cube": false}, {"s": [6, 7], "d": 3, "cube": true}], "spirit": true, "rule": "6 pts par groupe de 2 bâtiments ou plus"},
+  {"id": 39, "fr": "Bélier", "en": "Ram", "emoji": "🐏", "pts": [], "pat": [{"s": [2, 2], "d": 0, "cube": false}, {"s": [2, 2, 2], "d": 3, "cube": true}], "spirit": true, "rule": "4 pts par montagne de hauteur 2 ou 3 (même isolée)"},
+  {"id": 40, "fr": "Castor", "en": "Beaver", "emoji": "🦫", "pts": [], "pat": [{"s": [2], "d": 0, "cube": false}, {"s": [2, 2], "d": 2, "cube": true}, {"s": [2], "d": 3, "cube": false}], "spirit": true, "rule": "3 pts par montagne de hauteur 1 ou 2, 1 pt par montagne de hauteur 3 (même isolée)"},
+  {"id": 41, "fr": "Libellule", "en": "Dragonfly", "emoji": "🪰", "pts": [], "pat": [{"s": [4, 3], "d": 0, "cube": false}, {"s": [1], "d": 3, "cube": true}, {"s": [4, 3], "d": 3, "cube": false}], "spirit": true, "rule": "7 pts par groupe de 2 jetons bleus ou plus"},
+  {"id": 42, "fr": "Tortue", "en": "Tortoise", "emoji": "🐢", "pts": [], "pat": [{"s": [2, 2], "d": 0, "cube": false}, {"s": [1], "d": 3, "cube": true}, {"s": [1], "d": 3, "cube": false}], "spirit": true, "rule": "2 pts par jeton bleu"},
+];
+if (typeof module !== 'undefined') module.exports = { CARDS };
+else if (typeof self !== 'undefined') self.CARDS = CARDS;
+
+</script>
+<script>
+// Moteur de règles Harmonies (Libellud, 2024) — logique pure, sans DOM.
+// Fonctionne dans le navigateur (globals) et sous Node (module.exports) pour les tests.
+(function (root, factory) {
+  if (typeof module !== 'undefined' && module.exports) module.exports = factory(require('./cards.js').CARDS);
+  else root.Engine = factory(root.CARDS);
+})(typeof self !== 'undefined' ? self : this, function (CARDS) {
+  'use strict';
+
+  // ---------- Constantes ----------
+  const COLOR_NAMES = { 1: 'eau', 2: 'montagne', 3: 'tronc', 4: 'feuillage', 5: 'champ', 6: 'bâtiment' };
+  const TOKEN_COUNTS = { 1: 23, 2: 23, 3: 21, 4: 19, 5: 19, 6: 15 }; // 120 jetons
+  const CARD_BY_ID = new Map(CARDS.map(c => [c.id, c]));
+  const ANIMAL_IDS = CARDS.filter(c => !c.spirit).map(c => c.id);
+  const SPIRIT_IDS = CARDS.filter(c => c.spirit).map(c => c.id);
+  const MAX_ACTIVE_CARDS = 4;
+
+  // ---------- Plateau : hexagones à sommet plat, colonnes décalées (odd-q) ----------
+  // 5 colonnes : colonnes paires 5 cases (r 0..4), colonnes impaires 4 cases (r 0..3), décalées d'une demi-case vers le bas.
+  const CELLS = [];
+  for (let c = 0; c < 5; c++) {
+    const n = c % 2 === 0 ? 5 : 4;
+    for (let r = 0; r < n; r++) CELLS.push({ c, r });
+  }
+  const cellKey = (c, r) => c + ',' + r;
+  const CELL_INDEX = new Map(CELLS.map((cell, i) => [cellKey(cell.c, cell.r), i]));
+  const DIRS_EVEN = [[1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [0, 1]];
+  const DIRS_ODD = [[1, 1], [1, 0], [0, -1], [-1, 0], [-1, 1], [0, 1]];
+  function neighborCoord(c, r, d) {
+    const dd = (c & 1) ? DIRS_ODD[d] : DIRS_EVEN[d];
+    return { c: c + dd[0], r: r + dd[1] };
+  }
+  const NEIGHBORS = CELLS.map(({ c, r }) => {
+    const res = [];
+    for (let d = 0; d < 6; d++) {
+      const n = neighborCoord(c, r, d);
+      const i = CELL_INDEX.get(cellKey(n.c, n.r));
+      if (i !== undefined) res.push(i);
+    }
+    return res;
+  });
+
+  // ---------- Utilitaires ----------
+  function shuffle(arr, rng) {
+    rng = rng || Math.random;
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+  const clone = obj => JSON.parse(JSON.stringify(obj));
+  const top = s => (s.length ? s[s.length - 1] : 0);
+  const isMountain = s => s.length > 0 && s.every(t => t === 2);
+  const isBuilding = s => s.length === 2 && s[1] === 6 && (s[0] === 2 || s[0] === 3 || s[0] === 6);
+  function treeHeight(s) {
+    // hauteur d'un arbre (feuillage sur 0, 1 ou 2 troncs), 0 sinon
+    if (top(s) !== 4) return 0;
+    for (let i = 0; i < s.length - 1; i++) if (s[i] !== 3) return 0;
+    return s.length;
+  }
+  function emptyBoard() {
+    return CELLS.map(() => ({ s: [], cube: null }));
+  }
+
+  // ---------- Règles de pose ----------
+  // Le schéma officiel : niveau 3 = gris sur gris-gris, vert sur marron-marron ; niveau 2 = gris/gris, rouge/gris, rouge/rouge,
+  // rouge/marron, marron/marron, vert/marron ; niveau 1 = n'importe quelle couleur. Bleu et jaune uniquement au sol.
+  function canPlace(cell, color) {
+    if (cell.cube) return false;
+    const s = cell.s, h = s.length;
+    if (h >= 3) return false;
+    switch (color) {
+      case 1: case 5: return h === 0;
+      case 2: return s.every(t => t === 2);
+      case 3: return h < 2 && s.every(t => t === 3);
+      case 4: return s.every(t => t === 3);
+      case 6: return h < 2 && (h === 0 || s[h - 1] === 2 || s[h - 1] === 3 || s[h - 1] === 6);
+      default: return false;
+    }
+  }
+  function legalCells(board, color) {
+    const out = [];
+    for (let i = 0; i < board.length; i++) if (canPlace(board[i], color)) out.push(i);
+    return out;
+  }
+
+  // ---------- Motifs des cartes ----------
+  function patternCells(originIdx, pat, rot) {
+    let { c, r } = CELLS[originIdx];
+    const res = [originIdx];
+    for (let k = 1; k < pat.length; k++) {
+      const n = neighborCoord(c, r, (pat[k].d + rot) % 6);
+      const i = CELL_INDEX.get(cellKey(n.c, n.r));
+      if (i === undefined) return null;
+      res.push(i);
+      c = n.c; r = n.r;
+    }
+    return res;
+  }
+  function stackMatches(s, want) {
+    if (want.length === 2 && want[0] === 6 && want[1] === 7) return isBuilding(s);
+    if (s.length !== want.length) return false;
+    for (let i = 0; i < want.length; i++) if (s[s.length - 1 - i] !== want[i]) return false;
+    return true;
+  }
+  // Toutes les réalisations du motif de la carte sur le plateau (rotations 0..5), cube posable uniquement sur une case libre de cube.
+  function findMatches(board, card) {
+    const out = [], seen = new Set();
+    for (let o = 0; o < CELLS.length; o++) {
+      for (let rot = 0; rot < 6; rot++) {
+        const cells = patternCells(o, card.pat, rot);
+        if (!cells) continue;
+        let ok = true, cubeCell = -1;
+        for (let k = 0; k < cells.length && ok; k++) {
+          const cell = board[cells[k]];
+          if (!stackMatches(cell.s, card.pat[k].s)) ok = false;
+          else if (card.pat[k].cube) { cubeCell = cells[k]; if (cell.cube) ok = false; }
+        }
+        if (!ok) continue;
+        const sig = cells.slice().sort((a, b) => a - b).join('-') + ':' + cubeCell;
+        if (!seen.has(sig)) { seen.add(sig); out.push({ cells, cubeCell }); }
+      }
+    }
+    return out;
+  }
+  function cubeTargets(board, card) {
+    const set = new Set();
+    for (const m of findMatches(board, card)) set.add(m.cubeCell);
+    return [...set];
+  }
+
+  // ---------- Score ----------
+  function components(indices) {
+    const inSet = new Set(indices), seen = new Set(), groups = [];
+    for (const start of indices) {
+      if (seen.has(start)) continue;
+      const group = [], stack = [start];
+      seen.add(start);
+      while (stack.length) {
+        const i = stack.pop();
+        group.push(i);
+        for (const j of NEIGHBORS[i]) if (inSet.has(j) && !seen.has(j)) { seen.add(j); stack.push(j); }
+      }
+      groups.push(group);
+    }
+    return groups;
+  }
+  // Longueur de la meilleure rivière : nombre de jetons du plus court chemin entre les deux extrémités les plus éloignées.
+  function longestRiver(board) {
+    const water = new Set();
+    board.forEach((cell, i) => { if (top(cell.s) === 1) water.add(i); });
+    let best = 0;
+    for (const start of water) {
+      const dist = new Map([[start, 1]]);
+      const queue = [start];
+      while (queue.length) {
+        const i = queue.shift();
+        const d = dist.get(i);
+        if (d > best) best = d;
+        for (const j of NEIGHBORS[i]) if (water.has(j) && !dist.has(j)) { dist.set(j, d + 1); queue.push(j); }
+      }
+    }
+    return best;
+  }
+  function riverPoints(n) {
+    if (n < 2) return 0;
+    const table = [0, 0, 2, 5, 8, 11, 15];
+    return n <= 6 ? table[n] : 15 + 4 * (n - 6);
+  }
+  function islands(board) {
+    const land = [];
+    board.forEach((cell, i) => { if (top(cell.s) !== 1) land.push(i); });
+    return Math.max(1, components(land).length);
+  }
+  function scoreLandscape(board, side) {
+    let trees = 0, mountains = 0, buildings = 0;
+    board.forEach((cell, i) => {
+      const s = cell.s;
+      const th = treeHeight(s);
+      if (th) trees += [0, 1, 3, 7][th];
+      if (isMountain(s) && NEIGHBORS[i].some(j => isMountain(board[j].s))) mountains += [0, 1, 3, 7][s.length];
+      if (isBuilding(s)) {
+        const colors = new Set();
+        for (const j of NEIGHBORS[i]) { const t = top(board[j].s); if (t) colors.add(t); }
+        if (colors.size >= 3) buildings += 5;
+      }
+    });
+    const fieldCells = [];
+    board.forEach((cell, i) => { if (top(cell.s) === 5) fieldCells.push(i); });
+    const fields = components(fieldCells).filter(g => g.length >= 2).length * 5;
+    const water = side === 'B' ? islands(board) * 5 : riverPoints(longestRiver(board));
+    return { trees, mountains, fields, buildings, water };
+  }
+  function cardValue(card, cubesLeft) {
+    const placed = card.pts.length - cubesLeft;
+    return placed > 0 ? card.pts[placed - 1] : 0;
+  }
+  function scoreSpirit(board, id) {
+    const groupsOf = pred => components(board.map((cell, i) => (pred(cell.s) ? i : -1)).filter(i => i >= 0));
+    const countTrees = hs => board.filter(cell => hs.includes(treeHeight(cell.s))).length;
+    const countMountains = hs => board.filter(cell => isMountain(cell.s) && hs.includes(cell.s.length)).length;
+    switch (id) {
+      case 33: return groupsOf(s => top(s) === 5).reduce((a, g) => a + (g.length >= 3 ? 10 : 2), 0);
+      case 34: return groupsOf(s => top(s) === 5).length * 5;
+      case 35: return countTrees([2, 3]) * 4;
+      case 36: return countTrees([1, 2]) * 3 + countTrees([3]);
+      case 37: return groupsOf(isBuilding).length * 4;
+      case 38: return groupsOf(isBuilding).filter(g => g.length >= 2).length * 6;
+      case 39: return countMountains([2, 3]) * 4;
+      case 40: return countMountains([1, 2]) * 3 + countMountains([3]);
+      case 41: return groupsOf(s => top(s) === 1).filter(g => g.length >= 2).length * 7;
+      case 42: return board.filter(cell => top(cell.s) === 1).length * 2;
+      default: return 0;
+    }
+  }
+  function scorePlayer(player, side) {
+    const land = scoreLandscape(player.board, side);
+    let animals = 0;
+    for (const h of player.hand) animals += cardValue(CARD_BY_ID.get(h.id), h.left);
+    for (const d of player.done) animals += cardValue(CARD_BY_ID.get(d.id), 0);
+    const spirit = player.spirit && player.spirit.placed ? scoreSpirit(player.board, player.spirit.id) : 0;
+    const total = land.trees + land.mountains + land.fields + land.buildings + land.water + animals + spirit;
+    return Object.assign(land, { animals, spirit, total });
+  }
+
+  // ---------- Partie ----------
+  function newGame(opts, players, rng) {
+    rng = rng || Math.random;
+    const bag = [];
+    for (const [color, n] of Object.entries(TOKEN_COUNTS)) for (let i = 0; i < n; i++) bag.push(Number(color));
+    shuffle(bag, rng);
+    const market = [];
+    for (let i = 0; i < 5; i++) market.push(bag.splice(-3, 3));
+    const deck = shuffle(ANIMAL_IDS.slice(), rng);
+    const display = deck.splice(-5, 5);
+    const spiritDeck = shuffle(SPIRIT_IDS.slice(), rng);
+    const state = {
+      v: 1,
+      status: 'playing',
+      opts: { side: opts.side === 'B' ? 'B' : 'A', spirits: !!opts.spirits },
+      players: players.map((p, i) => ({
+        token: p.token, name: p.name, seat: i,
+        board: emptyBoard(), hand: [], done: [], cubes: 0,
+        spirit: null,
+        spiritChoices: opts.spirits ? spiritDeck.splice(-2, 2) : null,
+        turns: 0,
+      })),
+      bag, market, deck, display,
+      first: Math.floor(rng() * players.length),
+      turn: 0, turnNo: 1,
+      finalRound: false, endReason: null,
+      log: [],
+      cur: null,
+    };
+    state.turn = state.first;
+    state.cur = newTurn();
+    return state;
+  }
+  function newTurn() {
+    return { slot: null, tokens: [], cardTaken: false, actions: [] };
+  }
+  const current = state => state.players[state.turn];
+  const activeCount = p => p.hand.length + (p.spirit && !p.spirit.placed ? 1 : 0);
+  const emptyCount = board => board.filter(cell => cell.s.length === 0).length;
+
+  function assert(cond, msg) { if (!cond) throw new Error(msg); }
+
+  function takeTokens(state, slot) {
+    assert(state.status === 'playing', 'partie terminée');
+    assert(state.cur.slot === null, 'jetons déjà pris ce tour');
+    assert(slot >= 0 && slot < 5 && state.market[slot].length > 0, 'emplacement vide');
+    state.cur.slot = slot;
+    state.cur.tokens = state.market[slot].slice();
+    state.market[slot] = [];
+    state.cur.actions.push({ a: 'take', tokens: state.cur.tokens.slice() });
+  }
+  function placeToken(state, handIdx, cellIdx) {
+    const cur = state.cur;
+    assert(handIdx >= 0 && handIdx < cur.tokens.length, 'jeton invalide');
+    const color = cur.tokens[handIdx];
+    const cell = current(state).board[cellIdx];
+    assert(cell && canPlace(cell, color), 'pose illégale');
+    cell.s.push(color);
+    cur.tokens.splice(handIdx, 1);
+    cur.actions.push({ a: 'place', color, cell: cellIdx });
+  }
+  // Un jeton sans aucune case légale est défaussé (cas limite de fin de partie).
+  function discardToken(state, handIdx) {
+    const cur = state.cur;
+    const color = cur.tokens[handIdx];
+    assert(color !== undefined, 'jeton invalide');
+    assert(legalCells(current(state).board, color).length === 0, 'ce jeton peut encore être posé');
+    cur.tokens.splice(handIdx, 1);
+    cur.actions.push({ a: 'discard', color });
+  }
+  function canTakeCard(state) {
+    return state.status === 'playing' && !state.cur.cardTaken && activeCount(current(state)) < MAX_ACTIVE_CARDS;
+  }
+  function takeCard(state, displayIdx) {
+    assert(canTakeCard(state), 'carte impossible à prendre');
+    const id = state.display[displayIdx];
+    assert(id, 'emplacement vide');
+    const card = CARD_BY_ID.get(id);
+    state.display[displayIdx] = null;
+    current(state).hand.push({ id, left: card.pts.length });
+    state.cur.cardTaken = true;
+    state.cur.actions.push({ a: 'card', id });
+  }
+  function chooseSpirit(state, id) {
+    const p = current(state);
+    assert(p.spiritChoices && p.spiritChoices.includes(id), 'choix invalide');
+    p.spirit = { id, placed: false };
+    p.spiritChoices = null;
+    state.cur.actions.push({ a: 'spirit', id });
+  }
+  // Cartes (main + esprit) pour lesquelles un cube est posable, avec les cases candidates.
+  function placeableCubes(state) {
+    const p = current(state);
+    const out = [];
+    for (const h of p.hand) {
+      const targets = cubeTargets(p.board, CARD_BY_ID.get(h.id));
+      if (targets.length) out.push({ id: h.id, targets });
+    }
+    if (p.spirit && !p.spirit.placed) {
+      const targets = cubeTargets(p.board, CARD_BY_ID.get(p.spirit.id));
+      if (targets.length) out.push({ id: p.spirit.id, targets, spirit: true });
+    }
+    return out;
+  }
+  function placeCube(state, cardId, cellIdx) {
+    const p = current(state);
+    const card = CARD_BY_ID.get(cardId);
+    assert(card, 'carte inconnue');
+    assert(cubeTargets(p.board, card).includes(cellIdx), 'habitat non réalisé sur cette case');
+    if (card.spirit) {
+      assert(p.spirit && p.spirit.id === cardId && !p.spirit.placed, 'esprit déjà posé');
+      p.spirit.placed = true;
+      p.board[cellIdx].cube = { id: cardId, sp: true };
+    } else {
+      const hi = p.hand.findIndex(h => h.id === cardId);
+      assert(hi >= 0, 'carte non détenue');
+      const h = p.hand[hi];
+      h.left -= 1;
+      p.board[cellIdx].cube = { id: cardId };
+      if (h.left === 0) { p.hand.splice(hi, 1); p.done.push({ id: cardId, left: 0 }); }
+    }
+    p.cubes += 1;
+    state.cur.actions.push({ a: 'cube', id: cardId, cell: cellIdx });
+  }
+  function turnStatus(state) {
+    const p = current(state), cur = state.cur;
+    const marketEmpty = state.market.every(m => m.length === 0);
+    const reasons = [];
+    if (cur.slot === null && !marketEmpty) reasons.push('prends 3 jetons');
+    if (cur.tokens.length) reasons.push('pose tes jetons (' + cur.tokens.length + ')');
+    if (p.spiritChoices) reasons.push('choisis ton Esprit');
+    return { ok: reasons.length === 0, reasons };
+  }
+  function endTurn(state) {
+    const st = turnStatus(state);
+    assert(st.ok, st.reasons.join(', '));
+    const p = current(state), cur = state.cur;
+    p.turns += 1;
+    // Recharge du plateau central
+    if (cur.slot !== null) {
+      if (state.bag.length === 0) { state.finalRound = true; state.endReason = state.endReason || 'bag'; }
+      else state.market[cur.slot] = state.bag.splice(-Math.min(3, state.bag.length));
+    }
+    // Recharge des cartes Animaux
+    for (let i = 0; i < 5; i++) if (!state.display[i] && state.deck.length) state.display[i] = state.deck.pop();
+    // Fin de partie : 2 cases vides ou moins
+    if (emptyCount(p.board) <= 2) { state.finalRound = true; state.endReason = state.endReason || 'board'; }
+    state.log.push({ n: state.turnNo, p: state.turn, actions: cur.actions });
+    if (state.log.length > 60) state.log.splice(0, state.log.length - 60);
+    const next = (state.turn + 1) % state.players.length;
+    if (state.finalRound && next === state.first) {
+      state.status = 'finished';
+      state.cur = null;
+      state.result = finalResult(state);
+    } else {
+      state.turn = next;
+      state.turnNo += 1;
+      state.cur = newTurn();
+    }
+  }
+  function finalResult(state) {
+    const scores = state.players.map((p, i) => Object.assign({ seat: i, name: p.name, cubes: p.cubes }, scorePlayer(p, state.opts.side)));
+    const ranked = scores.slice().sort((a, b) => b.total - a.total || b.cubes - a.cubes);
+    const best = ranked[0];
+    const winners = ranked.filter(s => s.total === best.total && s.cubes === best.cubes).map(s => s.seat);
+    return { scores, winners };
+  }
+
+  // Résumé texte des actions d'un tour (pour le journal).
+  const COLOR_EMOJI = { 1: '🟦', 2: '⬜', 3: '🟫', 4: '🟩', 5: '🟨', 6: '🟥' };
+  function describeActions(actions) {
+    const parts = [];
+    for (const a of actions) {
+      if (a.a === 'take') parts.push(a.tokens.map(t => COLOR_EMOJI[t]).join(''));
+      else if (a.a === 'card') parts.push('carte ' + CARD_BY_ID.get(a.id).fr);
+      else if (a.a === 'cube') parts.push('cube ' + CARD_BY_ID.get(a.id).emoji + ' ' + CARD_BY_ID.get(a.id).fr);
+      else if (a.a === 'spirit') parts.push('esprit ' + CARD_BY_ID.get(a.id).fr);
+      else if (a.a === 'discard') parts.push('défausse ' + COLOR_EMOJI[a.color]);
+    }
+    return parts.join(' · ');
+  }
+
+  return {
+    CARDS, CARD_BY_ID, COLOR_NAMES, COLOR_EMOJI, TOKEN_COUNTS, CELLS, NEIGHBORS, MAX_ACTIVE_CARDS,
+    neighborCoord, canPlace, legalCells, patternCells, stackMatches, findMatches, cubeTargets,
+    components, longestRiver, riverPoints, islands, scoreLandscape, scoreSpirit, scorePlayer, cardValue,
+    newGame, newTurn, current, activeCount, emptyCount, takeTokens, placeToken, discardToken,
+    canTakeCard, takeCard, chooseSpirit, placeableCubes, placeCube, turnStatus, endTurn, finalResult,
+    describeActions, shuffle, clone, emptyBoard, treeHeight, isMountain, isBuilding, top,
+  };
+});
+
+</script>
+<script>
+// Rendu SVG : jetons, plateaux, motifs de cartes. Chaînes SVG (innerHTML), pas de dépendance.
+(function (root) {
+  'use strict';
+  const E = root.Engine;
+  const SQ3 = Math.sqrt(3);
+  const FILL = { 1: '#3d8fc4', 2: '#8f9498', 3: '#7d4b2a', 4: '#6aa83c', 5: '#e8b526', 6: '#cf4540' };
+  const DARK = { 1: '#2a6a95', 2: '#5f6468', 3: '#52301a', 4: '#467527', 5: '#b58816', 6: '#922c29' };
+  const LIGHT = { 1: '#6fb3dc', 2: '#b3b7bb', 3: '#9a6440', 4: '#8cc75a', 5: '#f2cb55', 6: '#e0655f' };
+
+  const esc = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+
+  function hexPoints(cx, cy, size) {
+    const pts = [];
+    for (let i = 0; i < 6; i++) {
+      const a = Math.PI / 3 * i;
+      pts.push((cx + size * Math.cos(a)).toFixed(3) + ',' + (cy + size * Math.sin(a)).toFixed(3));
+    }
+    return pts.join(' ');
+  }
+  function cellCenter(c, r) {
+    return { x: 1.5 * c, y: SQ3 * (r + (c % 2 ? 0.5 : 0)) };
+  }
+
+  // Un disque de jeton (vue 3/4) dessiné à (x, y) — y = centre de la face supérieure.
+  function disc(x, y, color, rx, ry, thick) {
+    return '<ellipse cx="' + x + '" cy="' + (y + thick) + '" rx="' + rx + '" ry="' + ry + '" fill="' + DARK[color] + '"/>' +
+      '<rect x="' + (x - rx) + '" y="' + y + '" width="' + (2 * rx) + '" height="' + thick + '" fill="' + DARK[color] + '"/>' +
+      '<ellipse cx="' + x + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '" fill="' + FILL[color] + '"/>' +
+      '<ellipse cx="' + (x - rx * 0.25) + '" cy="' + (y - ry * 0.3) + '" rx="' + (rx * 0.45) + '" ry="' + (ry * 0.35) + '" fill="' + LIGHT[color] + '" opacity=".55"/>';
+  }
+  function cubeMark(x, y, emoji, spirit) {
+    const s = 0.62;
+    return '<g class="cube">' +
+      '<rect x="' + (x - s / 2) + '" y="' + (y - s / 2 - 0.06) + '" width="' + s + '" height="' + s + '" rx=".1" fill="' + (spirit ? '#d9a441' : '#2b2118') + '"/>' +
+      '<rect x="' + (x - s / 2) + '" y="' + (y - s / 2 - 0.16) + '" width="' + s + '" height="' + (s * 0.35) + '" rx=".08" fill="' + (spirit ? '#f0c975' : '#4a3a2c') + '"/>' +
+      '<text x="' + x + '" y="' + (y + 0.12) + '" text-anchor="middle" font-size=".5" style="pointer-events:none">' + esc(emoji) + '</text></g>';
+  }
+  // Pile complète à (x, y) : niveaux empilés vers le haut.
+  function stack(x, y, s, cube, scale) {
+    scale = scale || 1;
+    const rx = 0.62 * scale, ry = 0.42 * scale, thick = 0.2 * scale, lift = 0.3 * scale;
+    let out = '<g class="stack">';
+    s.forEach((color, k) => { out += disc(x, y - k * lift, color, rx, ry, thick); });
+    if (cube) {
+      const card = E.CARD_BY_ID.get(cube.id);
+      out += cubeMark(x, y - (s.length - 1) * lift - 0.05, card ? card.emoji : '●', !!cube.sp);
+    }
+    return out + '</g>';
+  }
+  // Petit jeton isolé (barre de main, plateau central)
+  function tokenSVG(color, extra) {
+    return '<svg viewBox="-0.8 -0.7 1.6 1.6" ' + (extra || '') + '>' + disc(0, 0, color, 0.66, 0.44, 0.22) + '</svg>';
+  }
+  function slotSVG(tokens) {
+    if (!tokens.length) return '';
+    let out = '<svg viewBox="-0.9 -0.7 1.8 3.4">';
+    tokens.forEach((t, i) => { out += disc(0, i * 0.95, t, 0.66, 0.44, 0.22); });
+    return out + '</svg>';
+  }
+
+  // Plateau personnel. opts: {legal:Set, targets:Set, last:Set, readonly:bool}
+  function boardSVG(board, opts) {
+    opts = opts || {};
+    const pad = 1.15;
+    const minX = -pad, minY = -SQ3 / 2 - pad + 0.3, maxX = 6 + pad, maxY = SQ3 * 4.5 + SQ3 / 2 + pad - 0.2;
+    let out = '<svg class="board' + (opts.readonly ? ' readonly' : '') + '" viewBox="' + minX + ' ' + minY + ' ' + (maxX - minX) + ' ' + (maxY - minY) + '">';
+    // cases
+    E.CELLS.forEach((cell, i) => {
+      const { x, y } = cellCenter(cell.c, cell.r);
+      let cls = 'hex';
+      if (opts.legal && opts.legal.has(i)) cls += ' legal';
+      if (opts.targets && opts.targets.has(i)) cls += ' target';
+      if (opts.last && opts.last.has(i)) cls += ' last';
+      out += '<polygon class="' + cls + '" data-idx="' + i + '" points="' + hexPoints(x, y, 0.94) + '"/>';
+    });
+    // piles, dessinées de haut en bas de l'écran pour que les piles du bas recouvrent
+    const order = E.CELLS.map((cell, i) => ({ i, y: cellCenter(cell.c, cell.r).y })).sort((a, b) => a.y - b.y);
+    for (const { i } of order) {
+      const cell = board[i];
+      const { x, y } = cellCenter(E.CELLS[i].c, E.CELLS[i].r);
+      if (cell.s.length) out += stack(x, y + 0.12, cell.s, cell.cube, 1);
+      else if (opts.legal && opts.legal.has(i)) out += '<circle class="legal-dot" cx="' + x + '" cy="' + y + '" r=".22"/>';
+      if (opts.targets && opts.targets.has(i)) out += '<circle class="target-dot" cx="' + x + '" cy="' + (y - cell.s.length * 0.3 - 0.75) + '" r=".2"/>';
+    }
+    return out + '</svg>';
+  }
+
+  // Cellules d'un motif pour la rotation qui donne le dessin le plus "large" (bbox la moins haute).
+  function patternLayout(card) {
+    let best = null;
+    for (let rot = 0; rot < 6; rot++) {
+      let c = 0, r = 0;
+      const cells = [{ c, r }];
+      for (let k = 1; k < card.pat.length; k++) {
+        const n = E.neighborCoord(c, r, (card.pat[k].d + rot) % 6);
+        c = n.c; r = n.r; cells.push({ c, r });
+      }
+      const pts = cells.map(cc => cellCenter(cc.c, cc.r));
+      const ys = pts.map(p => p.y), xs = pts.map(p => p.x);
+      const h = Math.max(...ys) - Math.min(...ys), w = Math.max(...xs) - Math.min(...xs);
+      const score = h * 10 - w;
+      if (!best || score < best.score) best = { score, pts, cells };
+    }
+    return best.pts;
+  }
+  function patternSVG(card, big) {
+    const pts = patternLayout(card);
+    const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+    const minX = Math.min(...xs) - 1.15, maxX = Math.max(...xs) + 1.15;
+    const minY = Math.min(...ys) - 1.9, maxY = Math.max(...ys) + 1.05;
+    let out = '<svg class="pattern" viewBox="' + minX + ' ' + minY + ' ' + (maxX - minX) + ' ' + (maxY - minY) + '" preserveAspectRatio="xMidYMid meet">';
+    pts.forEach(p => { out += '<polygon points="' + hexPoints(p.x, p.y, 0.94) + '" fill="#efe1c3" stroke="#c9b08a" stroke-width=".06"/>'; });
+    const order = pts.map((p, k) => ({ k, y: p.y })).sort((a, b) => a.y - b.y);
+    for (const { k } of order) {
+      const p = pts[k], step = card.pat[k];
+      let s = step.s.slice().reverse(); // du bas vers le haut
+      if (step.s.length === 2 && step.s[0] === 6 && step.s[1] === 7) s = [7, 6];
+      let g = '<g class="stack">';
+      s.forEach((color, lvl) => {
+        if (color === 7) {
+          // base quelconque : disque tricolore (gris / marron / rouge)
+          const y = p.y + 0.12;
+          g += '<ellipse cx="' + p.x + '" cy="' + (y + 0.2) + '" rx=".62" ry=".42" fill="#5a4a3a"/><rect x="' + (p.x - 0.62) + '" y="' + y + '" width="1.24" height=".2" fill="#5a4a3a"/>';
+          g += '<path d="M' + (p.x - 0.62) + ' ' + y + ' A .62 .42 0 0 1 ' + (p.x + 0.62) + ' ' + y + ' L ' + p.x + ' ' + y + ' Z" fill="' + FILL[2] + '"/>';
+          g += '<path d="M' + (p.x + 0.62) + ' ' + y + ' A .62 .42 0 0 1 ' + (p.x - 0.62) + ' ' + y + ' L ' + p.x + ' ' + y + ' Z" fill="' + FILL[3] + '"/>';
+          g += '<path d="M' + (p.x - 0.62) + ' ' + y + ' A .62 .42 0 0 0 ' + (p.x - 0.31) + ' ' + (y + 0.365) + ' L ' + (p.x + 0.31) + ' ' + (y + 0.365) + ' A .62 .42 0 0 0 ' + (p.x + 0.62) + ' ' + y + ' L ' + p.x + ' ' + y + ' Z" fill="' + FILL[6] + '"/>';
+        } else g += disc(p.x, p.y + 0.12 - lvl * 0.3, color, 0.62, 0.42, 0.2);
+      });
+      if (step.cube) {
+        const topY = p.y + 0.12 - (s.length - 1) * 0.3;
+        g += '<rect x="' + (p.x - 0.31) + '" y="' + (topY - 0.86) + '" width=".62" height=".62" rx=".1" fill="' + (card.spirit ? '#d9a441' : '#2b2118') + '"/>' +
+          '<text x="' + p.x + '" y="' + (topY - 0.38) + '" text-anchor="middle" font-size=".46">' + esc(card.emoji) + '</text>';
+      }
+      out += g + '</g>';
+    }
+    return out + '</svg>';
+  }
+
+  // Couleur (CSS) de la case cube d'une carte, pour la bande de rappel.
+  function cubeColorOf(card) {
+    const step = card.pat.find(p => p.cube);
+    const c = step.s[0] === 6 ? 6 : step.s[0];
+    return FILL[c];
+  }
+
+  root.Render = { tokenSVG, slotSVG, boardSVG, patternSVG, cubeColorOf, esc, FILL, DARK };
+})(typeof self !== 'undefined' ? self : this);
+
+</script>
+<script>
+// Transport des parties : Supabase (en ligne) ou localStorage (même téléphone).
+// Interface commune : createGame, loadGame, saveGame (verrou optimiste), subscribe.
+(function (root) {
+  'use strict';
+
+  const TABLE = 'harmonies_games';
+  const LS_PREFIX = 'harmonies.game.';
+
+  function makeOnline(cfg) {
+    const client = root.supabase.createClient(cfg.url, cfg.key, {
+      realtime: { params: { eventsPerSecond: 5 } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    return {
+      mode: 'online',
+      async createGame(id, state) {
+        const { data, error } = await client.from(TABLE).insert({ id, state, version: 1 }).select('version').single();
+        if (error) throw new Error(error.message);
+        return { version: data.version };
+      },
+      async loadGame(id) {
+        const { data, error } = await client.from(TABLE).select('state, version').eq('id', id).maybeSingle();
+        if (error) throw new Error(error.message);
+        return data ? { state: data.state, version: data.version } : null;
+      },
+      async saveGame(id, state, version) {
+        const { data, error } = await client.from(TABLE).update({ state, version: version + 1 }).eq('id', id).eq('version', version).select('version');
+        if (error) throw new Error(error.message);
+        if (!data || !data.length) { const e = new Error('conflict'); e.code = 'conflict'; throw e; }
+        return { version: data[0].version };
+      },
+      // onChange() est appelé à chaque modification distante ; onStatus(bool) reflète la connexion temps réel.
+      subscribe(id, onChange, onStatus) {
+        const channel = client.channel('game-' + id)
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: TABLE, filter: 'id=eq.' + id }, () => onChange())
+          .subscribe(status => { if (onStatus) onStatus(status === 'SUBSCRIBED'); });
+        return () => { client.removeChannel(channel); };
+      },
+    };
+  }
+
+  function makeLocal() {
+    const listeners = new Map();
+    const read = id => { try { const raw = localStorage.getItem(LS_PREFIX + id); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } };
+    const write = (id, rec) => localStorage.setItem(LS_PREFIX + id, JSON.stringify(rec));
+    root.addEventListener('storage', ev => {
+      if (ev.key && ev.key.startsWith(LS_PREFIX)) {
+        const id = ev.key.slice(LS_PREFIX.length);
+        (listeners.get(id) || []).forEach(fn => fn());
+      }
+    });
+    return {
+      mode: 'local',
+      async createGame(id, state) { write(id, { state, version: 1 }); return { version: 1 }; },
+      async loadGame(id) { return read(id); },
+      async saveGame(id, state, version) {
+        const rec = read(id);
+        if (!rec || rec.version !== version) { const e = new Error('conflict'); e.code = 'conflict'; throw e; }
+        write(id, { state, version: version + 1 });
+        return { version: version + 1 };
+      },
+      subscribe(id, onChange, onStatus) {
+        if (!listeners.has(id)) listeners.set(id, []);
+        listeners.get(id).push(onChange);
+        if (onStatus) onStatus(true);
+        return () => { const arr = listeners.get(id) || []; const i = arr.indexOf(onChange); if (i >= 0) arr.splice(i, 1); };
+      },
+    };
+  }
+
+  root.Net = { makeOnline, makeLocal };
+})(typeof self !== 'undefined' ? self : this);
+
+</script>
+<script>
+// Application Harmonies : écrans, interactions, synchronisation.
+(function (root) {
+  'use strict';
+  const E = root.Engine, R = root.Render, esc = R.esc;
+  const $ = sel => document.querySelector(sel);
+  const CFG = root.HARMONIES_CONFIG || {};
+  const ONLINE_OK = !!(CFG.url && CFG.key && !CFG.url.startsWith('__') && root.supabase);
+  const SEAT_COLORS = ['#1f8a80', '#e0743d', '#7c4dff', '#c9a227'];
+  const SIDE_LABEL = { A: 'Face A (rivière)', B: 'Face B (îles)' };
+
+  // ---------- Stockage local (appareil) ----------
+  const ls = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* stockage indisponible */ } },
+    del(k) { try { localStorage.removeItem(k); } catch (e) { /* rien */ } },
+  };
+  const randomId = (n, alphabet) => {
+    alphabet = alphabet || 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let out = '';
+    const buf = new Uint32Array(n);
+    (root.crypto || {}).getRandomValues ? root.crypto.getRandomValues(buf) : buf.forEach((_, i) => { buf[i] = Math.floor(Math.random() * 4294967296); });
+    for (let i = 0; i < n; i++) out += alphabet[buf[i] % alphabet.length];
+    return out;
+  };
+  const myPid = () => {
+    // identité de l'appareil ; sessionStorage permet de tester deux joueurs dans deux onglets (?pid=...)
+    try { const sp = sessionStorage.getItem('harmonies.pid'); if (sp) return sp; } catch (e) { /* ignore */ }
+    let v = ls.get('harmonies.pid');
+    if (!v) { v = randomId(12, 'abcdefghijklmnopqrstuvwxyz0123456789'); ls.set('harmonies.pid', v); }
+    return v;
+  };
+  const myName = () => ls.get('harmonies.name', '');
+  function rememberGame(rec) {
+    const list = ls.get('harmonies.recent', []).filter(g => g.id !== rec.id);
+    list.unshift(Object.assign({ at: Date.now() }, rec));
+    ls.set('harmonies.recent', list.slice(0, 12));
+  }
+
+  // ---------- État de l'application ----------
+  const app = {
+    screen: 'home', net: null, mode: null, gameId: null, version: 0,
+    committed: null, work: null, undo: [], viewSeat: 0, selToken: null, cubeMode: null,
+    unsub: null, poll: null, rtOk: false, endShown: false, spiritPrompted: false, lastLogLen: 0,
+  };
+  const view = () => (app.work || app.committed);
+  const isMine = () => {
+    const s = app.committed;
+    if (!s || s.status !== 'playing') return false;
+    if (app.mode === 'local') return true;
+    return E.current(s).pid === myPid();
+  };
+  const mySeat = () => {
+    const s = app.committed;
+    if (!s) return -1;
+    if (app.mode === 'local') return s.turn;
+    return s.players.findIndex(p => p.pid === myPid());
+  };
+
+  // ---------- Petits composants ----------
+  let toastTimer = null;
+  function toast(msg, err) {
+    let t = $('#toast');
+    if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
+    t.className = 'toast' + (err ? ' err' : '');
+    t.textContent = msg;
+    t.classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.add('hidden'), err ? 3200 : 2200);
+  }
+  function modal(html, opts) {
+    closeModal();
+    const bg = document.createElement('div');
+    bg.className = 'modal-bg'; bg.id = 'modal';
+    bg.innerHTML = '<div class="modal">' + html + '</div>';
+    bg.addEventListener('click', ev => { if (ev.target === bg && !(opts && opts.sticky)) closeModal(); });
+    document.body.appendChild(bg);
+    return bg;
+  }
+  function closeModal() { const m = $('#modal'); if (m) m.remove(); }
+  function vibrate(ms) { if (navigator.vibrate) try { navigator.vibrate(ms); } catch (e) { /* ignore */ } }
+
+  // ---------- Cartes ----------
+  function trackHTML(card, left) {
+    if (card.spirit) return '<div class="rule">' + esc(card.rule) + '</div>';
+    const placed = card.pts.length - left;
+    return '<div class="track">' + card.pts.map((v, i) => {
+      let cls = 'step';
+      if (i >= placed) cls += ' cube'; else if (i === placed - 1) cls += ' cur'; else cls += ' got';
+      return '<div class="' + cls + '" title="' + v + ' pts">' + (i >= placed ? '&nbsp;' : v) + '</div>';
+    }).join('') + '</div>';
+  }
+  function cardHTML(card, opts) {
+    opts = opts || {};
+    const left = opts.left === undefined ? card.pts.length : opts.left;
+    let cls = 'card' + (card.spirit ? ' spirit' : '') + (opts.cls ? ' ' + opts.cls : '');
+    let badge = '';
+    if (opts.badge) badge = '<div class="badge' + (opts.badgeCls ? ' ' + opts.badgeCls : '') + '">' + esc(opts.badge) + '</div>';
+    const sub = card.spirit ? '' : (opts.done ? '<div class="cubes-left">terminée</div>' :
+      '<div class="cubes-left">' + (left === card.pts.length ? card.pts.length + ' cubes' : left + ' cube' + (left > 1 ? 's' : '') + ' restant' + (left > 1 ? 's' : '')) + '</div>');
+    return '<div class="' + cls + '" data-card="' + card.id + '" ' + (opts.attrs || '') + '>' +
+      '<div class="stripe" style="background:' + R.cubeColorOf(card) + '"></div>' + badge +
+      '<div class="head"><span class="emoji">' + card.emoji + '</span><span>' + esc(card.fr) + '</span></div>' +
+      R.patternSVG(card) + trackHTML(card, left) + sub + '</div>';
+  }
+  function cardDetail(card, extraHTML) {
+    const step = card.pat.find(p => p.cube);
+    const cubeColor = step.s[0] === 6 ? 6 : step.s[0];
+    const howto = card.spirit
+      ? '<p><b>Esprit de la Nature.</b> Pose son cube quand le motif est réalisé ; en fin de partie : ' + esc(card.rule) + '.</p>'
+      : '<p>Points selon le nombre de cubes posés : <b>' + card.pts.join(' → ') + '</b>. Le cube se pose sur le jeton <b>' + E.COLOR_NAMES[cubeColor] + '</b> ' + E.COLOR_EMOJI[cubeColor] + '.</p>';
+    modal('<h2>' + card.emoji + ' ' + esc(card.fr) + '</h2>' + cardHTML(card, { cls: 'big' }) + howto + (extraHTML || '') +
+      '<div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>');
+    $('#m-close').onclick = closeModal;
+  }
+
+  // ---------- Écran d'accueil ----------
+  function renderHome() {
+    app.screen = 'home';
+    document.title = 'Harmonies';
+    const recent = ls.get('harmonies.recent', []);
+    const opts = ls.get('harmonies.opts', { side: 'A', spirits: false });
+    $('#app').innerHTML =
+      '<div class="screen home">' +
+      '<div class="logo"><h1>HARMONIES</h1><p>Compose tes paysages, accueille tes animaux.</p></div>' +
+      '<div class="panel"><div class="field"><label>Ton prénom</label><input type="text" id="name" maxlength="16" placeholder="Ex. Hadrien" value="' + esc(myName()) + '"></div>' +
+      '<div class="field"><label>Plateau personnel</label><div class="seg" id="side"><button data-v="A" class="' + (opts.side === 'A' ? 'on' : '') + '">Face A · rivière</button><button data-v="B" class="' + (opts.side === 'B' ? 'on' : '') + '">Face B · îles</button></div></div>' +
+      '<label class="check"><input type="checkbox" id="spirits" ' + (opts.spirits ? 'checked' : '') + '> Cartes Esprit de la Nature (variante avancée)</label>' +
+      '<div class="row" style="margin-top:6px"><button class="btn" id="create" ' + (ONLINE_OK ? '' : 'disabled') + '>🌐 Créer une partie en ligne</button></div>' +
+      (ONLINE_OK ? '' : '<p class="note">Mode en ligne indisponible (pas de configuration serveur).</p>') +
+      '<div class="row" style="margin-top:10px"><button class="btn secondary" id="local">📱 Jouer sur ce téléphone</button></div></div>' +
+      '<div class="panel"><h2>Rejoindre une partie</h2><div class="row"><input type="text" id="code" placeholder="CODE" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-weight:700"><button class="btn" id="join" ' + (ONLINE_OK ? '' : 'disabled') + '>Rejoindre</button></div></div>' +
+      (recent.length ? '<div class="panel"><h2>Parties récentes</h2><ul class="recent">' + recent.map(g =>
+        '<li data-id="' + esc(g.id) + '" data-mode="' + g.mode + '"><span class="code">' + esc(g.mode === 'local' ? '📱' : g.id) + '</span><span class="meta">' + esc(g.label || '') + '<br>' + new Date(g.at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) + '</span><button class="btn small">Ouvrir</button></li>').join('') + '</ul></div>' : '') +
+      '<div class="panel rules"><h2>Comment jouer</h2><p>À ton tour : prends les <b>3 jetons</b> d\'un emplacement du plateau central et pose-les sur ton plateau (en respectant les règles d\'empilement). Tu peux aussi prendre <b>1 carte Animal</b> (max 4 devant toi) et poser des <b>cubes</b> dès que leur habitat est réalisé — ces actions sont possibles à tout moment du tour.</p>' +
+      '<p>Fin de partie : sac vide au moment de recharger, ou <b>2 cases vides ou moins</b> sur ton plateau (on finit la manche).</p><button class="btn ghost" id="rules-more">Voir le détail des règles et du score →</button></div>' +
+      '</div>';
+    $('#name').addEventListener('change', ev => ls.set('harmonies.name', ev.target.value.trim()));
+    $('#side').addEventListener('click', ev => {
+      const b = ev.target.closest('button'); if (!b) return;
+      [...$('#side').children].forEach(x => x.classList.toggle('on', x === b));
+      saveOpts();
+    });
+    $('#spirits').addEventListener('change', saveOpts);
+    function saveOpts() { ls.set('harmonies.opts', readOpts()); }
+    function readOpts() { return { side: $('#side .on').dataset.v, spirits: $('#spirits').checked }; }
+    function ensureName() {
+      const n = $('#name').value.trim();
+      if (!n) { toast('Indique ton prénom d\'abord', true); $('#name').focus(); return null; }
+      ls.set('harmonies.name', n);
+      return n;
+    }
+    $('#create').onclick = async () => {
+      const n = ensureName(); if (!n) return;
+      try { await createOnline(readOpts(), n); } catch (e) { toast('Création impossible : ' + e.message, true); }
+    };
+    $('#join').onclick = async () => {
+      const n = ensureName(); if (!n) return;
+      const code = $('#code').value.trim().toUpperCase();
+      if (code.length < 4) { toast('Code invalide', true); return; }
+      openOnline(code);
+    };
+    $('#local').onclick = () => localSetup(readOpts());
+    $('#rules-more').onclick = showRules;
+    document.querySelectorAll('.recent li').forEach(li => {
+      li.querySelector('button').onclick = () => { if (li.dataset.mode === 'local') openLocal(li.dataset.id); else openOnline(li.dataset.id); };
+    });
+  }
+
+  function localSetup(opts) {
+    const names = ls.get('harmonies.localNames', [myName() || 'Joueur 1', 'Joueur 2']);
+    modal('<h2>📱 Partie sur ce téléphone</h2><p class="note">Les joueurs se passent le téléphone à chaque tour.</p>' +
+      '<div id="names">' + names.map((n, i) => '<div class="field"><label>Joueur ' + (i + 1) + '</label><input type="text" maxlength="16" value="' + esc(n) + '"></div>').join('') + '</div>' +
+      '<div class="row"><button class="btn secondary small" id="m-add">+ joueur</button><button class="btn secondary small" id="m-del">− joueur</button></div>' +
+      '<div class="actions"><button class="btn secondary" id="m-cancel">Annuler</button><button class="btn" id="m-go">Commencer</button></div>');
+    const getNames = () => [...document.querySelectorAll('#names input')].map(i => i.value.trim());
+    $('#m-add').onclick = () => { const ns = getNames(); if (ns.length < 4) { ns.push('Joueur ' + (ns.length + 1)); ls.set('harmonies.localNames', ns); localSetup(opts); } };
+    $('#m-del').onclick = () => { const ns = getNames(); if (ns.length > 2) { ns.pop(); ls.set('harmonies.localNames', ns); localSetup(opts); } };
+    $('#m-cancel').onclick = closeModal;
+    $('#m-go').onclick = () => {
+      const ns = getNames().map((n, i) => n || 'Joueur ' + (i + 1));
+      ls.set('harmonies.localNames', ns);
+      closeModal();
+      startLocal(opts, ns);
+    };
+  }
+
+  // ---------- Création / ouverture ----------
+  async function startLocal(opts, names) {
+    app.net = root.Net.makeLocal(); app.mode = 'local';
+    const id = randomId(6);
+    const state = E.newGame(opts, names.map((name, i) => ({ token: 'local' + i, name })));
+    state.players.forEach((p, i) => { p.pid = 'local' + i; });
+    state.id = id; state.mode = 'local';
+    await app.net.createGame(id, state);
+    rememberGame({ id, mode: 'local', label: names.join(', ') + ' · ' + SIDE_LABEL[opts.side] });
+    enterGame(id, state, 1);
+  }
+  async function openLocal(id) {
+    app.net = root.Net.makeLocal(); app.mode = 'local';
+    const rec = await app.net.loadGame(id);
+    if (!rec) { toast('Partie introuvable sur cet appareil', true); return; }
+    enterGame(id, rec.state, rec.version);
+  }
+  async function createOnline(opts, name) {
+    app.net = root.Net.makeOnline(CFG); app.mode = 'online';
+    const id = randomId(5);
+    const state = { status: 'lobby', id, opts, host: myPid(), players: [{ pid: myPid(), name }], createdAt: Date.now() };
+    await app.net.createGame(id, state);
+    rememberGame({ id, mode: 'online', label: 'En ligne · ' + SIDE_LABEL[opts.side] });
+    history.replaceState(null, '', '?g=' + id);
+    enterGame(id, state, 1);
+  }
+  async function openOnline(id) {
+    if (!ONLINE_OK) { toast('Mode en ligne indisponible', true); return; }
+    app.net = root.Net.makeOnline(CFG); app.mode = 'online';
+    let rec;
+    try { rec = await app.net.loadGame(id); } catch (e) { toast('Connexion impossible : ' + e.message, true); return; }
+    if (!rec) { toast('Aucune partie avec le code ' + id, true); history.replaceState(null, '', location.pathname); return; }
+    history.replaceState(null, '', '?g=' + id);
+    enterGame(id, rec.state, rec.version);
+  }
+
+  function enterGame(id, state, version) {
+    if (app.unsub) { app.unsub(); app.unsub = null; }
+    clearInterval(app.poll);
+    app.gameId = id; app.committed = state; app.version = version; app.work = null; app.undo = [];
+    app.selToken = null; app.cubeMode = null; app.endShown = false; app.spiritPrompted = false; app.lastLogLen = (state.log || []).length;
+    app.viewSeat = 0;
+    app.unsub = app.net.subscribe(id, () => refresh(), ok => { app.rtOk = ok; const d = $('#conn'); if (d) d.className = 'conn ' + (ok ? 'on' : 'off'); });
+    if (app.mode === 'online') {
+      app.poll = setInterval(() => { if (document.visibilityState === 'visible') refresh(); }, 15000);
+    }
+    render();
+  }
+  async function refresh() {
+    if (!app.gameId || !app.net) return;
+    let rec;
+    try { rec = await app.net.loadGame(app.gameId); } catch (e) { return; }
+    if (!rec || rec.version <= app.version) return;
+    const wasMine = isMine();
+    app.committed = rec.state; app.version = rec.version;
+    if (!wasMine || !isMine()) { app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; ls.del('harmonies.draft.' + app.gameId); }
+    announceRemote();
+    render();
+  }
+  function announceRemote() {
+    const s = app.committed;
+    if (!s.log) return;
+    if (s.log.length > app.lastLogLen) {
+      const last = s.log[s.log.length - 1];
+      const who = s.players[last.p];
+      if (!who || who.pid !== myPid() || app.mode === 'local') toast((who ? who.name : '?') + ' : ' + (E.describeActions(last.actions) || 'a joué'));
+    }
+    app.lastLogLen = s.log.length;
+  }
+
+  // ---------- Lobby ----------
+  async function joinLobby(name) {
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const rec = await app.net.loadGame(app.gameId);
+      if (!rec || rec.state.status !== 'lobby') return;
+      const st = rec.state;
+      if (st.players.some(p => p.pid === myPid())) { app.committed = st; app.version = rec.version; return; }
+      if (st.players.length >= 4) { toast('La partie est complète (4 joueurs)', true); return; }
+      st.players.push({ pid: myPid(), name });
+      try {
+        const r = await app.net.saveGame(app.gameId, st, rec.version);
+        app.committed = st; app.version = r.version;
+        rememberGame({ id: app.gameId, mode: 'online', label: 'En ligne · ' + SIDE_LABEL[st.opts.side] });
+        return;
+      } catch (e) { if (e.code !== 'conflict') throw e; }
+    }
+  }
+  function renderLobby() {
+    app.screen = 'lobby';
+    const s = app.committed;
+    const host = s.host === myPid();
+    const inGame = s.players.some(p => p.pid === myPid());
+    const link = location.origin + location.pathname + '?g=' + s.id;
+    $('#app').innerHTML = '<div class="screen home">' +
+      '<div class="logo"><h1>HARMONIES</h1><p>Salle d\'attente</p></div>' +
+      '<div class="panel"><h2>Code de la partie</h2><div class="code-big">' + esc(s.id) + '</div>' +
+      '<p class="note" style="text-align:center">' + esc(SIDE_LABEL[s.opts.side]) + (s.opts.spirits ? ' · Esprits de la Nature' : '') + '</p>' +
+      '<div class="row"><button class="btn" id="share">📤 Envoyer le lien à Belai</button><button class="btn secondary" id="copy">Copier</button></div></div>' +
+      '<div class="panel"><h2>Joueurs (' + s.players.length + '/4)</h2><ul class="players-list">' + s.players.map((p, i) =>
+        '<li><span class="dot" style="background:' + SEAT_COLORS[i] + '"></span><b>' + esc(p.name) + '</b>' + (p.pid === s.host ? ' <span class="note">· hôte</span>' : '') + (p.pid === myPid() ? ' <span class="note">· toi</span>' : '') + '</li>').join('') + '</ul>' +
+      (inGame ? '' : '<div class="field" style="margin-top:10px"><label>Ton prénom</label><input type="text" id="jname" maxlength="16" value="' + esc(myName()) + '"></div><button class="btn block" id="joinbtn">Rejoindre la partie</button>') +
+      '</div>' +
+      (host ? '<button class="btn block" id="start" ' + (s.players.length >= 2 ? '' : 'disabled') + '>Commencer la partie (' + s.players.length + ' joueur' + (s.players.length > 1 ? 's' : '') + ')</button>' +
+        (s.players.length < 2 ? '<p class="note" style="text-align:center">En attente d\'au moins un autre joueur… la page se met à jour toute seule.</p>' : '') :
+        '<p class="note" style="text-align:center">En attente que l\'hôte lance la partie… <span class="conn ' + (app.rtOk ? 'on' : '') + '" id="conn"></span></p>') +
+      '<button class="btn ghost" id="leave">← Retour à l\'accueil</button></div>';
+    $('#share').onclick = async () => {
+      const text = 'Viens jouer à Harmonies avec moi ! Code ' + s.id + ' — ' + link;
+      if (navigator.share) { try { await navigator.share({ title: 'Harmonies', text, url: link }); } catch (e) { /* annulé */ } }
+      else { await copyText(link); toast('Lien copié'); }
+    };
+    $('#copy').onclick = async () => { await copyText(link); toast('Lien copié'); };
+    $('#leave').onclick = () => { leaveGame(); renderHome(); };
+    if (!inGame) $('#joinbtn').onclick = async () => {
+      const n = $('#jname').value.trim(); if (!n) { toast('Indique ton prénom', true); return; }
+      ls.set('harmonies.name', n);
+      try { await joinLobby(n); render(); } catch (e) { toast('Impossible de rejoindre : ' + e.message, true); }
+    };
+    if (host) $('#start').onclick = async () => {
+      const st = E.newGame(s.opts, s.players.map(p => ({ token: p.pid, name: p.name })));
+      st.players.forEach((p, i) => { p.pid = s.players[i].pid; });
+      st.id = s.id; st.host = s.host; st.mode = 'online';
+      try {
+        const r = await app.net.saveGame(app.gameId, st, app.version);
+        app.committed = st; app.version = r.version; app.lastLogLen = 0;
+        render();
+      } catch (e) { toast('Lancement impossible : ' + e.message, true); refresh(); }
+    };
+  }
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); } catch (e) { prompt('Copie ce lien :', text); }
+  }
+  function leaveGame() {
+    if (app.unsub) app.unsub();
+    clearInterval(app.poll);
+    app.unsub = null; app.gameId = null; app.committed = null; app.work = null;
+    history.replaceState(null, '', location.pathname);
+  }
+
+  // ---------- Rendu principal ----------
+  function render() {
+    const s = app.committed;
+    if (!s) return renderHome();
+    if (s.status === 'lobby') return renderLobby();
+    renderGame();
+  }
+
+  function ensureWork() {
+    if (!isMine()) { app.work = null; return; }
+    if (app.work) return;
+    const draft = ls.get('harmonies.draft.' + app.gameId);
+    if (draft && draft.version === app.version && draft.work && draft.work.turn === app.committed.turn) {
+      app.work = draft.work; app.undo = draft.undo || [];
+    } else {
+      app.work = E.clone(app.committed); app.undo = [];
+    }
+    app.viewSeat = app.work.turn;
+    app.selToken = app.work.cur.tokens.length ? 0 : null;
+    app.cubeMode = null;
+  }
+  function saveDraft() {
+    if (app.work) ls.set('harmonies.draft.' + app.gameId, { version: app.version, work: app.work, undo: app.undo });
+  }
+  function act(fn) {
+    // applique une action au tour en cours, avec instantané pour Annuler
+    const snap = E.clone(app.work);
+    try { fn(app.work); }
+    catch (e) { app.work = snap; toast(e.message, true); return false; }
+    app.undo.push(snap);
+    saveDraft();
+    return true;
+  }
+
+  function renderGame() {
+    app.screen = 'game';
+    ensureWork();
+    const s = view();
+    const mine = isMine();
+    const me = mySeat();
+    if (app.viewSeat >= s.players.length) app.viewSeat = 0;
+    const cur = s.cur;
+    const viewing = s.players[app.viewSeat];
+    const viewingMine = mine && app.viewSeat === s.turn;
+    const side = s.opts.side;
+    document.title = (mine && s.status === 'playing' ? '🫵 À toi · ' : '') + 'Harmonies · ' + (s.id || '');
+
+    // Score en direct
+    const scores = s.players.map(p => E.scorePlayer(p, side));
+
+    // Message d'état
+    let msg;
+    if (s.status === 'finished') msg = '🏁 Partie terminée';
+    else if (mine) {
+      const st = E.turnStatus(s);
+      if (app.cubeMode) msg = 'Choisis la case du cube ' + E.CARD_BY_ID.get(app.cubeMode.id).emoji;
+      else if (cur.slot === null && !s.market.every(m => !m.length)) msg = '🫵 À toi : prends 3 jetons';
+      else if (cur.tokens.length) msg = '🫵 Pose tes jetons (' + cur.tokens.length + ' restant' + (cur.tokens.length > 1 ? 's' : '') + ')';
+      else if (!st.ok) msg = '🫵 ' + st.reasons[0];
+      else msg = '✅ Termine ton tour quand tu veux';
+    } else msg = '⏳ Tour de ' + esc(E.current(s).name) + (app.mode === 'online' ? '…' : '');
+
+    const legal = new Set(), targets = new Set(), last = new Set();
+    if (viewingMine && !app.cubeMode && app.selToken !== null && cur.tokens[app.selToken] !== undefined) {
+      E.legalCells(viewing.board, cur.tokens[app.selToken]).forEach(i => legal.add(i));
+    }
+    if (viewingMine && app.cubeMode) app.cubeMode.targets.forEach(i => targets.add(i));
+    if (viewingMine) cur.actions.forEach(a => { if (a.a === 'place') last.add(a.cell); });
+    else {
+      const lastLog = (s.log || []).slice().reverse().find(l => l.p === app.viewSeat);
+      if (lastLog) lastLog.actions.forEach(a => { if (a.a === 'place') last.add(a.cell); });
+    }
+
+    const placeable = mine ? E.placeableCubes(s) : [];
+    const placeableIds = new Set(placeable.map(p => p.id));
+    const canTake = mine && E.canTakeCard(s);
+
+    let html = '<div class="screen game">' +
+      '<div class="topbar"><span class="title">HARMONIES</span><span class="code">' + esc(s.id || '') + '</span>' +
+      (app.mode === 'online' ? '<span class="conn ' + (app.rtOk ? 'on' : 'off') + '" id="conn" title="temps réel"></span>' : '') +
+      '<span class="spacer"></span><button class="icon-btn" id="menu">☰</button></div>' +
+      '<div class="status' + (mine ? ' mine' : '') + '"><span class="msg">' + msg + '</span><span class="scores">' +
+      s.players.map((p, i) => '<span class="score-chip' + (i === app.viewSeat ? ' active' : '') + '" data-seat="' + i + '"><span class="dot" style="background:' + SEAT_COLORS[i] + '"></span>' + esc(p.name) + (i === s.turn && s.status === 'playing' ? ' 🎲' : '') + ' <b>' + scores[i].total + '</b></span>').join('') +
+      '</span></div>';
+
+    // Plateau central
+    html += '<div class="section"><h3>Plateau central' + (s.bag ? ' <span class="hint" style="color:var(--muted)">· sac : ' + s.bag.length + '</span>' : '') + (mine && cur.slot === null && s.status === 'playing' ? ' <span class="hint">← choisis un groupe</span>' : '') + '</h3><div class="market">' +
+      s.market.map((m, i) => {
+        const takeable = mine && cur.slot === null && m.length > 0 && !app.cubeMode;
+        return '<div class="slot' + (takeable ? ' takeable' : '') + (m.length ? '' : ' empty') + '" data-slot="' + i + '">' + (m.length ? R.slotSVG(m) : (cur && cur.slot === i ? '<span style="color:#f6e9cf;font-size:12px">pris</span>' : '')) + '</div>';
+      }).join('') + '</div></div>';
+
+    // Plateaux
+    html += '<div class="board-tabs">' + s.players.map((p, i) => '<button data-seat="' + i + '" class="' + (i === app.viewSeat ? 'on' : '') + '">' + esc(p.name) + (i === me && app.mode === 'online' ? ' (toi)' : '') + ' · ' + E.emptyCount(p.board) + ' vides</button>').join('') + '</div>' +
+      '<div class="board-wrap">' + R.boardSVG(viewing.board, { legal, targets, last, readonly: !viewingMine }) + '</div>';
+
+    // Cartes disponibles
+    html += '<div class="section"><h3>Animaux disponibles' + (canTake ? ' <span class="hint">· tu peux en prendre une</span>' : (mine && cur.cardTaken ? ' <span class="hint" style="color:var(--muted)">· carte prise ce tour</span>' : '')) + '</h3><div class="cards-strip">' +
+      s.display.map((id, i) => {
+        if (!id) return '<div class="card empty"></div>';
+        const card = E.CARD_BY_ID.get(id);
+        return cardHTML(card, { cls: canTake ? 'takeable' : '', badge: canTake ? 'Prendre' : '', badgeCls: 'teal', attrs: 'data-display="' + i + '"' });
+      }).join('') + '</div></div>';
+
+    // Cartes du joueur affiché
+    const p = viewing;
+    const items = [];
+    if (p.spiritChoices && viewingMine) items.push('<div class="card spirit" id="spirit-choose"><div class="head"><span class="emoji">✨</span><span>Choisis ton Esprit</span></div><div style="height:70px;display:grid;place-items:center;font-size:36px">❔</div><div class="cubes-left">2 cartes à découvrir</div></div>');
+    if (p.spirit) {
+      const card = E.CARD_BY_ID.get(p.spirit.id);
+      const pl = placeableIds.has(card.id) && viewingMine;
+      items.push(cardHTML(card, { cls: (pl ? 'placeable' : '') + (p.spirit.placed ? ' done' : ''), badge: pl ? 'Poser' : (p.spirit.placed ? '✓ posé' : ''), badgeCls: p.spirit.placed ? 'teal' : '', attrs: 'data-mine="1"' }));
+    }
+    for (const h of p.hand) {
+      const card = E.CARD_BY_ID.get(h.id);
+      const pl = placeableIds.has(h.id) && viewingMine;
+      items.push(cardHTML(card, { left: h.left, cls: pl ? 'placeable' : '', badge: pl ? 'Poser' : '', attrs: 'data-mine="1"' }));
+    }
+    for (const d of p.done) items.push(cardHTML(E.CARD_BY_ID.get(d.id), { left: 0, cls: 'done', done: true, badge: '✓', badgeCls: 'teal', attrs: 'data-mine="1"' }));
+    const active = E.activeCount(p);
+    html += '<div class="section"><h3>Cartes de ' + esc(p.name) + ' <span class="hint" style="color:var(--muted)">· ' + active + '/4 en cours' + (p.done.length ? ' · ' + p.done.length + ' terminée' + (p.done.length > 1 ? 's' : '') : '') + '</span></h3><div class="cards-strip">' +
+      (items.length ? items.join('') : '<div class="card empty"><div class="cubes-left" style="padding-top:60px">aucune carte</div></div>') + '</div></div>';
+
+    // Journal
+    const log = (s.log || []).slice(-8).reverse();
+    html += '<div class="section"><h3>Journal</h3></div><ul class="log">' + (log.length ? log.map(l =>
+      '<li>Tour ' + l.n + ' · <b>' + esc(s.players[l.p].name) + '</b> : ' + esc(E.describeActions(l.actions) || '—') + '</li>').join('') : '<li>Début de partie.</li>') + '</ul>';
+
+    // Barre du bas
+    html += '<div class="handbar">';
+    if (s.status === 'finished') {
+      html += '<div class="tokens"><span class="placeholder">Partie terminée</span></div><div class="actions"><button class="btn" id="results">Résultats</button></div>';
+    } else if (!mine) {
+      html += '<div class="tokens"><span class="placeholder">' + (app.mode === 'online' ? 'En attente de ' + esc(E.current(s).name) + '…' : 'Tour de ' + esc(E.current(s).name)) + '</span></div><div class="actions">' +
+        (app.mode === 'online' ? '<button class="btn secondary" id="reload">↻</button>' : '') + '</div>';
+    } else {
+      const st = E.turnStatus(s);
+      html += '<div class="tokens">' + (cur.slot === null && cur.tokens.length === 0 ?
+        '<span class="placeholder">' + (s.market.every(m => !m.length) ? 'Plus de jetons à prendre' : 'Prends 3 jetons ↑') + '</span>' :
+        cur.tokens.map((t, i) => {
+          const dead = !E.legalCells(E.current(s).board, t).length;
+          return '<button class="tok' + (i === app.selToken ? ' sel' : '') + (dead ? ' dead' : '') + '" data-tok="' + i + '" title="' + E.COLOR_NAMES[t] + '">' + R.tokenSVG(t) + '</button>';
+        }).join('') + (cur.tokens.length === 0 ? '<span class="placeholder">Jetons posés ✓</span>' : '')) + '</div>' +
+        '<div class="actions"><button class="btn secondary" id="undo" ' + (app.undo.length ? '' : 'disabled') + '>Annuler</button>' +
+        '<button class="btn" id="end" ' + (st.ok ? '' : 'disabled') + '>Fin du tour</button></div>';
+    }
+    html += '</div></div>';
+    $('#app').innerHTML = html;
+    bindGame(s, mine, viewingMine, placeable);
+
+    if (mine && app.cubeMode) showBanner('Pose le cube ' + E.CARD_BY_ID.get(app.cubeMode.id).emoji + ' ' + esc(E.CARD_BY_ID.get(app.cubeMode.id).fr) + ' : tape une case orange', () => { app.cubeMode = null; renderGame(); });
+    else if (mine && app.selToken !== null && cur.tokens[app.selToken] !== undefined && !E.legalCells(E.current(s).board, cur.tokens[app.selToken]).length) {
+      showBanner('Aucune case possible pour ce jeton', () => { act(w => E.discardToken(w, app.selToken)); app.selToken = app.work.cur.tokens.length ? 0 : null; renderGame(); }, 'Défausser');
+    } else hideBanner();
+
+    if (mine && E.current(s).spiritChoices && !app.spiritPrompted && !app.cubeMode) { app.spiritPrompted = true; showSpiritChoice(); }
+    if (s.status === 'finished' && !app.endShown) { app.endShown = true; showResults(); }
+  }
+
+  function showBanner(text, onClick, label) {
+    let b = $('#banner');
+    if (!b) { b = document.createElement('div'); b.id = 'banner'; b.className = 'banner'; document.body.appendChild(b); }
+    b.innerHTML = '<span>' + text + '</span><button>' + esc(label || 'Annuler') + '</button>';
+    b.querySelector('button').onclick = onClick;
+  }
+  function hideBanner() { const b = $('#banner'); if (b) b.remove(); }
+
+  function bindGame(s, mine, viewingMine, placeable) {
+    $('#menu').onclick = showMenu;
+    document.querySelectorAll('.score-chip').forEach(chip => { chip.onclick = () => { const seat = +chip.dataset.seat; if (app.viewSeat === seat) showScores(); else { app.viewSeat = seat; renderGame(); } }; });
+    document.querySelectorAll('.board-tabs button').forEach(b => { b.onclick = () => { app.viewSeat = +b.dataset.seat; renderGame(); }; });
+    const reload = $('#reload'); if (reload) reload.onclick = () => { refresh(); toast('Mise à jour…'); };
+    const results = $('#results'); if (results) results.onclick = showResults;
+    // Marché
+    document.querySelectorAll('.slot.takeable').forEach(sl => {
+      sl.onclick = () => {
+        if (act(w => E.takeTokens(w, +sl.dataset.slot))) { app.selToken = 0; vibrate(15); renderGame(); scrollToBoard(); }
+      };
+    });
+    // Jetons en main
+    document.querySelectorAll('.tok').forEach(b => { b.onclick = () => { app.selToken = +b.dataset.tok; app.cubeMode = null; renderGame(); }; });
+    // Plateau
+    const board = $('.board');
+    if (board && viewingMine) {
+      board.addEventListener('click', ev => {
+        const hex = ev.target.closest('.hex'); if (!hex) return;
+        const idx = +hex.dataset.idx;
+        const w = app.work;
+        if (app.cubeMode) {
+          if (!app.cubeMode.targets.has(idx)) { toast('Cette case ne convient pas à cet habitat', true); return; }
+          const id = app.cubeMode.id;
+          if (act(x => E.placeCube(x, id, idx))) { app.cubeMode = null; vibrate(20); toast('Cube posé ' + E.CARD_BY_ID.get(id).emoji); }
+          renderGame(); return;
+        }
+        if (app.selToken === null || w.cur.tokens[app.selToken] === undefined) {
+          if (w.cur.slot === null) toast('Prends d\'abord 3 jetons sur le plateau central', true);
+          return;
+        }
+        const color = w.cur.tokens[app.selToken];
+        if (!E.canPlace(w.players[w.turn].board[idx], color)) { toast('Pose impossible ici (' + E.COLOR_NAMES[color] + ')', true); return; }
+        const sel = app.selToken;
+        if (act(x => E.placeToken(x, sel, idx))) {
+          vibrate(10);
+          app.selToken = app.work.cur.tokens.length ? Math.min(sel, app.work.cur.tokens.length - 1) : null;
+          // proposer les cubes devenus posables
+          const now = E.placeableCubes(app.work);
+          if (now.length && app.work.cur.tokens.length === 0) toast('Habitat réalisé : ' + now.map(x => E.CARD_BY_ID.get(x.id).emoji).join(' ') + ' → « Poser »');
+        }
+        renderGame();
+      });
+    }
+    // Cartes disponibles
+    document.querySelectorAll('.card[data-display]').forEach(c => {
+      c.onclick = ev => {
+        const card = E.CARD_BY_ID.get(+c.dataset.card);
+        const canTake = mine && E.canTakeCard(app.work);
+        if (ev.target.closest('.badge') && canTake) { takeDisplay(+c.dataset.display); return; }
+        cardDetail(card, canTake ? '<button class="btn block" id="m-take">Prendre cette carte</button>' : (mine ? '<p class="note">' + (app.work.cur.cardTaken ? 'Tu as déjà pris une carte ce tour.' : 'Tu as déjà 4 cartes en cours.') + '</p>' : ''));
+        const b = $('#m-take'); if (b) b.onclick = () => { closeModal(); takeDisplay(+c.dataset.display); };
+      };
+    });
+    function takeDisplay(i) { if (act(w => E.takeCard(w, i))) { vibrate(15); toast('Carte prise'); } renderGame(); }
+    // Mes cartes
+    const spiritBtn = $('#spirit-choose'); if (spiritBtn) spiritBtn.onclick = showSpiritChoice;
+    document.querySelectorAll('.card[data-mine]').forEach(c => {
+      c.onclick = ev => {
+        const id = +c.dataset.card;
+        const card = E.CARD_BY_ID.get(id);
+        const pc = placeable.find(x => x.id === id);
+        if (pc && viewingMine && ev.target.closest('.badge')) { startCube(pc); return; }
+        cardDetail(card, pc && viewingMine ? '<button class="btn block warn" id="m-cube">Poser un cube ' + card.emoji + '</button>' : '');
+        const b = $('#m-cube'); if (b) b.onclick = () => { closeModal(); startCube(pc); };
+      };
+    });
+    function startCube(pc) {
+      if (pc.targets.length === 1) {
+        if (act(w => E.placeCube(w, pc.id, pc.targets[0]))) { vibrate(20); toast('Cube posé ' + E.CARD_BY_ID.get(pc.id).emoji); }
+        renderGame(); return;
+      }
+      app.cubeMode = { id: pc.id, targets: new Set(pc.targets) };
+      renderGame(); scrollToBoard();
+    }
+    // Annuler / Fin du tour
+    const undo = $('#undo'); if (undo) undo.onclick = () => {
+      if (!app.undo.length) return;
+      app.work = app.undo.pop();
+      app.selToken = app.work.cur.tokens.length ? 0 : null; app.cubeMode = null;
+      saveDraft(); renderGame();
+    };
+    const end = $('#end'); if (end) end.onclick = endTurn;
+  }
+  function scrollToBoard() { const b = $('.board-wrap'); if (b) b.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+
+  async function endTurn() {
+    const w = E.clone(app.work);
+    try { E.endTurn(w); } catch (e) { toast(e.message, true); return; }
+    const btn = $('#end'); if (btn) { btn.disabled = true; btn.textContent = 'Envoi…'; }
+    try {
+      const r = await app.net.saveGame(app.gameId, w, app.version);
+      app.committed = w; app.version = r.version; app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.spiritPrompted = false;
+      app.lastLogLen = w.log.length;
+      ls.del('harmonies.draft.' + app.gameId);
+      if (app.mode === 'local' && w.status === 'playing') {
+        modal('<h2>📱 Au tour de ' + esc(E.current(w).name) + '</h2><p>Passe le téléphone à ' + esc(E.current(w).name) + '.</p><div class="actions"><button class="btn" id="m-ok">C\'est parti</button></div>', { sticky: true });
+        $('#m-ok').onclick = () => { closeModal(); render(); };
+      } else render();
+    } catch (e) {
+      if (e.code === 'conflict') { toast('La partie a changé entre-temps, rechargement…', true); app.work = null; await refresh(); render(); }
+      else { toast('Envoi impossible : ' + e.message + ' — réessaie', true); renderGame(); }
+    }
+  }
+
+  // ---------- Modales de jeu ----------
+  function showSpiritChoice() {
+    if (!app.work) return;
+    const p = E.current(app.work);
+    if (!p.spiritChoices) return;
+    modal('<h2>✨ Choisis ton Esprit de la Nature</h2><p class="note">Une seule carte est gardée, l\'autre retourne dans la boîte. Elle compte dans ta limite de 4 cartes tant que son cube n\'est pas posé.</p>' +
+      '<div class="choice-grid">' + p.spiritChoices.map(id => cardHTML(E.CARD_BY_ID.get(id), { attrs: 'data-choose="' + id + '"' })).join('') + '</div>' +
+      '<div class="actions"><button class="btn secondary" id="m-later">Plus tard</button></div>');
+    $('#m-later').onclick = closeModal;
+    document.querySelectorAll('[data-choose]').forEach(c => { c.onclick = () => { const id = +c.dataset.choose; closeModal(); if (act(w => E.chooseSpirit(w, id))) toast('Esprit choisi : ' + E.CARD_BY_ID.get(id).fr); renderGame(); }; });
+  }
+  function scoreTable(s) {
+    const rows = [['trees', '🌳 Arbres'], ['mountains', '⛰️ Montagnes'], ['fields', '🌾 Champs'], ['buildings', '🏠 Bâtiments'], [s.opts.side === 'B' ? 'water' : 'water', s.opts.side === 'B' ? '🏝️ Îles' : '🌊 Rivière'], ['animals', '🐾 Animaux'], ['spirit', '✨ Esprit']];
+    const scores = s.players.map(p => E.scorePlayer(p, s.opts.side));
+    return '<table class="scores"><tr><th></th>' + s.players.map((p, i) => '<th style="color:' + SEAT_COLORS[i] + '">' + esc(p.name) + '</th>').join('') + '</tr>' +
+      rows.filter(([k]) => k !== 'spirit' || s.opts.spirits).map(([k, label]) => '<tr><td>' + label + '</td>' + scores.map(sc => '<td>' + sc[k] + '</td>').join('') + '</tr>').join('') +
+      '<tr class="total"><td>Total</td>' + scores.map(sc => '<td>' + sc.total + '</td>').join('') + '</tr>' +
+      '<tr><td class="note">cubes posés</td>' + s.players.map(p => '<td class="note">' + p.cubes + '</td>').join('') + '</tr></table>';
+  }
+  function showScores() {
+    const s = view();
+    modal('<h2>Score en direct</h2>' + scoreTable(s) + '<p class="note">Estimation calculée sur l\'état actuel des plateaux (' + esc(SIDE_LABEL[s.opts.side]) + ').</p><div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>');
+    $('#m-close').onclick = closeModal;
+  }
+  function showResults() {
+    const s = app.committed;
+    if (!s.result) return;
+    const winners = s.result.winners.map(i => s.players[i].name);
+    const reason = s.endReason === 'bag' ? 'le sac était vide' : 'un plateau n\'avait plus que 2 cases vides ou moins';
+    modal('<h2>🏁 Fin de partie</h2><div class="winner">' + (winners.length > 1 ? 'Égalité : ' + esc(winners.join(' & ')) : '🏆 ' + esc(winners[0]) + ' gagne !') + '</div>' +
+      scoreTable(s) + '<p class="note">Fin déclenchée car ' + reason + '. En cas d\'égalité, le plus grand nombre de cubes posés l\'emporte.</p>' +
+      '<div class="actions"><button class="btn secondary" id="m-close">Voir les plateaux</button><button class="btn" id="m-again">Revanche</button></div>');
+    $('#m-close').onclick = closeModal;
+    $('#m-again').onclick = rematch;
+  }
+  async function rematch() {
+    const s = app.committed;
+    closeModal();
+    if (app.mode === 'local') { startLocal(s.opts, s.players.map(p => p.name)); return; }
+    if (s.rematch) { openOnline(s.rematch); return; }
+    try {
+      const id = randomId(5);
+      const state = { status: 'lobby', id, opts: s.opts, host: myPid(), players: s.players.map(p => ({ pid: p.pid, name: p.name })), createdAt: Date.now() };
+      await app.net.createGame(id, state);
+      const old = E.clone(s); old.rematch = id;
+      try { await app.net.saveGame(app.gameId, old, app.version); } catch (e) { /* peu importe */ }
+      rememberGame({ id, mode: 'online', label: 'En ligne · ' + SIDE_LABEL[s.opts.side] });
+      history.replaceState(null, '', '?g=' + id);
+      enterGame(id, state, 1);
+    } catch (e) { toast('Revanche impossible : ' + e.message, true); }
+  }
+  function showMenu() {
+    const s = app.committed;
+    const link = location.origin + location.pathname + '?g=' + (s.id || '');
+    modal('<h2>Menu</h2><ul class="menu">' +
+      (app.mode === 'online' ? '<li id="mn-share">📤 Partager le lien de la partie</li>' : '') +
+      '<li id="mn-scores">📊 Score détaillé</li><li id="mn-rules">📖 Règles et légende</li>' +
+      (app.mode === 'online' && s.status === 'playing' && mySeat() < 0 ? '<li id="mn-claim">🪪 Je suis un des joueurs (reprendre ma place)</li>' : '') +
+      (app.mode === 'online' ? '<li id="mn-reload">↻ Recharger la partie</li>' : '') +
+      '<li id="mn-home">🏠 Retour à l\'accueil</li></ul>' +
+      '<p class="note">' + (app.mode === 'online' ? 'Partie en ligne · code ' + esc(s.id) + ' · ' : 'Partie locale · ') + esc(SIDE_LABEL[s.opts.side]) + (s.opts.spirits ? ' · Esprits' : '') + '</p>' +
+      '<div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>');
+    $('#m-close').onclick = closeModal;
+    const on = (id, fn) => { const e = $(id); if (e) e.onclick = fn; };
+    on('#mn-share', async () => { closeModal(); if (navigator.share) { try { await navigator.share({ title: 'Harmonies', text: 'Notre partie d\'Harmonies (code ' + s.id + ')', url: link }); } catch (e) { /* annulé */ } } else { await copyText(link); toast('Lien copié'); } });
+    on('#mn-scores', () => { closeModal(); showScores(); });
+    on('#mn-rules', () => { closeModal(); showRules(); });
+    on('#mn-reload', () => { closeModal(); app.version = 0; refresh(); });
+    on('#mn-home', () => { closeModal(); leaveGame(); renderHome(); });
+    on('#mn-claim', () => {
+      closeModal();
+      modal('<h2>Qui es-tu ?</h2><p class="note">Cet appareil n\'est associé à aucun joueur de la partie (nouveau téléphone, données effacées…).</p><ul class="menu">' +
+        s.players.map((p, i) => '<li data-seat="' + i + '"><span class="dot" style="background:' + SEAT_COLORS[i] + '"></span>' + esc(p.name) + '</li>').join('') + '</ul><div class="actions"><button class="btn secondary" id="m-close">Annuler</button></div>');
+      $('#m-close').onclick = closeModal;
+      document.querySelectorAll('.menu li[data-seat]').forEach(li => { li.onclick = async () => {
+        const st = E.clone(app.committed); st.players[+li.dataset.seat].pid = myPid();
+        try { const r = await app.net.saveGame(app.gameId, st, app.version); app.committed = st; app.version = r.version; app.work = null; closeModal(); render(); toast('Bienvenue, ' + st.players[+li.dataset.seat].name); }
+        catch (e) { toast('Échec : ' + e.message, true); refresh(); }
+      }; });
+    });
+  }
+  function showRules() {
+    const tok = c => R.tokenSVG(c);
+    modal('<h2>📖 Règles essentielles</h2><div class="rules">' +
+      '<p><b>Tour de jeu</b> — obligatoire : prendre les 3 jetons d\'un emplacement du plateau central et les poser. Optionnel (à tout moment, même entre deux jetons) : prendre 1 carte Animal (une par tour, max 4 cartes en cours) et poser des cubes (sans limite).</p>' +
+      '<p><b>Empilement</b> — bleu et jaune : uniquement au sol, rien dessus. Gris : au sol ou sur du gris (max 3). Marron : au sol ou sur 1 marron. Vert : au sol (buisson) ou sur 1 ou 2 marrons (arbre). Rouge : au sol ou sur 1 gris / marron / rouge (bâtiment). Jamais sur une case qui porte un cube.</p>' +
+      '<div class="legend">' +
+      '<div>' + tok(4) + ' Arbre : 1 / 3 / 7 pts (hauteur 1, 2, 3)</div>' +
+      '<div>' + tok(2) + ' Montagne : 1 / 3 / 7 pts, si voisine d\'une autre montagne</div>' +
+      '<div>' + tok(5) + ' Champ : 5 pts par groupe d\'au moins 2 jaunes</div>' +
+      '<div>' + tok(6) + ' Bâtiment : 5 pts si entouré de 3 couleurs différentes</div>' +
+      '<div>' + tok(1) + ' Face A · rivière : 2 / 5 / 8 / 11 / 15 (+4 par jeton au-delà de 6), la meilleure rivière seulement</div>' +
+      '<div>' + tok(1) + ' Face B · îles : 5 pts par groupe de cases séparé par l\'eau</div>' +
+      '</div>' +
+      '<p><b>Cubes</b> — le motif de la carte doit être reproduit exactement (hauteurs comprises), dans n\'importe quelle orientation. Le cube va sur la case indiquée, qui doit être libre de cube. Un jeton peut servir à plusieurs habitats ; un cube posé est définitif et bloque sa case. Quand la carte n\'a plus de cube, elle est terminée et ne compte plus dans la limite de 4.</p>' +
+      '<p><b>Points des cartes</b> — la valeur d\'une carte est celle du dernier palier découvert (0 si aucun cube posé).</p>' +
+      '<p><b>Fin</b> — quand le sac est vide au moment de recharger, ou quand un joueur a 2 cases vides ou moins : on termine la manche. Égalité : le plus de cubes posés.</p>' +
+      '</div><div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>');
+    $('#m-close').onclick = closeModal;
+  }
+
+  // ---------- Démarrage ----------
+  function boot() {
+    const params = new URLSearchParams(location.search);
+    const code = (params.get('g') || '').toUpperCase();
+    if (params.get('pid')) { try { sessionStorage.setItem('harmonies.pid', params.get('pid')); } catch (e) { /* ignore */ } }
+    if (params.get('name')) ls.set('harmonies.name', params.get('name'));
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && app.mode === 'online' && app.gameId) refresh(); });
+    if (code && ONLINE_OK) {
+      renderHome();
+      openOnline(code).then(async () => {
+        if (app.committed && app.committed.status === 'lobby' && !app.committed.players.some(p => p.pid === myPid()) && myName()) {
+          try { await joinLobby(myName()); render(); } catch (e) { toast('Impossible de rejoindre : ' + e.message, true); }
+        }
+      });
+    } else renderHome();
+  }
+  root.HarmoniesApp = { boot, app, render, act, endTurn, refresh };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})(typeof self !== 'undefined' ? self : this);
+
+</script>
+</body>
+</html>
