@@ -79,10 +79,74 @@
       src.connect(f).connect(g).connect(c.destination);
       src.start(t0);
     }
+    // ---- musique d'ambiance : nappe douce (accordage 432 Hz), clochettes pentatoniques, souffle ----
+    let music = ls.get('harmonies.music', true);
+    let musicNodes = null, musicTimer = null;
+    const N = n => 432 * Math.pow(2, n / 12); // demi-tons au-dessus du la 432
+    const CHORDS = [[-24, -17, -12, -8], [-29, -20, -13, -8], [-19, -12, -5, 0], [-26, -17, -10, -5]];
+    const BELLS = [0, 4, 7, 9, 12, 16, 19];
+    function startMusic() {
+      const c = ensure(); if (!c || musicNodes) return;
+      const master = c.createGain(); master.gain.setValueAtTime(0.0001, c.currentTime); master.gain.exponentialRampToValueAtTime(0.9, c.currentTime + 4);
+      const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1100; lp.Q.value = 0.4;
+      const delay = c.createDelay(2); delay.delayTime.value = 0.42;
+      const fb = c.createGain(); fb.gain.value = 0.32;
+      const wet = c.createGain(); wet.gain.value = 0.35;
+      lp.connect(master); lp.connect(delay); delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(master);
+      master.connect(c.destination);
+      // souffle
+      const len = c.sampleRate * 2, buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0;
+      for (let i = 0; i < len; i++) { const w = Math.random() * 2 - 1; b0 = 0.99765 * b0 + w * 0.099; b1 = 0.963 * b1 + w * 0.2965; b2 = 0.57 * b2 + w * 1.0526; d[i] = (b0 + b1 + b2 + w * 0.1848) * 0.05; }
+      const wind = c.createBufferSource(); wind.buffer = buf; wind.loop = true;
+      const wf = c.createBiquadFilter(); wf.type = 'lowpass'; wf.frequency.value = 400;
+      const wg = c.createGain(); wg.gain.value = 0.25;
+      const wl = c.createOscillator(); wl.frequency.value = 0.07; const wlg = c.createGain(); wlg.gain.value = 0.12; wl.connect(wlg).connect(wg.gain);
+      wind.connect(wf).connect(wg).connect(master); wind.start(); wl.start();
+      musicNodes = { master, lp, wind, wl, chord: 0, voices: [] };
+      const playChord = () => {
+        if (!musicNodes) return;
+        const t0 = c.currentTime;
+        const notes = CHORDS[musicNodes.chord % CHORDS.length]; musicNodes.chord++;
+        const old = musicNodes.voices; musicNodes.voices = [];
+        old.forEach(v => { v.g.gain.cancelScheduledValues(t0); v.g.gain.setValueAtTime(v.g.gain.value, t0); v.g.gain.exponentialRampToValueAtTime(0.0001, t0 + 5); v.o.stop(t0 + 5.2); v.o2.stop(t0 + 5.2); });
+        notes.forEach((n, i) => {
+          const o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain();
+          o.type = i === 0 ? 'triangle' : 'sine'; o2.type = 'sine';
+          o.frequency.value = N(n); o2.frequency.value = N(n) * 1.003;
+          g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(i === 0 ? 0.05 : 0.035, t0 + 4);
+          o.connect(g); o2.connect(g); g.connect(lp); o.start(t0); o2.start(t0);
+          musicNodes.voices.push({ o, o2, g });
+        });
+        // clochettes
+        for (let k = 0; k < 3; k++) {
+          const at = t0 + 2 + Math.random() * 9;
+          const bo = c.createOscillator(), bg = c.createGain(), pan = c.createStereoPanner ? c.createStereoPanner() : null;
+          bo.type = 'sine'; bo.frequency.value = N(BELLS[Math.floor(Math.random() * BELLS.length)] + 12);
+          bg.gain.setValueAtTime(0.0001, at); bg.gain.exponentialRampToValueAtTime(0.03, at + 0.03); bg.gain.exponentialRampToValueAtTime(0.0001, at + 3);
+          if (pan) { pan.pan.value = Math.random() * 1.4 - 0.7; bo.connect(bg).connect(pan).connect(lp); } else bo.connect(bg).connect(lp);
+          bo.start(at); bo.stop(at + 3.2);
+        }
+      };
+      playChord();
+      musicTimer = setInterval(playChord, 14000);
+    }
+    function stopMusic() {
+      if (!musicNodes) return;
+      const c = ctx, t0 = c.currentTime;
+      clearInterval(musicTimer); musicTimer = null;
+      const m = musicNodes; musicNodes = null;
+      m.master.gain.cancelScheduledValues(t0); m.master.gain.setValueAtTime(m.master.gain.value, t0); m.master.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.5);
+      setTimeout(() => { try { m.voices.forEach(v => { v.o.stop(); v.o2.stop(); }); m.wind.stop(); m.wl.stop(); m.master.disconnect(); } catch (e) { /* déjà arrêté */ } }, 1700);
+    }
+    document.addEventListener('visibilitychange', () => { if (!ctx || !musicNodes) return; const t0 = ctx.currentTime; musicNodes.master.gain.cancelScheduledValues(t0); musicNodes.master.gain.setValueAtTime(musicNodes.master.gain.value, t0); musicNodes.master.gain.exponentialRampToValueAtTime(document.visibilityState === 'visible' ? 0.9 : 0.0001, t0 + 0.8); });
     return {
       get enabled() { return enabled; },
       toggle() { enabled = !enabled; ls.set('harmonies.sound', enabled); if (enabled) { ensure(); this.take(); } return enabled; },
-      unlock() { ensure(); },
+      unlock() { ensure(); if (music && !musicNodes) startMusic(); },
+      get music() { return music; },
+      get debug() { return { ctx: ctx ? ctx.state : null, music: !!musicNodes, voices: musicNodes ? musicNodes.voices.length : 0 }; },
+      toggleMusic() { music = !music; ls.set('harmonies.music', music); if (music) { ensure(); startMusic(); } else stopMusic(); return music; },
       take() { noise(0.16, 1400, 0.12, 0, 0.6); tone(520, 0.12, 'sine', 0.05, 0, 760); },
       place() { noise(0.045, 2200, 0.28, 0, 1.2); tone(190, 0.11, 'triangle', 0.22, 0, 120); },
       card() { noise(0.09, 3200, 0.16, 0, 1); noise(0.06, 5000, 0.08, 0.05, 1); },
@@ -164,7 +228,7 @@
     screen: 'home', net: null, mode: null, gameId: null, version: 0,
     committed: null, work: null, undo: [], viewSeat: 0, selToken: null, cubeMode: null,
     unsub: null, poll: null, rtOk: false, endShown: false, spiritPrompted: false, lastLogLen: 0,
-    replay: null, busy: false, stage: 'play', stageManual: false, cardsOpen: null,
+    replay: null, busy: false, stage: 'play', stageManual: false, cardsOpen: null, headerOpen: false,
   };
   const view = () => (app.replay ? app.replay.state : (app.work || app.committed));
   const isMine = () => {
@@ -688,11 +752,13 @@
     // ----- barre haute + état -----
     const steps = mine && s.status === 'playing' ? '<span class="steps">' + [['1', 'Jetons'], ['2', 'Poser'], ['3', 'Animaux']].map(([n, l], i) =>
       '<span class="stp' + (step === i + 1 ? ' cur' : (step > i + 1 ? ' done' : '')) + '"><b>' + (step > i + 1 ? ic('check') : n) + '</b><em>' + l + '</em></span>').join('') + '</span>' : '';
+    const connHTML = app.mode === 'online' ? '<span class="conn ' + (app.rtOk ? 'on' : 'off') + '" id="conn" title="temps réel"></span>' : '';
     let html = '<div class="screen game">' +
-      '<div class="topbar">' + R.logoSVG('logo-small') + '<span class="code">' + esc(s.id || '') + '</span>' +
-      (app.mode === 'online' ? '<span class="conn ' + (app.rtOk ? 'on' : 'off') + '" id="conn" title="temps réel"></span>' : '') +
-      '<span class="spacer"></span><button class="icon-btn" id="sound" title="Sons">' + ic(Sfx.enabled ? 'sound' : 'mute') + '</button><button class="icon-btn" id="menu" title="Menu">' + ic('menu') + '</button></div>' +
-      '<div class="status' + msgCls + '"><span class="msg">' + ic(msgIcon, 'inl') + '<span>' + msg + '</span></span>' + steps + '</div>';
+      (app.headerOpen
+        ? '<div class="topbar" id="topbar">' + R.logoSVG('logo-small') + '<span class="code">' + esc(s.id || '') + '</span>' + connHTML + '<span class="spacer"></span><button class="icon-btn" id="hdr-toggle" title="Replier">' + ic('minus') + '</button></div>'
+        : '<button class="topbar-mini" id="hdr-toggle" title="Afficher l\'en-tête"><span class="brand">HARMONIES</span><span class="code">' + esc(s.id || '') + '</span>' + connHTML + '</button>') +
+      '<div class="status' + msgCls + '"><button class="icon-btn dark" id="menu" title="Menu">' + ic('menu') + '</button><span class="msg">' + ic(msgIcon, 'inl') + '<span>' + msg + '</span></span>' + steps +
+      '<button class="icon-btn dark" id="music" title="Musique">' + ic(Sfx.music ? 'music' : 'music-off') + '</button><button class="icon-btn dark" id="sound" title="Sons">' + ic(Sfx.enabled ? 'sound' : 'mute') + '</button></div>';
 
     // ----- scène : choisir (jetons + animaux) ou jouer (plateau + cartes) -----
     html += '<div class="stage">';
@@ -758,20 +824,25 @@
       return '<button class="tok' + (i === app.selToken ? ' sel' : '') + (dead ? ' dead' : '') + (anim.arrivingHand ? ' arriving' : '') + '" data-tok="' + i + '" title="' + E.COLOR_NAMES[t] + '">' + R.tokenSVG(t) + '</button>';
     }).join('');
     const myCount = E.activeCount(s.players[me >= 0 ? me : s.turn]);
-    html += '<div class="footer"><div class="foot-row">' +
-      '<div class="view-tabs">' +
-      '<button data-stage="choose" class="' + (stage === 'choose' ? 'on' : '') + '">' + ic('grid') + '<span>Choisir</span>' + (mine && (step === 1 || (step === 3 && canTake)) ? '<i class="dotb"></i>' : '') + '</button>' +
-      '<button data-stage="play" class="' + (stage === 'play' ? 'on' : '') + '">' + ic('layers') + '<span>Plateau</span>' + (mine && (step === 2 || app.cubeMode || placeable.length) ? '<i class="dotb"></i>' : '') + '<em class="cnt">' + myCount + '</em></button>' +
-      '</div>' +
-      '<div class="foot-hand"><div class="foot-lbl">' + handLabel + '</div><div class="tokens">' + handHTML + '</div></div></div>';
-    html += '<div class="foot-actions">';
-    if (s.status === 'finished') html += '<button class="btn primary block" id="results">' + ic('trophy') + 'Résultats</button>';
-    else if (replaying) html += '<span class="placeholder">' + ic('film', 'inl') + 'Rejeu du tour…</span>';
-    else if (!mine) html += '<span class="placeholder">' + ic('hourglass', 'inl') + 'Tu joues après ' + esc(E.current(s).name) + '</span>' + (app.mode === 'online' ? '<button class="btn secondary icon" id="reload" title="Actualiser">' + ic('refresh') + '</button>' : '');
+    const folded = stage === 'play';
+    const tabsHTML = '<div class="view-tabs">' +
+      '<button data-stage="choose" class="' + (stage === 'choose' ? 'on' : '') + '" title="Jetons et animaux">' + ic('grid') + '<span>Choisir</span>' + (mine && (step === 1 || (step === 3 && canTake)) ? '<i class="dotb"></i>' : '') + '</button>' +
+      '<button data-stage="play" class="' + (stage === 'play' ? 'on' : '') + '" title="Plateau et cartes">' + ic('layers') + '<span>Plateau</span>' + (mine && (step === 2 || app.cubeMode || placeable.length) ? '<i class="dotb"></i>' : '') + '<em class="cnt">' + myCount + '</em></button>' +
+      '</div>';
+    let actionsHTML = '';
+    if (s.status === 'finished') actionsHTML = '<button class="btn primary" id="results">' + ic('trophy') + '<span class="lbl">Résultats</span></button>';
+    else if (replaying) actionsHTML = folded ? '' : '<span class="placeholder">' + ic('film', 'inl') + 'Rejeu du tour…</span>';
+    else if (!mine) actionsHTML = (folded ? '' : '<span class="placeholder">' + ic('hourglass', 'inl') + 'Tu joues après ' + esc(E.current(s).name) + '</span>') + (app.mode === 'online' ? '<button class="btn secondary icon" id="reload" title="Actualiser">' + ic('refresh') + '</button>' : '');
     else {
       const st = E.turnStatus(s);
-      html += '<button class="btn secondary" id="undo" ' + (app.undo.length ? '' : 'disabled') + '>' + ic('undo') + '<span class="lbl">Annuler</span></button>' +
-        '<button class="btn primary' + (st.ok ? ' ready' : '') + '" id="end" ' + (st.ok ? '' : 'disabled') + '>Fin du tour</button>';
+      actionsHTML = '<button class="btn secondary' + (folded ? ' icon' : '') + '" id="undo" ' + (app.undo.length ? '' : 'disabled') + ' title="Annuler">' + ic('undo') + '<span class="lbl">Annuler</span></button>' +
+        '<button class="btn primary' + (st.ok ? ' ready' : '') + '" id="end" ' + (st.ok ? '' : 'disabled') + ' title="Fin du tour">' + (folded ? ic('flag') : '') + '<span class="lbl">' + (folded ? 'Fin' : 'Fin du tour') + '</span></button>';
+    }
+    if (folded) {
+      html += '<div class="footer folded"><div class="foot-row">' + tabsHTML + '<div class="foot-hand"><div class="tokens">' + handHTML + '</div></div><div class="foot-actions">' + actionsHTML + '</div></div>';
+    } else {
+      html += '<div class="footer"><div class="foot-row">' + tabsHTML + '<div class="foot-hand"><div class="foot-lbl">' + handLabel + '</div><div class="tokens">' + handHTML + '</div></div></div>' +
+        '<div class="foot-actions">' + actionsHTML + '</div>';
     }
     html += '</div></div></div>';
     $('#app').innerHTML = html;
@@ -792,6 +863,8 @@
   function bindGame(s, mine, viewingMine, placeable) {
     $('#menu').onclick = showMenu;
     $('#sound').onclick = () => { const on = Sfx.toggle(); $('#sound').innerHTML = ic(on ? 'sound' : 'mute'); toast(on ? 'Sons activés' : 'Sons coupés'); };
+    $('#music').onclick = () => { const on = Sfx.toggleMusic(); $('#music').innerHTML = ic(on ? 'music' : 'music-off'); toast(on ? 'Musique d\'ambiance' : 'Musique coupée'); };
+    $('#hdr-toggle').onclick = () => { app.headerOpen = !app.headerOpen; renderGame(); };
     $$('.view-tabs button').forEach(b => { b.onclick = () => { if (app.replay) return; setStage(b.dataset.stage, true); }; });
     $$('.board-tabs button').forEach(b => { b.onclick = () => { const seat = +b.dataset.seat; if (app.viewSeat === seat) showScores(); else { app.viewSeat = seat; renderGame(); } }; });
     const reload = $('#reload'); if (reload) reload.onclick = () => { refresh(); toast('Mise à jour…'); };
