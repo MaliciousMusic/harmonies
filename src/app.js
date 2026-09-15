@@ -394,7 +394,7 @@
       '<div class="screen home">' + bgHTML() + '<div class="home-content">' + heroHTML({ lion: true, sub: 'Compose your landscapes, welcome your animals' }) +
       '<div class="home-body">' +
       '<div class="panel glass"><div class="field"><label>Your name and animal</label><div class="me-row">' + avatarBtnHTML(myAvatar(), 'avatar-btn') +
-      '<input type="text" id="name" maxlength="16" placeholder="e.g. Belai" value="' + esc(myName()) + '"></div></div>' +
+      '<input type="text" id="name" maxlength="16" placeholder="e.g. Hadrien" value="' + esc(myName()) + '"></div></div>' +
       '<div class="field"><label>Your board</label><div class="seg" id="side"><button data-v="A" class="' + (opts.side === 'A' ? 'on' : '') + '">' + miniTok(1) + 'Side A · river</button><button data-v="B" class="' + (opts.side === 'B' ? 'on' : '') + '">' + miniTok(5) + 'Side B · islands</button></div></div>' +
       '<label class="check"><input type="checkbox" id="spirits" ' + (opts.spirits ? 'checked' : '') + '><span>' + ic('sparkles', 'inl') + ' Nature\'s Spirit cards <em>(advanced variant)</em></span></label>' +
       '<div class="row" style="margin-top:8px"><button class="btn primary" id="create" ' + (ONLINE_OK ? '' : 'disabled') + '>' + ic('globe') + 'Create an online game</button></div>' +

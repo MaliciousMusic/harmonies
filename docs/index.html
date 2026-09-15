@@ -535,7 +535,7 @@ table.scores tr.total td { font-family: var(--display); font-weight: 600; font-s
 </head>
 <body>
 <div id="app"></div>
-<script>window.HARMONIES_CONFIG = { url: "https://jeqdtpuoufapovxvwtwa.supabase.co", key: "sb_publishable_kTn0yH1LO-vQ7cpjMx8-hQ_ydhfxLDx", build: "20260915113847" };</script>
+<script>window.HARMONIES_CONFIG = { url: "https://jeqdtpuoufapovxvwtwa.supabase.co", key: "sb_publishable_kTn0yH1LO-vQ7cpjMx8-hQ_ydhfxLDx", build: "20260915121237" };</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.min.js"></script>
 <script>
 // Données des 32 cartes Animaux (1-32) et 10 cartes Esprit de la Nature (33-42).
@@ -2101,7 +2101,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       '<div class="screen home">' + bgHTML() + '<div class="home-content">' + heroHTML({ lion: true, sub: 'Compose your landscapes, welcome your animals' }) +
       '<div class="home-body">' +
       '<div class="panel glass"><div class="field"><label>Your name and animal</label><div class="me-row">' + avatarBtnHTML(myAvatar(), 'avatar-btn') +
-      '<input type="text" id="name" maxlength="16" placeholder="e.g. Belai" value="' + esc(myName()) + '"></div></div>' +
+      '<input type="text" id="name" maxlength="16" placeholder="e.g. Hadrien" value="' + esc(myName()) + '"></div></div>' +
       '<div class="field"><label>Your board</label><div class="seg" id="side"><button data-v="A" class="' + (opts.side === 'A' ? 'on' : '') + '">' + miniTok(1) + 'Side A · river</button><button data-v="B" class="' + (opts.side === 'B' ? 'on' : '') + '">' + miniTok(5) + 'Side B · islands</button></div></div>' +
       '<label class="check"><input type="checkbox" id="spirits" ' + (opts.spirits ? 'checked' : '') + '><span>' + ic('sparkles', 'inl') + ' Nature\'s Spirit cards <em>(advanced variant)</em></span></label>' +
       '<div class="row" style="margin-top:8px"><button class="btn primary" id="create" ' + (ONLINE_OK ? '' : 'disabled') + '>' + ic('globe') + 'Create an online game</button></div>' +
