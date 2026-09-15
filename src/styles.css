@@ -60,15 +60,48 @@ h1, h2, h3 { margin: 0; font-family: var(--display); font-weight: 600; letter-sp
 .icon-btn { background: rgba(255,255,255,.14); border: 0; color: inherit; border-radius: 12px; width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer; }
 .icon-btn .ic { width: 22px; height: 22px; }
 
-/* ---------- Accueil / héros ---------- */
+/* ---------- Accueil : collines plein écran, lion, panneaux translucides ---------- */
 .screen { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
-.hero { position: relative; height: 200px; overflow: hidden; border-radius: 0 0 34px 34px; box-shadow: var(--shadow-lg); }
-.hero-hills { position: absolute; inset: 0; width: 100%; height: 100%; }
-.hero-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 0 18px; }
-.logo-svg { width: min(86vw, 360px); height: auto; filter: drop-shadow(0 4px 0 rgba(30,42,90,.35)) drop-shadow(0 8px 14px rgba(30,42,90,.35)); }
-.tagline { font-family: var(--display); font-weight: 500; color: var(--navy); background: rgba(255,253,248,.85); padding: 5px 14px; border-radius: 999px; font-size: 14px; }
-.home-body { padding: 18px 16px 40px; max-width: 480px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 16px; }
+body.scenic { background: var(--navy); }
+.bg { position: fixed; inset: 0; z-index: 0; }
+.bg svg { width: 100%; height: 100%; display: block; }
+.home-content { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+.hero2 { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: calc(14px + env(safe-area-inset-top, 0px)) 18px 4px; }
+.hero2.small { padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+.hero2.small .logo-svg { width: min(60vw, 240px); }
+.hero-lion { width: min(44vw, 180px); height: auto; filter: drop-shadow(0 8px 14px rgba(30,42,90,.35)); animation: lion-in .7s cubic-bezier(.2,.9,.3,1.2); }
+@keyframes lion-in { from { transform: scale(.6) translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+.logo-svg { width: min(80vw, 340px); height: auto; filter: drop-shadow(0 4px 0 rgba(30,42,90,.35)) drop-shadow(0 8px 14px rgba(30,42,90,.35)); }
+.tagline { font-family: var(--display); font-weight: 500; color: var(--navy); background: rgba(255,253,248,.88); padding: 6px 16px; border-radius: 999px; font-size: 14px; box-shadow: var(--shadow); text-align: center; max-width: 92vw; }
+.home-body { padding: 14px 16px 44px; max-width: 480px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 14px; }
 .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 22px; padding: 16px; box-shadow: var(--shadow); }
+.panel.glass { background: rgba(255,253,248,.95); border-color: rgba(255,255,255,.75); box-shadow: 0 8px 24px rgba(30,42,90,.22); }
+.note.light { color: rgba(255,255,255,.85); text-shadow: 0 1px 2px rgba(30,42,90,.5); }
+.btn.ghost.light { color: #fff; text-shadow: 0 1px 2px rgba(30,42,90,.5); }
+.home .credits { color: rgba(255,255,255,.8); text-shadow: 0 1px 2px rgba(30,42,90,.5); }
+/* avatars (animal choisi) */
+.avatar { --seat: #2a8f8a; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--seat); flex: none; overflow: hidden; vertical-align: middle; }
+.avatar .animal { width: 82%; height: 82%; }
+.avatar b { font-family: var(--display); font-weight: 600; color: var(--seat); font-size: .9em; }
+.avatar.xs { width: 22px; height: 22px; box-shadow: 0 0 0 1.5px var(--seat); }
+.avatar.md { width: 38px; height: 38px; }
+.avatar.lg { width: 56px; height: 56px; box-shadow: 0 0 0 3px var(--seat); }
+.avatar.big { width: 64px; height: 64px; box-shadow: 0 0 0 3px var(--seat), 0 4px 12px rgba(0,0,0,.25); display: grid; margin: 0 auto 6px; }
+.avatar-btn { position: relative; border: 0; background: transparent; padding: 0; cursor: pointer; flex: none; display: inline-block; line-height: 0; }
+.avatar-btn i { position: absolute; right: -3px; bottom: -3px; width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg, #f4a55c, var(--orange)); color: #fff; display: grid; place-items: center; box-shadow: 0 0 0 2px #fff; }
+.avatar-btn i .ic { width: 12px; height: 12px; }
+.avatar-btn.sm i { width: 16px; height: 16px; }
+.me-row { display: flex; gap: 12px; align-items: center; }
+.me-row input { flex: 1; min-width: 0; }
+.avatar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
+.av-choice { border: 2px solid var(--line); background: #fff; border-radius: 14px; padding: 6px 2px 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; font-size: 10.5px; font-weight: 800; color: var(--muted); font-family: var(--body); }
+.av-choice .animal { width: 40px; height: 40px; }
+.av-choice span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.av-choice.on { border-color: var(--teal); background: #dff2ec; color: var(--teal-d); }
+.winner-row { display: flex; justify-content: center; gap: 8px; margin: 0 0 6px; }
+.pass-phone { text-align: center; padding: 6px 0; }
+.th-player { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; font-size: 12px; }
+.turn-overlay .avatar.big { margin-bottom: 8px; }
 .panel h2 { font-size: 18px; margin-bottom: 10px; color: var(--navy); display: flex; align-items: center; }
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
 .field label { font-size: 13px; color: var(--muted); font-weight: 700; }
@@ -108,7 +141,14 @@ body.in-game { overflow: hidden; height: 100vh; height: 100dvh; }
   display: flex; align-items: center; gap: 10px; padding: 6px 12px; box-shadow: 0 2px 8px rgba(30,42,90,.35); z-index: 5;
 }
 .logo-small { width: 140px; height: auto; }
-.topbar-mini { flex: none; width: 100%; border: 0; background: linear-gradient(135deg, var(--navy), var(--blue)); color: #f6e9cf; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 3px 10px; cursor: pointer; font-family: var(--display); font-size: 12px; letter-spacing: 2px; min-height: 24px; }
+.topbar-mini { flex: none; width: 100%; background: linear-gradient(135deg, var(--navy), var(--blue)); color: #f6e9cf; display: flex; align-items: stretch; min-height: 30px; z-index: 5; }
+.topbar-mini .mini-main { flex: 1; min-width: 0; border: 0; background: transparent; color: inherit; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 3px 10px; cursor: pointer; font-family: var(--display); font-size: 12px; letter-spacing: 2px; }
+.chat-btn { position: relative; border: 0; background: rgba(255,255,255,.14); color: #f6e9cf; width: 46px; display: grid; place-items: center; cursor: pointer; flex: none; }
+.chat-btn .ic { width: 20px; height: 20px; }
+.topbar .chat-btn { border-radius: 12px; height: 40px; width: 40px; }
+.chat-btn.float { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; border-radius: 14px; width: 44px; height: 44px; background: rgba(30,42,90,.7); color: #fff; box-shadow: var(--shadow); }
+.badge-n { position: absolute; top: 3px; right: 3px; min-width: 17px; height: 17px; border-radius: 999px; background: var(--coral); color: #fff; font-style: normal; font-size: 10.5px; font-weight: 800; font-family: var(--body); display: grid; place-items: center; padding: 0 4px; box-shadow: 0 0 0 2px #fff; }
+.badge-n.inl { position: static; display: inline-grid; margin-left: 6px; }
 .topbar-mini .brand { font-weight: 600; opacity: .9; }
 .topbar-mini .code { font-size: 11px; opacity: .8; padding: 0 7px; }
 .icon-btn.dark { background: #eee6d4; color: var(--navy); width: 36px; height: 36px; border-radius: 11px; flex: none; }
@@ -170,6 +210,8 @@ body.in-game { overflow: hidden; height: 100vh; height: 100dvh; }
   display: inline-flex; align-items: center; gap: 5px; font-size: 13px;
 }
 .board-tabs button b { font-weight: 600; background: rgba(30,42,90,.08); border-radius: 999px; padding: 0 7px; }
+.board-tabs button .avatar.xs { margin-left: -2px; }
+.board-tabs button.on .avatar { box-shadow: 0 0 0 1.5px #fff; }
 .board-tabs button .ic { width: 14px; height: 14px; color: var(--orange-d); margin: 0; }
 .board-tabs button.on { background: var(--seat); color: #fff; border-color: var(--seat); }
 .board-tabs button.on b { background: rgba(255,255,255,.25); }
@@ -200,6 +242,7 @@ body.in-game { overflow: hidden; height: 100vh; height: 100dvh; }
 .deck-wrap.mini { width: auto; }
 .deck-wrap.mini .deck { width: 28px; height: 39px; }
 .prow { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.prow .avatar-btn { margin-right: 2px; }
 .prow input[type=text] { flex: 1; min-width: 0; }
 .sel, .prow select { font: inherit; font-family: var(--display); padding: 9px 10px; border-radius: 12px; border: 2px solid var(--line); background: #fff; color: var(--ink); }
 .prow select { flex: 0 0 auto; max-width: 46%; }
@@ -441,3 +484,31 @@ table.scores tr.total td { font-family: var(--display); font-weight: 600; font-s
 @media (prefers-reduced-motion: reduce) {
   .fly, .float-text, .confetti, .turn-overlay, .pop, .flip, .board .disc.drop, .board .cube.bounce, .slot .disc.drop { animation: none !important; transition: none !important; }
 }
+
+/* ---------- Chat : bulle éphémère en haut de l'écran, volet de discussion ---------- */
+#chat-pops { position: fixed; top: calc(8px + env(safe-area-inset-top, 0px)); left: 10px; right: 10px; z-index: 70; display: flex; flex-direction: column; gap: 6px; pointer-events: none; align-items: center; }
+.chat-pop { pointer-events: auto; display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, var(--navy), var(--blue)); color: #fff; padding: 8px 12px; border-radius: 18px; box-shadow: var(--shadow-lg); border: 2px solid var(--yellow); animation: pop-in .3s cubic-bezier(.2,.9,.3,1.3); cursor: pointer; max-width: 520px; width: 100%; }
+.chat-pop.out { animation: pop-out .35s ease-in forwards; }
+.chat-pop .cp-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.chat-pop .cp-body b { font-family: var(--display); font-weight: 600; font-size: 13px; color: var(--yellow); }
+.chat-pop .cp-body span { font-weight: 600; font-size: 14px; word-break: break-word; line-height: 1.25; }
+.chat-pop .cp-ic { width: 20px; height: 20px; opacity: .7; flex: none; }
+@keyframes pop-in { from { transform: translateY(-24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes pop-out { to { transform: translateY(-16px); opacity: 0; } }
+.modal.chat-sheet { display: flex; flex-direction: column; max-height: 88vh; }
+.chat-list { flex: 1; min-height: 150px; max-height: 48vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 6px 2px; scrollbar-width: thin; scrollbar-color: var(--teal) #eee6d4; }
+.cmsg { display: flex; gap: 8px; align-items: flex-end; }
+.cmsg.mine { flex-direction: row-reverse; }
+.cbubble { background: #eee6d4; border-radius: 16px 16px 16px 4px; padding: 6px 11px; max-width: 80%; }
+.cmsg.mine .cbubble { background: linear-gradient(135deg, var(--teal-l), var(--teal)); color: #fff; border-radius: 16px 16px 4px 16px; }
+.cmeta { display: flex; gap: 8px; align-items: baseline; font-size: 11px; color: var(--muted); }
+.cmsg.mine .cmeta { color: rgba(255,255,255,.85); }
+.cmeta b { font-family: var(--display); font-weight: 600; font-size: 12.5px; }
+.ctext { font-weight: 600; word-break: break-word; line-height: 1.3; }
+.chat-quick { display: flex; gap: 6px; overflow-x: auto; padding: 8px 0 4px; scrollbar-width: none; }
+.chat-quick::-webkit-scrollbar { display: none; }
+.chip { flex: none; border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 12px; font-family: var(--display); font-weight: 500; font-size: 13px; cursor: pointer; color: var(--navy); }
+.chip:active { background: #eee6d4; }
+.chat-form { display: flex; gap: 8px; margin-top: 6px; align-items: center; }
+.chat-form input { flex: 1; min-width: 0; }
+.chat-form .btn.icon { flex: none; width: 48px; }

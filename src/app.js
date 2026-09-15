@@ -1,4 +1,4 @@
-// Application Harmonies : écrans, interactions, animations, sons, synchronisation.
+// Application Harmonies : écrans, interactions, animations, sons, chat, synchronisation. Interface en anglais.
 (function (root) {
   'use strict';
   const E = root.Engine, R = root.Render, esc = R.esc, I = root.Icons, Bot = root.Bot;
@@ -8,11 +8,14 @@
   const CFG = root.HARMONIES_CONFIG || {};
   const ONLINE_OK = !!(CFG.url && CFG.key && !CFG.url.startsWith('__') && root.supabase);
   const SEAT_COLORS = ['#2a8f8a', '#e8873a', '#6b4fa0', '#d96a8e'];
-  const SIDE_LABEL = { A: 'Face A · rivière', B: 'Face B · îles' };
-  const BOT_LABEL = { 1: 'Bot débutant', 2: 'Bot confirmé', 3: 'Bot expert' };
-  const botName = (players, level) => { const used = new Set(players.map(p => p.name)); const base = Bot.NAMES.find(n => !used.has(n)) || 'Bot'; return base; };
+  const SIDE_LABEL = { A: 'Side A · river', B: 'Side B · islands' };
+  const BOT_LABEL = { 1: 'Novice bot', 2: 'Skilled bot', 3: 'Expert bot' };
+  const BOT_OPTIONS = [[0, 'Human'], [1, 'Novice bot'], [2, 'Skilled bot'], [3, 'Expert bot']];
+  const QUICK_CHAT = ['👋 Hi!', 'GG!', 'Nice move!', 'Your turn 😉', 'One sec…', 'Well played!'];
+  const botName = (players, level) => { const used = new Set(players.map(p => p.name)); void level; return Bot.NAMES.find(n => !used.has('Bot ' + n) && !used.has(n)) || 'Bot'; };
   const BANNER = ['#f2c94c', '#e8873a', '#5cc2b7', '#2a8f8a', '#2c4a8a', '#1e2a5a'];
   const wait = ms => new Promise(r => setTimeout(r, ms));
+  const plural = (n, word) => n + ' ' + word + (n > 1 ? 's' : '');
 
   // ---------- Stockage local (appareil) ----------
   const ls = {
@@ -37,6 +40,12 @@
     return v;
   };
   const myName = () => ls.get('harmonies.name', '');
+  // Avatar du profil : id d'une carte Animal (tiré au sort la première fois)
+  const myAvatar = () => {
+    let a = ls.get('harmonies.avatar', 0);
+    if (!a || !E.CARD_BY_ID.has(a)) { a = E.CARDS[Math.floor(Math.random() * E.CARDS.length)].id; ls.set('harmonies.avatar', a); }
+    return a;
+  };
   function rememberGame(rec) {
     const list = ls.get('harmonies.recent', []).filter(g => g.id !== rec.id);
     list.unshift(Object.assign({ at: Date.now() }, rec));
@@ -157,6 +166,7 @@
       undo() { tone(420, 0.09, 'triangle', 0.12); tone(300, 0.12, 'triangle', 0.12, 0.07); },
       error() { tone(140, 0.16, 'sawtooth', 0.06, 0, 110); },
       draw() { noise(0.12, 900, 0.1, 0, 0.5); },
+      chat() { tone(880, 0.08, 'sine', 0.08); tone(1175, 0.16, 'sine', 0.1, 0.08); },
       win() { [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 0.28, 'triangle', 0.16, i * 0.13)); },
       lose() { [392, 349, 311].forEach((f, i) => tone(f, 0.3, 'triangle', 0.12, i * 0.18)); },
     };
@@ -230,8 +240,11 @@
     screen: 'home', net: null, mode: null, gameId: null, version: 0,
     committed: null, work: null, undo: [], viewSeat: 0, selToken: null, cubeMode: null,
     unsub: null, poll: null, rtOk: false, endShown: false, spiritPrompted: false, lastLogLen: 0,
-    replay: null, busy: false, stage: 'play', stageManual: false, cardsOpen: ls.get('harmonies.cardsOpen', true), headerOpen: false, botRunning: false,
+    replay: null, busy: false, stage: 'play', stageManual: false, cardsOpen: ls.get('harmonies.cardsOpen', true), headerOpen: false, botRunning: false, botTimer: null,
+    modalClose: null,
   };
+  // Chat de la partie (en ligne) : messages reçus, dernier id connu, non lus
+  const chat = { msgs: [], lastId: 0, unread: 0, unsub: null, open: false };
   const view = () => (app.replay ? app.replay.state : (app.work || app.committed));
   const isMine = () => {
     const s = app.committed;
@@ -246,6 +259,7 @@
     if (app.mode === 'local') return s.players[s.turn].bot ? s.players.findIndex(p => !p.bot) : s.turn;
     return s.players.findIndex(p => p.pid === myPid());
   };
+  const seatOfPid = pid => { const s = app.committed; return s && s.players ? s.players.findIndex(p => p.pid === pid) : -1; };
 
   // ---------- Petits composants ----------
   let toastTimer = null;
@@ -266,9 +280,14 @@
     bg.innerHTML = '<div class="modal' + (opts && opts.cls ? ' ' + opts.cls : '') + '">' + html + '</div>';
     bg.addEventListener('click', ev => { if (ev.target === bg && !(opts && opts.sticky)) closeModal(); });
     document.body.appendChild(bg);
+    app.modalClose = opts && opts.onClose ? opts.onClose : null;
     return bg;
   }
-  function closeModal() { const m = $('#modal'); if (m) m.remove(); }
+  function closeModal() {
+    const m = $('#modal'); if (m) m.remove();
+    const fn = app.modalClose; app.modalClose = null;
+    if (fn) fn();
+  }
   let interacted = false;
   function vibrate(ms) { if (interacted && navigator.vibrate) try { navigator.vibrate(ms); } catch (e) { /* ignore */ } }
   function showBanner(html, onClick, label) {
@@ -289,15 +308,22 @@
   const seatDot = i => '<span class="dot" style="background:' + SEAT_COLORS[i] + '"></span>';
   const miniTok = c => '<span class="mtok">' + R.tokenSVG(c) + '</span>';
   const miniAnimal = id => '<span class="manimal">' + R.animalSVG(id) + '</span>';
+  // Avatar rond d'un joueur (animal choisi, ou initiale), cerclé de la couleur de son siège
+  function avatarHTML(p, seat, cls) {
+    const color = seat >= 0 && seat < SEAT_COLORS.length ? SEAT_COLORS[seat] : '#2a8f8a';
+    const id = (p && p.avatar) || (p && p.bot ? Bot.avatarFor(p.name) : 0);
+    return '<span class="avatar' + (cls ? ' ' + cls : '') + '" style="--seat:' + color + '">' + (id && E.CARD_BY_ID.has(id) ? R.animalSVG(id) : '<b>' + esc(String((p && p.name) || '?').slice(0, 1).toUpperCase()) + '</b>') + '</span>';
+  }
+  const namePlate = (p, seat, cls) => avatarHTML(p, seat, cls || 'xs') + '<b>' + esc(p.name) + '</b>';
   // Résumé HTML des actions d'un tour (journal, toasts)
   function actionsHTML(actions) {
     const parts = [];
     for (const a of actions) {
       if (a.a === 'take') parts.push(a.tokens.map(miniTok).join(''));
-      else if (a.a === 'card') parts.push(miniAnimal(a.id) + ' ' + esc(E.CARD_BY_ID.get(a.id).fr));
-      else if (a.a === 'cube') parts.push('<span class="mcube"></span>' + miniAnimal(a.id) + ' ' + esc(E.CARD_BY_ID.get(a.id).fr));
-      else if (a.a === 'spirit') parts.push(ic('sparkles', 'inl') + ' ' + esc(E.CARD_BY_ID.get(a.id).fr));
-      else if (a.a === 'discard') parts.push('défausse ' + miniTok(a.color));
+      else if (a.a === 'card') parts.push(miniAnimal(a.id) + ' ' + esc(E.CARD_BY_ID.get(a.id).en));
+      else if (a.a === 'cube') parts.push('<span class="mcube"></span>' + miniAnimal(a.id) + ' ' + esc(E.CARD_BY_ID.get(a.id).en));
+      else if (a.a === 'spirit') parts.push(ic('sparkles', 'inl') + ' ' + esc(E.CARD_BY_ID.get(a.id).en));
+      else if (a.a === 'discard') parts.push('discards ' + miniTok(a.color));
     }
     return parts.join('<span class="sep">·</span>');
   }
@@ -319,9 +345,9 @@
       }).join('') + '</div>';
     }
     const foot = card.spirit ? '<div class="rule">' + esc(card.rule) + '</div>' :
-      '<div class="foot">' + (opts.done ? 'terminée · ' + card.pts[card.pts.length - 1] + ' pts' : (placed ? placed + '/' + card.pts.length + ' posé' + (placed > 1 ? 's' : '') + ' · vaut ' + E.cardValue(card, left) + ' pts' : card.pts.length + ' cubes à poser')) + '</div>';
+      '<div class="foot">' + (opts.done ? 'completed · ' + card.pts[card.pts.length - 1] + ' pts' : (placed ? placed + '/' + card.pts.length + ' placed · worth ' + E.cardValue(card, left) + ' pts' : card.pts.length + ' cubes to place')) + '</div>';
     return '<div class="' + cls + '" data-card="' + card.id + '" ' + (opts.attrs || '') + '>' + badge +
-      '<div class="head">' + esc(card.fr) + '</div>' +
+      '<div class="head">' + esc(card.en) + '</div>' +
       '<div class="art">' + R.sceneSVG(card) + R.animalSVG(card.id) + '</div>' +
       R.patternSVG(card) + track + foot + '</div>';
   }
@@ -329,42 +355,60 @@
     const step = card.pat.find(p => p.cube);
     const cubeColor = step.s[0] === 7 ? 6 : step.s[0];
     const howto = card.spirit
-      ? '<p><b>Esprit de la Nature.</b> Pose son cube quand le motif est réalisé ; en fin de partie : ' + esc(card.rule) + '.</p>'
-      : '<p>Valeur selon le nombre de cubes posés : <b>' + card.pts.join(' → ') + '</b> pts. Le cube se pose sur le jeton <b>' + E.COLOR_NAMES[cubeColor] + '</b> ' + miniTok(cubeColor) + ' du motif, dans n\'importe quelle orientation.</p>';
+      ? '<p><b>Nature\'s Spirit.</b> Place its cube once the pattern is built; at the end of the game: ' + esc(card.rule) + '.</p>'
+      : '<p>Value by number of cubes placed: <b>' + card.pts.join(' → ') + '</b> pts. The cube goes on the <b>' + E.COLOR_NAMES[cubeColor] + '</b> ' + miniTok(cubeColor) + ' token of the pattern, in any orientation.</p>';
     modal(cardHTML(card, { cls: 'big' }) + howto + (extraHTML || '') +
-      '<div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>');
+      '<div class="actions"><button class="btn secondary" id="m-close">Close</button></div>');
     $('#m-close').onclick = closeModal;
   }
 
-  // ---------- Écran d'accueil ----------
-  function headerHTML(sub) {
-    return '<div class="hero">' + R.hillsSVG(400, 190, BANNER, { reeds: 14, seed: 7, cls: 'hero-hills' }) +
-      '<div class="hero-inner">' + R.logoSVG() + (sub ? '<div class="tagline">' + sub + '</div>' : '') + '</div></div>';
+  // ---------- Profil : choix de l'animal ----------
+  function showAvatarPicker(current, onPick) {
+    modal('<h2>' + ic('smile', 'h') + 'Pick your animal</h2><p class="note">Shown next to your name for the other players.</p><div class="avatar-grid">' +
+      E.CARDS.map(c => '<button class="av-choice' + (c.id === current ? ' on' : '') + '" data-av="' + c.id + '" title="' + esc(c.en) + '">' + R.animalSVG(c.id) + '<span>' + esc(c.en) + '</span></button>').join('') +
+      '</div><div class="actions"><button class="btn secondary" id="m-close">Close</button></div>', { cls: 'sheet' });
+    $('#m-close').onclick = closeModal;
+    $$('.av-choice').forEach(b => { b.onclick = () => { const id = +b.dataset.av; closeModal(); Sfx.card(); onPick(id); }; });
   }
+
+  // ---------- Écran d'accueil (fond de collines plein écran, lion) ----------
+  function bgHTML() {
+    const w = Math.max(320, root.innerWidth || 400), h = Math.max(480, root.innerHeight || 800);
+    return '<div class="bg">' + R.hillsSVG(w, h, BANNER, { reeds: 22, seed: 7, cls: 'bg-hills', sunX: 0.8 }) + '</div>';
+  }
+  function heroHTML(opts) {
+    opts = opts || {};
+    return '<div class="hero2' + (opts.lion ? ' with-lion' : ' small') + '">' + (opts.lion ? R.lionSVG('hero-lion') : '') + R.logoSVG() +
+      (opts.sub ? '<div class="tagline">' + opts.sub + '</div>' : '') + (opts.extra || '') + '</div>';
+  }
+  const avatarBtnHTML = (id, btnId) => '<button class="avatar-btn" id="' + btnId + '" title="Choose your animal">' + avatarHTML({ avatar: id, name: myName() }, -1, 'lg') + '<i>' + ic('edit') + '</i></button>';
   function renderHome() {
     app.screen = 'home';
     document.body.classList.remove('in-game');
+    document.body.classList.add('scenic');
     document.title = 'Harmonies';
     hideBanner();
     const recent = ls.get('harmonies.recent', []);
     const opts = ls.get('harmonies.opts', { side: 'A', spirits: false });
     $('#app').innerHTML =
-      '<div class="screen home">' + headerHTML('Compose tes paysages, accueille tes animaux') +
+      '<div class="screen home">' + bgHTML() + '<div class="home-content">' + heroHTML({ lion: true, sub: 'Compose your landscapes, welcome your animals' }) +
       '<div class="home-body">' +
-      '<div class="panel"><div class="field"><label>Ton prénom</label><input type="text" id="name" maxlength="16" placeholder="Ex. Hadrien" value="' + esc(myName()) + '"></div>' +
-      '<div class="field"><label>Plateau personnel</label><div class="seg" id="side"><button data-v="A" class="' + (opts.side === 'A' ? 'on' : '') + '">' + miniTok(1) + 'Face A · rivière</button><button data-v="B" class="' + (opts.side === 'B' ? 'on' : '') + '">' + miniTok(5) + 'Face B · îles</button></div></div>' +
-      '<label class="check"><input type="checkbox" id="spirits" ' + (opts.spirits ? 'checked' : '') + '><span>' + ic('sparkles', 'inl') + ' Cartes Esprit de la Nature <em>(variante avancée)</em></span></label>' +
-      '<div class="row" style="margin-top:8px"><button class="btn primary" id="create" ' + (ONLINE_OK ? '' : 'disabled') + '>' + ic('globe') + 'Créer une partie en ligne</button></div>' +
-      (ONLINE_OK ? '' : '<p class="note">Mode en ligne indisponible (pas de configuration serveur).</p>') +
-      '<div class="row" style="margin-top:10px"><button class="btn secondary" id="local">' + ic('phone') + 'Jouer sur ce téléphone</button></div></div>' +
-      '<div class="panel"><h2>' + ic('login', 'h') + 'Rejoindre une partie</h2><div class="row"><input type="text" id="code" placeholder="CODE" maxlength="6" class="code-input"><button class="btn primary" id="join" ' + (ONLINE_OK ? '' : 'disabled') + '>Rejoindre</button></div></div>' +
-      (recent.length ? '<div class="panel"><h2>' + ic('layers', 'h') + 'Parties récentes</h2><ul class="recent">' + recent.map(g =>
-        '<li data-id="' + esc(g.id) + '" data-mode="' + g.mode + '"><span class="code">' + (g.mode === 'local' ? ic('phone') : esc(g.id)) + '</span><span class="meta">' + esc(g.label || '') + '<br>' + new Date(g.at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) + '</span><button class="btn small secondary">Ouvrir</button></li>').join('') + '</ul></div>' : '') +
-      '<div class="panel rules"><h2>' + ic('book', 'h') + 'Comment jouer</h2><p>À ton tour : prends les <b>3 jetons</b> d\'un emplacement du plateau central et pose-les sur ton plateau (en respectant les règles d\'empilement). Tu peux aussi prendre <b>1 carte Animal</b> (max 4 devant toi) et poser des <b>cubes</b> dès que leur habitat est réalisé — ces actions sont possibles à tout moment du tour.</p>' +
-      '<p>Fin de partie : sac vide au moment de recharger, ou <b>2 cases vides ou moins</b> sur ton plateau (on finit la manche).</p><button class="btn ghost" id="rules-more">Le détail des règles et du score →</button></div>' +
-      '<p class="credits">Adaptation non officielle du jeu Harmonies (Johan Benvenuto, Libellud). Icônes animaux : OpenMoji (CC BY-SA 4.0).</p>' +
-      '</div></div>';
+      '<div class="panel glass"><div class="field"><label>Your name and animal</label><div class="me-row">' + avatarBtnHTML(myAvatar(), 'avatar-btn') +
+      '<input type="text" id="name" maxlength="16" placeholder="e.g. Belai" value="' + esc(myName()) + '"></div></div>' +
+      '<div class="field"><label>Your board</label><div class="seg" id="side"><button data-v="A" class="' + (opts.side === 'A' ? 'on' : '') + '">' + miniTok(1) + 'Side A · river</button><button data-v="B" class="' + (opts.side === 'B' ? 'on' : '') + '">' + miniTok(5) + 'Side B · islands</button></div></div>' +
+      '<label class="check"><input type="checkbox" id="spirits" ' + (opts.spirits ? 'checked' : '') + '><span>' + ic('sparkles', 'inl') + ' Nature\'s Spirit cards <em>(advanced variant)</em></span></label>' +
+      '<div class="row" style="margin-top:8px"><button class="btn primary" id="create" ' + (ONLINE_OK ? '' : 'disabled') + '>' + ic('globe') + 'Create an online game</button></div>' +
+      (ONLINE_OK ? '' : '<p class="note">Online play unavailable (no server configuration).</p>') +
+      '<div class="row" style="margin-top:10px"><button class="btn secondary" id="local">' + ic('phone') + 'Play on this phone</button></div></div>' +
+      '<div class="panel glass"><h2>' + ic('login', 'h') + 'Join a game</h2><div class="row"><input type="text" id="code" placeholder="CODE" maxlength="6" class="code-input"><button class="btn primary" id="join" ' + (ONLINE_OK ? '' : 'disabled') + '>Join</button></div></div>' +
+      (recent.length ? '<div class="panel glass"><h2>' + ic('layers', 'h') + 'Recent games</h2><ul class="recent">' + recent.map(g =>
+        '<li data-id="' + esc(g.id) + '" data-mode="' + g.mode + '"><span class="code">' + (g.mode === 'local' ? ic('phone') : esc(g.id)) + '</span><span class="meta">' + esc(g.label || '') + '<br>' + new Date(g.at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' }) + '</span><button class="btn small secondary">Open</button></li>').join('') + '</ul></div>' : '') +
+      '<div class="panel glass rules"><h2>' + ic('book', 'h') + 'How to play</h2><p>On your turn, take the <b>3 tokens</b> of one slot of the central board and place them on your board (following the stacking rules). You may also take <b>1 Animal card</b> (max 4 in front of you) and place <b>cubes</b> as soon as their habitat is built — these actions are possible at any time during the turn.</p>' +
+      '<p>Game end: bag empty when refilling, or <b>2 empty spaces or fewer</b> on your board (the round is completed).</p><button class="btn ghost" id="rules-more">Full rules and scoring →</button></div>' +
+      '<p class="credits">Unofficial adaptation of Harmonies (Johan Benvenuto, Libellud). Animal icons: OpenMoji (CC BY-SA 4.0).</p>' +
+      '</div></div></div>';
     $('#name').addEventListener('change', ev => ls.set('harmonies.name', ev.target.value.trim()));
+    $('#avatar-btn').onclick = () => showAvatarPicker(myAvatar(), id => { ls.set('harmonies.avatar', id); $('#avatar-btn').innerHTML = avatarHTML({ avatar: id, name: myName() }, -1, 'lg') + '<i>' + ic('edit') + '</i>'; });
     $('#side').addEventListener('click', ev => {
       const b = ev.target.closest('button'); if (!b) return;
       [...$('#side').children].forEach(x => x.classList.toggle('on', x === b));
@@ -375,20 +419,20 @@
     function readOpts() { return { side: $('#side .on').dataset.v, spirits: $('#spirits').checked }; }
     function ensureName() {
       const n = $('#name').value.trim();
-      if (!n) { toast('Indique ton prénom d\'abord', true); $('#name').focus(); return null; }
+      if (!n) { toast('Enter your name first', true); $('#name').focus(); return null; }
       ls.set('harmonies.name', n);
       return n;
     }
     $('#create').onclick = async () => {
       const n = ensureName(); if (!n) return;
       Sfx.unlock();
-      try { await createOnline(readOpts(), n); } catch (e) { toast('Création impossible : ' + e.message, true); }
+      try { await createOnline(readOpts(), n); } catch (e) { toast('Could not create the game: ' + e.message, true); }
     };
     $('#join').onclick = async () => {
       const n = ensureName(); if (!n) return;
       Sfx.unlock();
       const code = $('#code').value.trim().toUpperCase();
-      if (code.length < 4) { toast('Code invalide', true); return; }
+      if (code.length < 4) { toast('Invalid code', true); return; }
       openOnline(code);
     };
     $('#local').onclick = () => { Sfx.unlock(); localSetup(readOpts()); };
@@ -397,27 +441,29 @@
       li.querySelector('button').onclick = () => { Sfx.unlock(); if (li.dataset.mode === 'local') openLocal(li.dataset.id); else openOnline(li.dataset.id); };
     });
   }
-
   function playerRow(pl, i) {
-    return '<div class="prow"><span class="dot" style="background:' + SEAT_COLORS[i] + '"></span><input type="text" maxlength="16" value="' + esc(pl.name) + '" data-i="' + i + '">' +
-      '<select class="ptype" data-i="' + i + '">' + [[0, 'Humain'], [1, 'Bot débutant'], [2, 'Bot confirmé'], [3, 'Bot expert']].map(([v, l]) => '<option value="' + v + '"' + (pl.bot === v ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>';
+    const av = pl.avatar || (pl.bot ? Bot.avatarFor(pl.name) : 0);
+    return '<div class="prow" data-av="' + av + '"><button class="avatar-btn sm" data-pick="' + i + '" title="Animal">' + avatarHTML({ avatar: av, name: pl.name, bot: pl.bot }, i, 'md') + '</button><input type="text" maxlength="16" value="' + esc(pl.name) + '" data-i="' + i + '">' +
+      '<select class="ptype" data-i="' + i + '">' + BOT_OPTIONS.map(([v, l]) => '<option value="' + v + '"' + (pl.bot === v ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>';
   }
   function localSetup(opts) {
     let players = ls.get('harmonies.localPlayers', null);
-    if (!players) { const old = ls.get('harmonies.localNames', null); players = old ? old.map(n => ({ name: n, bot: 0 })) : [{ name: myName() || 'Joueur 1', bot: 0 }, { name: 'Bot Fennec', bot: 2 }]; }
-    modal('<h2>' + ic('phone', 'h') + 'Partie sur ce téléphone</h2><p class="note">Humains et bots ; les humains se passent le téléphone. Trois niveaux de bot : débutant (au hasard), confirmé (vise le score immédiat), expert (prépare ses habitats).</p>' +
+    if (!players) players = [{ name: myName() || 'Player 1', bot: 0, avatar: myAvatar() }, { name: 'Bot Fennec', bot: 2 }];
+    if (players[0] && !players[0].bot) { players[0].avatar = myAvatar(); if (myName()) players[0].name = myName(); }
+    modal('<h2>' + ic('phone', 'h') + 'Game on this phone</h2><p class="note">Humans and bots; humans pass the phone around. Three bot levels: novice (random), skilled (goes for immediate points), expert (also prepares its habitats).</p>' +
       '<div id="prows">' + players.map(playerRow).join('') + '</div>' +
-      '<div class="row"><button class="btn secondary small" id="m-add">' + ic('plus') + 'joueur</button><button class="btn secondary small" id="m-del">' + ic('minus') + 'joueur</button></div>' +
-      '<div class="actions"><button class="btn secondary" id="m-cancel">Annuler</button><button class="btn primary" id="m-go">Commencer</button></div>');
-    const read = () => $$('#prows .prow').map((row, i) => ({ name: row.querySelector('input').value.trim(), bot: +row.querySelector('select').value }));
+      '<div class="row"><button class="btn secondary small" id="m-add">' + ic('plus') + 'player</button><button class="btn secondary small" id="m-del">' + ic('minus') + 'player</button></div>' +
+      '<div class="actions"><button class="btn secondary" id="m-cancel">Cancel</button><button class="btn primary" id="m-go">Start</button></div>');
+    const read = () => $$('#prows .prow').map(row => ({ name: row.querySelector('input').value.trim(), bot: +row.querySelector('select').value, avatar: +row.dataset.av || 0 }));
     const rerender = pl => { ls.set('harmonies.localPlayers', pl); localSetup(opts); };
     $('#m-add').onclick = () => { const pl = read(); if (pl.length < 4) { pl.push({ name: 'Bot ' + botName(pl, 2), bot: 2 }); rerender(pl); } };
     $('#m-del').onclick = () => { const pl = read(); if (pl.length > 2) { pl.pop(); rerender(pl); } };
-    $$('#prows select').forEach(sel => { sel.onchange = () => { const row = sel.closest('.prow'); const inp = row.querySelector('input'); const lvl = +sel.value; if (lvl && (!inp.value.trim() || /^Joueur \d|^Bot /.test(inp.value))) inp.value = 'Bot ' + botName(read().filter((_, k) => k !== +sel.dataset.i), lvl); }; });
+    $$('#prows select').forEach(sel => { sel.onchange = () => { const row = sel.closest('.prow'); const inp = row.querySelector('input'); const lvl = +sel.value; if (lvl && (!inp.value.trim() || /^Player \d|^Bot /.test(inp.value))) { inp.value = 'Bot ' + botName(read().filter((_, k) => k !== +sel.dataset.i), lvl); row.dataset.av = Bot.avatarFor(inp.value); } const pl = read(); ls.set('harmonies.localPlayers', pl); localSetup(opts); }; });
+    $$('#prows [data-pick]').forEach(b => { b.onclick = () => { const pl = read(); ls.set('harmonies.localPlayers', pl); const i = +b.dataset.pick; showAvatarPicker(pl[i].avatar, id => { pl[i].avatar = id; if (i === 0 && !pl[0].bot) ls.set('harmonies.avatar', id); rerender(pl); }); }; });
     $('#m-cancel').onclick = closeModal;
     $('#m-go').onclick = () => {
-      const pl = read().map((p, i) => ({ name: p.name || (p.bot ? 'Bot ' + (i + 1) : 'Joueur ' + (i + 1)), bot: p.bot }));
-      if (pl.every(p => p.bot)) { toast('Il faut au moins un joueur humain', true); return; }
+      const pl = read().map((p, i) => ({ name: p.name || (p.bot ? 'Bot ' + (i + 1) : 'Player ' + (i + 1)), bot: p.bot, avatar: p.avatar || (p.bot ? Bot.avatarFor(p.name) : E.CARDS[(i * 7 + 3) % E.CARDS.length].id) }));
+      if (pl.every(p => p.bot)) { toast('At least one human player is needed', true); return; }
       ls.set('harmonies.localPlayers', pl);
       closeModal();
       startLocal(opts, pl);
@@ -428,7 +474,7 @@
   async function startLocal(opts, players) {
     app.net = root.Net.makeLocal(); app.mode = 'local';
     const id = randomId(6);
-    const state = E.newGame(opts, players.map((pl, i) => ({ token: 'local' + i, name: pl.name, bot: pl.bot || 0 })));
+    const state = E.newGame(opts, players.map((pl, i) => ({ token: 'local' + i, name: pl.name, bot: pl.bot || 0, avatar: pl.avatar || 0 })));
     state.players.forEach((p, i) => { p.pid = 'local' + i; });
     state.id = id; state.mode = 'local';
     await app.net.createGame(id, state);
@@ -438,37 +484,40 @@
   async function openLocal(id) {
     app.net = root.Net.makeLocal(); app.mode = 'local';
     const rec = await app.net.loadGame(id);
-    if (!rec) { toast('Partie introuvable sur cet appareil', true); return; }
+    if (!rec) { toast('Game not found on this device', true); return; }
     enterGame(id, rec.state, rec.version);
   }
   async function createOnline(opts, name) {
     app.net = root.Net.makeOnline(CFG); app.mode = 'online';
     const id = randomId(5);
-    const state = { status: 'lobby', id, opts, host: myPid(), players: [{ pid: myPid(), name }], createdAt: Date.now() };
+    const state = { status: 'lobby', id, opts, host: myPid(), players: [{ pid: myPid(), name, avatar: myAvatar() }], createdAt: Date.now() };
     await app.net.createGame(id, state);
-    rememberGame({ id, mode: 'online', label: 'En ligne · ' + SIDE_LABEL[opts.side] });
+    rememberGame({ id, mode: 'online', label: 'Online · ' + SIDE_LABEL[opts.side] });
     history.replaceState(null, '', '?g=' + id);
     enterGame(id, state, 1);
   }
   async function openOnline(id) {
-    if (!ONLINE_OK) { toast('Mode en ligne indisponible', true); return; }
+    if (!ONLINE_OK) { toast('Online play unavailable', true); return; }
     app.net = root.Net.makeOnline(CFG); app.mode = 'online';
     let rec;
-    try { rec = await app.net.loadGame(id); } catch (e) { toast('Connexion impossible : ' + e.message, true); return; }
-    if (!rec) { toast('Aucune partie avec le code ' + id, true); history.replaceState(null, '', location.pathname); return; }
+    try { rec = await app.net.loadGame(id); } catch (e) { toast('Connection failed: ' + e.message, true); return; }
+    if (!rec) { toast('No game with code ' + id, true); history.replaceState(null, '', location.pathname); return; }
     history.replaceState(null, '', '?g=' + id);
     enterGame(id, rec.state, rec.version);
   }
 
   function enterGame(id, state, version) {
     if (app.unsub) { app.unsub(); app.unsub = null; }
-    clearInterval(app.poll);
+    if (chat.unsub) { chat.unsub(); chat.unsub = null; }
+    clearInterval(app.poll); clearTimeout(app.botTimer); app.botTimer = null;
     app.gameId = id; app.committed = state; app.version = version; app.work = null; app.undo = []; app.replay = null; app.busy = false;
     app.selToken = null; app.cubeMode = null; app.endShown = false; app.spiritPrompted = false; app.lastLogLen = (state.log || []).length;
     app.viewSeat = 0; app.stageManual = false;
+    chat.msgs = []; chat.lastId = 0; chat.unread = 0; chat.open = false;
     app.unsub = app.net.subscribe(id, () => refresh(), ok => { app.rtOk = ok; const d = $('#conn'); if (d) d.className = 'conn ' + (ok ? 'on' : 'off'); });
     if (app.mode === 'online') {
-      app.poll = setInterval(() => { if (document.visibilityState === 'visible') refresh(); }, 15000);
+      app.poll = setInterval(() => { if (document.visibilityState === 'visible') { refresh(); loadChat(false); } }, 15000);
+      if (app.net.chat) { chat.unsub = app.net.subscribeChat(id, m => addChatMsg(m, true)); loadChat(true); }
     }
     render();
     if (isMine() && state.status === 'playing') announceMyTurn();
@@ -485,6 +534,7 @@
     const prev = app.committed;
     const wasMine = isMine();
     app.committed = rec.state; app.version = rec.version;
+    clearTimeout(app.botTimer); app.botTimer = null;
     if (app.replay) app.replay.abort = true;
     if (!wasMine || !isMine()) { app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.stageManual = false; ls.del('harmonies.draft.' + app.gameId); }
     // rejeu animé du tour adverse si l'on dispose de l'état exact qui le précédait
@@ -495,14 +545,14 @@
     const canReplay = remote && prev && prev.status === 'playing' && prev.log && s.log.length === prev.log.length + 1 && prev.turn === entry.p && prev.turnNo === entry.n && document.visibilityState === 'visible';
     app.lastLogLen = s.log ? s.log.length : 0;
     if (canReplay) { await replayTurn(prev, entry, s); return; }
-    if (remote) toast(esc(who.name) + ' : ' + (actionsHTML(entry.actions) || 'a joué'));
+    if (remote) toast(avatarHTML(who, entry.p, 'xs') + esc(who.name) + ': ' + (actionsHTML(entry.actions) || 'played'));
     render();
     if (isMine() && s.status === 'playing' && !wasMine) announceMyTurn();
     maybeRunBot();
   }
   function announceMyTurn() {
     const me = E.current(app.committed);
-    turnOverlay(ic('hand', 'big') + '<div>À toi de jouer' + (app.mode === 'online' ? ', ' + esc(me.name) : ' : ' + esc(me.name)) + ' !</div>');
+    turnOverlay(avatarHTML(me, app.committed.turn, 'big') + '<div>Your turn' + (app.mode === 'online' ? ', ' + esc(me.name) : ': ' + esc(me.name)) + '!</div>');
     Sfx.turn(); vibrate([30, 40, 30]);
   }
 
@@ -523,7 +573,7 @@
     } else if (a.a === 'cube') {
       await goStage('play'); await animatedCube(state, a.id, a.cell);
     } else if (a.a === 'spirit') {
-      E.chooseSpirit(state, a.id); renderGame(); toast(esc(name) + ' choisit l\'esprit ' + esc(E.CARD_BY_ID.get(a.id).fr));
+      E.chooseSpirit(state, a.id); renderGame(); toast(esc(name) + ' chooses the spirit ' + esc(E.CARD_BY_ID.get(a.id).en));
     } else if (a.a === 'discard') {
       const idx = state.cur.tokens.indexOf(a.color); if (idx >= 0) E.discardToken(state, idx); renderGame();
     }
@@ -537,7 +587,7 @@
     const name = next.players[entry.p].name;
     app.stage = 'play'; app.stageManual = false;
     renderGame();
-    showBanner(ic('film', 'inl') + ' ' + esc(name) + ' joue son tour…', () => { token.abort = true; }, ic('skip') + 'Passer');
+    showBanner(ic('film', 'inl') + ' ' + esc(name) + ' is playing…', () => { token.abort = true; }, ic('skip') + 'Skip');
     await wait(500);
     for (const a of entry.actions) {
       if (token.abort) break;
@@ -563,15 +613,31 @@
     maybeRunBot();
   }
 
-  // ---------- Bots : joués par l'appareil hôte (ou en local) ----------
-  function botsHere() { return app.mode === 'local' || (app.committed && app.committed.host === myPid()); }
-  function maybeRunBot() {
+  // ---------- Bots : joués par l'appareil hôte, ou à défaut par n'importe quel joueur humain connecté ----------
+  // Délai avant que cet appareil joue le tour du bot : l'hôte tout de suite, les autres humains après (au cas où l'hôte est absent).
+  function botDelay() {
     const s = app.committed;
-    if (!s || s.status !== 'playing' || app.replay || app.botRunning || !botsHere()) return;
+    if (app.mode === 'local' || s.host === myPid()) return 700;
+    const humans = s.players.filter(p => !p.bot && p.pid !== s.host).map(p => p.pid);
+    const rank = humans.indexOf(myPid());
+    return rank < 0 ? -1 : 7000 + rank * 4000;
+  }
+  function maybeRunBot() {
+    clearTimeout(app.botTimer); app.botTimer = null;
+    const s = app.committed;
+    if (!s || s.status !== 'playing' || app.replay || app.botRunning) return;
     const p = E.current(s);
     if (!p.bot) return;
-    app.botRunning = true;
-    setTimeout(runBotTurn, 700);
+    const delay = botDelay();
+    if (delay < 0) return;
+    const version = app.version;
+    app.botTimer = setTimeout(() => {
+      app.botTimer = null;
+      if (app.version !== version || app.botRunning || app.replay || !app.committed || app.committed.status !== 'playing') return;
+      if (delay > 1000 && document.visibilityState !== 'visible') { maybeRunBot(); return; }
+      app.botRunning = true;
+      runBotTurn();
+    }, delay);
   }
   async function runBotTurn() {
     const s = app.committed;
@@ -585,7 +651,7 @@
     const token = { state: vis, seat: s.turn, abort: false, bot: true };
     app.replay = token; app.viewSeat = s.turn; app.stage = 'choose'; app.stageManual = false;
     renderGame();
-    showBanner(ic('dice', 'inl') + ' ' + esc(p.name) + ' (' + BOT_LABEL[p.bot].toLowerCase() + ') joue…', () => { token.abort = true; }, ic('skip') + 'Passer');
+    showBanner(ic('dice', 'inl') + ' ' + esc(p.name) + ' (' + BOT_LABEL[p.bot].toLowerCase() + ') is playing…', () => { token.abort = true; }, ic('skip') + 'Skip');
     await wait(600);
     for (const a of actions) {
       if (token.abort) break;
@@ -597,7 +663,7 @@
     E.endTurn(planned);
     let saved = null;
     try { saved = await app.net.saveGame(app.gameId, planned, version); }
-    catch (e) { if (app.replay === token) app.replay = null; hideBanner(); app.botRunning = false; await refresh(); render(); return; }
+    catch (e) { if (app.replay === token) app.replay = null; hideBanner(); app.botRunning = false; await refresh(); render(); maybeRunBot(); return; }
     if (app.replay === token) app.replay = null;
     hideBanner();
     const prevDisplay = s.display;
@@ -623,49 +689,53 @@
       if (!rec || rec.state.status !== 'lobby') return;
       const st = rec.state;
       if (st.players.some(p => p.pid === myPid())) { app.committed = st; app.version = rec.version; return; }
-      if (st.players.length >= 4) { toast('La partie est complète (4 joueurs)', true); return; }
-      st.players.push({ pid: myPid(), name });
+      if (st.players.length >= 4) { toast('The game is full (4 players)', true); return; }
+      st.players.push({ pid: myPid(), name, avatar: myAvatar() });
       try {
         const r = await app.net.saveGame(app.gameId, st, rec.version);
         app.committed = st; app.version = r.version;
-        rememberGame({ id: app.gameId, mode: 'online', label: 'En ligne · ' + SIDE_LABEL[st.opts.side] });
+        rememberGame({ id: app.gameId, mode: 'online', label: 'Online · ' + SIDE_LABEL[st.opts.side] });
         return;
       } catch (e) { if (e.code !== 'conflict') throw e; }
     }
   }
+  const chatBtnHTML = cls => (chatAvailable() ? '<button class="chat-btn ' + (cls || '') + '" id="chat-btn" title="Chat">' + ic('chat') + (chat.unread ? '<i class="badge-n">' + chat.unread + '</i>' : '') + '</button>' : '');
   function renderLobby() {
     app.screen = 'lobby';
     document.body.classList.remove('in-game');
+    document.body.classList.add('scenic');
     hideBanner();
     const s = app.committed;
     const host = s.host === myPid();
     const inGame = s.players.some(p => p.pid === myPid());
     const link = location.origin + location.pathname + '?g=' + s.id;
-    $('#app').innerHTML = '<div class="screen home">' + headerHTML('Salle d\'attente') + '<div class="home-body">' +
-      '<div class="panel"><h2>' + ic('users', 'h') + 'Code de la partie</h2><div class="code-big">' + esc(s.id) + '</div>' +
-      '<p class="note center">' + esc(SIDE_LABEL[s.opts.side]) + (s.opts.spirits ? ' · Esprits de la Nature' : '') + '</p>' +
-      '<div class="row"><button class="btn primary" id="share">' + ic('send') + 'Envoyer le lien</button><button class="btn secondary" id="copy">' + ic('copy') + 'Copier</button></div></div>' +
-      '<div class="panel"><h2>' + ic('users', 'h') + 'Joueurs (' + s.players.length + '/4)</h2><ul class="players-list">' + s.players.map((p, i) =>
-        '<li>' + seatDot(i) + '<b>' + esc(p.name) + '</b>' + (p.bot ? ' <span class="note">· ' + BOT_LABEL[p.bot] + '</span>' : '') + (p.pid === s.host ? ' <span class="note">· hôte</span>' : '') + (p.pid === myPid() ? ' <span class="note">· toi</span>' : '') +
-        (host && p.bot ? '<span class="spacer"></span><button class="btn small secondary icon" data-rmbot="' + i + '" title="Retirer">' + ic('x') + '</button>' : '') + '</li>').join('') + '</ul>' +
-      (host && s.players.length < 4 ? '<div class="row" style="margin-top:8px"><select id="botlvl" class="sel"><option value="1">Bot débutant</option><option value="2" selected>Bot confirmé</option><option value="3">Bot expert</option></select><button class="btn secondary small" id="addbot">' + ic('plus') + 'Ajouter un bot</button></div>' : '') +
-      (inGame ? '' : '<div class="field" style="margin-top:10px"><label>Ton prénom</label><input type="text" id="jname" maxlength="16" value="' + esc(myName()) + '"></div><button class="btn primary block" id="joinbtn">Rejoindre la partie</button>') +
+    $('#app').innerHTML = '<div class="screen home">' + bgHTML() + '<div class="home-content">' + heroHTML({ sub: 'Waiting room', extra: chatBtnHTML('float') }) + '<div class="home-body">' +
+      '<div class="panel glass"><h2>' + ic('users', 'h') + 'Game code</h2><div class="code-big">' + esc(s.id) + '</div>' +
+      '<p class="note center">' + esc(SIDE_LABEL[s.opts.side]) + (s.opts.spirits ? ' · Nature\'s Spirits' : '') + '</p>' +
+      '<div class="row"><button class="btn primary" id="share">' + ic('send') + 'Send the link</button><button class="btn secondary" id="copy">' + ic('copy') + 'Copy</button></div></div>' +
+      '<div class="panel glass"><h2>' + ic('users', 'h') + 'Players (' + s.players.length + '/4)</h2><ul class="players-list">' + s.players.map((p, i) =>
+        '<li>' + avatarHTML(p, i, 'md') + '<b>' + esc(p.name) + '</b>' + (p.bot ? ' <span class="note">· ' + BOT_LABEL[p.bot] + '</span>' : '') + (p.pid === s.host ? ' <span class="note">· host</span>' : '') + (p.pid === myPid() ? ' <span class="note">· you</span>' : '') +
+        (host && p.bot ? '<span class="spacer"></span><button class="btn small secondary icon" data-rmbot="' + i + '" title="Remove">' + ic('x') + '</button>' : '') + '</li>').join('') + '</ul>' +
+      (host && s.players.length < 4 ? '<div class="row" style="margin-top:8px"><select id="botlvl" class="sel"><option value="1">Novice bot</option><option value="2" selected>Skilled bot</option><option value="3">Expert bot</option></select><button class="btn secondary small" id="addbot">' + ic('plus') + 'Add a bot</button></div>' : '') +
+      (inGame ? '' : '<div class="field" style="margin-top:10px"><label>Your name and animal</label><div class="me-row">' + avatarBtnHTML(myAvatar(), 'avatar-btn') + '<input type="text" id="jname" maxlength="16" value="' + esc(myName()) + '" placeholder="Your name"></div></div><button class="btn primary block" id="joinbtn">Join the game</button>') +
       '</div>' +
-      (host ? '<button class="btn primary block big" id="start" ' + (s.players.length >= 2 ? '' : 'disabled') + '>' + ic('play') + 'Commencer la partie (' + s.players.length + ' joueur' + (s.players.length > 1 ? 's' : '') + ')</button>' +
-        (s.players.length < 2 ? '<p class="note center">En attente d\'au moins un autre joueur… la page se met à jour toute seule.</p>' : '') :
-        '<p class="note center">En attente que l\'hôte lance la partie… <span class="conn ' + (app.rtOk ? 'on' : '') + '" id="conn"></span></p>') +
-      '<button class="btn ghost" id="leave">' + ic('back') + 'Retour à l\'accueil</button></div></div>';
+      (host ? '<button class="btn primary block big" id="start" ' + (s.players.length >= 2 ? '' : 'disabled') + '>' + ic('play') + 'Start the game (' + plural(s.players.length, 'player') + ')</button>' +
+        (s.players.length < 2 ? '<p class="note center light">Waiting for at least one more player… this page refreshes by itself.</p>' : '') :
+        '<p class="note center light">Waiting for the host to start the game… <span class="conn ' + (app.rtOk ? 'on' : '') + '" id="conn"></span></p>') +
+      '<button class="btn ghost light" id="leave">' + ic('back') + 'Back to home</button></div></div></div>';
     $('#share').onclick = async () => {
-      const text = 'Viens jouer à Harmonies avec moi ! Code ' + s.id + ' — ' + link;
+      const text = 'Come play Harmonies with me! Code ' + s.id + ' — ' + link;
       if (navigator.share) { try { await navigator.share({ title: 'Harmonies', text, url: link }); } catch (e) { /* annulé */ } }
-      else { await copyText(link); toast('Lien copié'); }
+      else { await copyText(link); toast('Link copied'); }
     };
-    $('#copy').onclick = async () => { await copyText(link); toast('Lien copié'); };
+    $('#copy').onclick = async () => { await copyText(link); toast('Link copied'); };
     $('#leave').onclick = () => { leaveGame(); renderHome(); };
+    const cb = $('#chat-btn'); if (cb) cb.onclick = openChat;
+    const ab2 = $('#avatar-btn'); if (ab2) ab2.onclick = () => showAvatarPicker(myAvatar(), id => { ls.set('harmonies.avatar', id); ab2.innerHTML = avatarHTML({ avatar: id, name: myName() }, -1, 'lg') + '<i>' + ic('edit') + '</i>'; });
     if (!inGame) $('#joinbtn').onclick = async () => {
-      const n = $('#jname').value.trim(); if (!n) { toast('Indique ton prénom', true); return; }
+      const n = $('#jname').value.trim(); if (!n) { toast('Enter your name', true); return; }
       ls.set('harmonies.name', n); Sfx.unlock();
-      try { await joinLobby(n); render(); } catch (e) { toast('Impossible de rejoindre : ' + e.message, true); }
+      try { await joinLobby(n); render(); } catch (e) { toast('Could not join: ' + e.message, true); }
     };
     async function saveLobby(mut) {
       for (let attempt = 0; attempt < 3; attempt++) {
@@ -673,15 +743,15 @@
         if (!rec || rec.state.status !== 'lobby') return;
         const st = rec.state; mut(st);
         try { const r = await app.net.saveGame(app.gameId, st, rec.version); app.committed = st; app.version = r.version; render(); return; }
-        catch (e) { if (e.code !== 'conflict') { toast('Échec : ' + e.message, true); return; } }
+        catch (e) { if (e.code !== 'conflict') { toast('Failed: ' + e.message, true); return; } }
       }
     }
-    const ab = $('#addbot'); if (ab) ab.onclick = () => { const lvl = +$('#botlvl').value; saveLobby(st => { if (st.players.length < 4) st.players.push({ pid: 'bot-' + randomId(6, 'abcdefghijklmnopqrstuvwxyz0123456789'), name: 'Bot ' + botName(st.players, lvl), bot: lvl }); }); };
+    const ab = $('#addbot'); if (ab) ab.onclick = () => { const lvl = +$('#botlvl').value; saveLobby(st => { if (st.players.length < 4) { const name = 'Bot ' + botName(st.players, lvl); st.players.push({ pid: 'bot-' + randomId(6, 'abcdefghijklmnopqrstuvwxyz0123456789'), name, bot: lvl, avatar: Bot.avatarFor(name) }); } }); };
     $$('[data-rmbot]').forEach(b => { b.onclick = () => { const i = +b.dataset.rmbot; saveLobby(st => { if (st.players[i] && st.players[i].bot) st.players.splice(i, 1); }); }; });
     if (host) $('#start').onclick = async () => {
       Sfx.unlock();
-      if (s.players.every(p => p.bot)) { toast('Il faut au moins un joueur humain', true); return; }
-      const st = E.newGame(s.opts, s.players.map(p => ({ token: p.pid, name: p.name, bot: p.bot || 0 })));
+      if (s.players.every(p => p.bot)) { toast('At least one human player is needed', true); return; }
+      const st = E.newGame(s.opts, s.players.map(p => ({ token: p.pid, name: p.name, bot: p.bot || 0, avatar: p.avatar || 0 })));
       st.players.forEach((p, i) => { p.pid = s.players[i].pid; });
       st.id = s.id; st.host = s.host; st.mode = 'online';
       try {
@@ -690,16 +760,18 @@
         render();
         if (isMine()) announceMyTurn();
         maybeRunBot();
-      } catch (e) { toast('Lancement impossible : ' + e.message, true); refresh(); }
+      } catch (e) { toast('Could not start: ' + e.message, true); refresh(); }
     };
   }
   async function copyText(text) {
-    try { await navigator.clipboard.writeText(text); } catch (e) { prompt('Copie ce lien :', text); }
+    try { await navigator.clipboard.writeText(text); } catch (e) { prompt('Copy this link:', text); }
   }
   function leaveGame() {
     if (app.unsub) app.unsub();
-    clearInterval(app.poll);
-    app.unsub = null; app.gameId = null; app.committed = null; app.work = null; app.replay = null;
+    if (chat.unsub) chat.unsub();
+    clearInterval(app.poll); clearTimeout(app.botTimer);
+    app.unsub = null; chat.unsub = null; app.botTimer = null; app.gameId = null; app.committed = null; app.work = null; app.replay = null; app.botRunning = false;
+    chat.msgs = []; chat.lastId = 0; chat.unread = 0; chat.open = false;
     history.replaceState(null, '', location.pathname);
   }
 
@@ -709,6 +781,7 @@
     document.body.classList.toggle('in-game', !!s && s.status !== 'lobby');
     if (!s) return renderHome();
     if (s.status === 'lobby') return renderLobby();
+    document.body.classList.remove('scenic');
     renderGame();
   }
   function ensureWork() {
@@ -781,15 +854,6 @@
     fitObserver.observe(box);
   }
 
-  function miniCardHTML(card, left, opts) {
-    opts = opts || {};
-    const placed = card.pts.length - left;
-    return '<button class="mini' + (opts.placeable ? ' placeable' : '') + (opts.done ? ' done' : '') + (card.spirit ? ' spirit' : '') + (opts.arriving ? ' arriving' : '') + '" data-card="' + card.id + '" title="' + esc(card.fr) + '">' +
-      R.animalSVG(card.id) + (card.spirit ? '' : '<span class="left">' + (opts.done ? ic('check') : left) + '</span>') +
-      (opts.placeable ? '<span class="go">' + ic('cube') + '</span>' : '') +
-      '<span class="lbl">' + esc(card.fr) + '</span></button>';
-  }
-
   function renderGame(anim) {
     anim = anim || {};
     app.screen = 'game';
@@ -806,23 +870,24 @@
     const side = s.opts.side;
     if (!app.stageManual && !replaying) app.stage = anim.stage || autoStage();
     const stage = app.stage;
-    document.title = (mine && s.status === 'playing' ? 'À toi · ' : '') + 'Harmonies · ' + (s.id || '');
+    document.title = (mine && s.status === 'playing' ? 'Your turn · ' : '') + 'Harmonies · ' + (s.id || '');
     const scores = s.players.map(p => E.scorePlayer(p, side));
     const step = stepOf(s, mine);
+    const curName = esc(E.current(s).name);
 
     // Message d'état
     let msg, msgIcon = 'hourglass', msgCls = '';
-    if (s.status === 'finished') { msg = 'Partie terminée'; msgIcon = 'flag'; }
-    else if (replaying) { msg = esc(E.current(s).name) + ' joue…'; msgIcon = 'film'; }
+    if (s.status === 'finished') { msg = 'Game over'; msgIcon = 'flag'; }
+    else if (replaying) { msg = curName + ' is playing…'; msgIcon = 'film'; }
     else if (mine) {
       const st = E.turnStatus(s);
       msgIcon = 'hand'; msgCls = ' mine';
-      if (app.cubeMode) { msg = 'Tape une case orange pour poser le cube'; msgIcon = 'cube'; }
-      else if (step === 1) msg = 'Prends un groupe de 3 jetons';
-      else if (step === 2) msg = 'Pose tes jetons (' + cur.tokens.length + ')';
+      if (app.cubeMode) { msg = 'Tap an orange space to place the cube'; msgIcon = 'cube'; }
+      else if (step === 1) msg = 'Take a group of 3 tokens';
+      else if (step === 2) msg = 'Place your tokens (' + cur.tokens.length + ')';
       else if (!st.ok) msg = st.reasons[0];
-      else { msg = 'Carte ou cube ? Sinon, fin du tour'; msgIcon = 'check'; }
-    } else msg = 'Tour de ' + esc(E.current(s).name) + (app.mode === 'online' ? '…' : '');
+      else { msg = 'Card or cube? Otherwise end your turn'; msgIcon = 'check'; }
+    } else msg = curName + '\'s turn' + (app.mode === 'online' ? '…' : '');
 
     const legal = new Set(), targets = new Set(), last = new Set();
     if (viewingMine && !app.cubeMode && app.selToken !== null && cur.tokens[app.selToken] !== undefined) {
@@ -836,74 +901,76 @@
     }
     const placeable = mine ? E.placeableCubes(s) : [];
     const placeableIds = new Set(placeable.map(p => p.id));
+    void placeableIds;
     const canTake = mine && E.canTakeCard(s);
 
     // ----- barre haute + état -----
-    const steps = mine && s.status === 'playing' ? '<span class="steps">' + [['1', 'Jetons'], ['2', 'Poser'], ['3', 'Animaux']].map(([n, l], i) =>
+    const steps = mine && s.status === 'playing' ? '<span class="steps">' + [['1', 'Tokens'], ['2', 'Place'], ['3', 'Animals']].map(([n, l], i) =>
       '<span class="stp' + (step === i + 1 ? ' cur' : (step > i + 1 ? ' done' : '')) + '"><b>' + (step > i + 1 ? ic('check') : n) + '</b><em>' + l + '</em></span>').join('') + '</span>' : '';
-    const connHTML = app.mode === 'online' ? '<span class="conn ' + (app.rtOk ? 'on' : 'off') + '" id="conn" title="temps réel"></span>' : '';
+    const connHTML = app.mode === 'online' ? '<span class="conn ' + (app.rtOk ? 'on' : 'off') + '" id="conn" title="live connection"></span>' : '';
+    const chatB = chatBtnHTML('hdr');
     let html = '<div class="screen game">' +
       (app.headerOpen
-        ? '<div class="topbar" id="topbar">' + R.logoSVG('logo-small') + '<span class="code">' + esc(s.id || '') + '</span>' + connHTML + '<span class="spacer"></span><button class="icon-btn" id="hdr-toggle" title="Replier">' + ic('minus') + '</button></div>'
-        : '<button class="topbar-mini" id="hdr-toggle" title="Afficher l\'en-tête"><span class="brand">HARMONIES</span><span class="code">' + esc(s.id || '') + '</span>' + connHTML + '</button>') +
+        ? '<div class="topbar" id="topbar">' + R.logoSVG('logo-small') + '<span class="code">' + esc(s.id || '') + '</span>' + connHTML + '<span class="spacer"></span>' + chatB + '<button class="icon-btn" id="hdr-toggle" title="Collapse">' + ic('minus') + '</button></div>'
+        : '<div class="topbar-mini"><button class="mini-main" id="hdr-toggle" title="Show the header"><span class="brand">HARMONIES</span><span class="code">' + esc(s.id || '') + '</span>' + connHTML + '</button>' + chatB + '</div>') +
       '<div class="status' + msgCls + '"><button class="icon-btn dark" id="menu" title="Menu">' + ic('menu') + '</button><span class="msg">' + ic(msgIcon, 'inl') + '<span>' + msg + '</span></span>' + steps +
-      '<button class="icon-btn dark" id="music" title="Musique">' + ic(Sfx.music ? 'music' : 'music-off') + '</button><button class="icon-btn dark" id="sound" title="Sons">' + ic(Sfx.enabled ? 'sound' : 'mute') + '</button></div>';
+      '<button class="icon-btn dark" id="music" title="Music">' + ic(Sfx.music ? 'music' : 'music-off') + '</button><button class="icon-btn dark" id="sound" title="Sounds">' + ic(Sfx.enabled ? 'sound' : 'mute') + '</button></div>';
 
     // ----- scène : choisir (jetons + animaux) ou jouer (plateau + cartes) -----
     html += '<div class="stage">';
     if (stage === 'choose') {
-      html += '<div class="stage-choose"><div class="choose-market"><div class="stage-head">' + secTitle('blue', 'grid', 'Plateau central') +
-        (mine && step === 1 ? '<span class="hint">prends un groupe</span>' : (mine && cur.slot !== null ? '<span class="hint muted">jetons pris</span>' : '')) +
-        '<span class="spacer"></span><span class="pouch-wrap" title="Jetons restants dans le sac">' + R.pouchSVG(s.bag ? s.bag.length : 0) + '</span></div>' +
+      html += '<div class="stage-choose"><div class="choose-market"><div class="stage-head">' + secTitle('blue', 'grid', 'Central board') +
+        (mine && step === 1 ? '<span class="hint">take a group</span>' : (mine && cur.slot !== null ? '<span class="hint muted">tokens taken</span>' : '')) +
+        '<span class="spacer"></span><span class="pouch-wrap" title="Tokens left in the bag">' + R.pouchSVG(s.bag ? s.bag.length : 0) + '</span></div>' +
         '<div class="market">' + s.market.map((m, i) => {
           const takeable = mine && cur.slot === null && m.length > 0 && !app.cubeMode;
           const arriving = anim.refillSlot === i;
-          return '<div class="slot' + (takeable ? ' takeable' : '') + (m.length ? '' : ' empty') + '" data-slot="' + i + '">' + (m.length ? R.slotSVG(m, arriving) : (cur && cur.slot === i ? '<span class="slot-empty">pris</span>' : '')) + '</div>';
+          return '<div class="slot' + (takeable ? ' takeable' : '') + (m.length ? '' : ' empty') + '" data-slot="' + i + '">' + (m.length ? R.slotSVG(m, arriving) : (cur && cur.slot === i ? '<span class="slot-empty">taken</span>' : '')) + '</div>';
         }).join('') + '</div></div>' +
-        '<div class="choose-animals"><div class="stage-head">' + secTitle('orange', 'star', 'Animaux') +
-        '<span class="hint' + (canTake ? '' : ' muted') + '">' + (canTake ? 'tu peux en prendre une' : (mine && cur.cardTaken ? 'carte prise ce tour' : (mine ? 'limite de 4 atteinte' : 'une par tour, 4 max'))) + '</span>' +
-        '<span class="spacer"></span><span class="deck-wrap mini" title="Pioche">' + R.deckSVG(s.deck.length) + '</span></div>' +
+        '<div class="choose-animals"><div class="stage-head">' + secTitle('orange', 'star', 'Animals') +
+        '<span class="hint' + (canTake ? '' : ' muted') + '">' + (canTake ? 'you can take one' : (mine && cur.cardTaken ? 'card taken this turn' : (mine ? '4-card limit reached' : 'one per turn, 4 max'))) + '</span>' +
+        '<span class="spacer"></span><span class="deck-wrap mini" title="Draw pile">' + R.deckSVG(s.deck.length) + '</span></div>' +
         '<div class="cards-strip compact">' +
         s.display.map((id, i) => {
           if (!id) return '<div class="card empty" data-display="' + i + '"></div>';
           const card = E.CARD_BY_ID.get(id);
           const arriving = anim.newDisplay && anim.newDisplay.includes(i);
-          return cardHTML(card, { cls: (canTake ? 'takeable' : '') + (arriving ? ' arriving' : ''), badge: canTake ? 'Prendre' : '', badgeCls: 'teal', attrs: 'data-display="' + i + '"' });
+          return cardHTML(card, { cls: (canTake ? 'takeable' : '') + (arriving ? ' arriving' : ''), badge: canTake ? 'Take' : '', badgeCls: 'teal', attrs: 'data-display="' + i + '"' });
         }).join('') + '</div></div></div>';
     } else {
       const p2 = viewing;
       const items = [];
       const pcOf = id => (viewingMine ? placeable.find(x => x.id === id) : null);
-      if (p2.spiritChoices && viewingMine) items.push('<div class="card tone-sp spirit choose" id="spirit-choose"><div class="head">Esprit</div><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '</div><div class="choose-body">' + ic('sparkles') + 'À choisir</div></div>');
-      if (p2.spirit) items.push(cardHTML(E.CARD_BY_ID.get(p2.spirit.id), { cls: (pcOf(p2.spirit.id) ? 'placeable' : '') + (p2.spirit.placed ? ' done' : ''), badge: pcOf(p2.spirit.id) ? ic('cube') + 'Poser' : (p2.spirit.placed ? ic('check') : ''), badgeCls: p2.spirit.placed ? 'teal' : '', attrs: 'data-mine="1"' }));
-      for (const h of p2.hand) items.push(cardHTML(E.CARD_BY_ID.get(h.id), { left: h.left, cls: (pcOf(h.id) ? 'placeable' : '') + (anim.arrivingCard === h.id ? ' arriving' : ''), badge: pcOf(h.id) ? ic('cube') + 'Poser' : '', attrs: 'data-mine="1"' }));
+      if (p2.spiritChoices && viewingMine) items.push('<div class="card tone-sp spirit choose" id="spirit-choose"><div class="head">Spirit</div><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '</div><div class="choose-body">' + ic('sparkles') + 'To choose</div></div>');
+      if (p2.spirit) items.push(cardHTML(E.CARD_BY_ID.get(p2.spirit.id), { cls: (pcOf(p2.spirit.id) ? 'placeable' : '') + (p2.spirit.placed ? ' done' : ''), badge: pcOf(p2.spirit.id) ? ic('cube') + 'Place' : (p2.spirit.placed ? ic('check') : ''), badgeCls: p2.spirit.placed ? 'teal' : '', attrs: 'data-mine="1"' }));
+      for (const h of p2.hand) items.push(cardHTML(E.CARD_BY_ID.get(h.id), { left: h.left, cls: (pcOf(h.id) ? 'placeable' : '') + (anim.arrivingCard === h.id ? ' arriving' : ''), badge: pcOf(h.id) ? ic('cube') + 'Place' : '', attrs: 'data-mine="1"' }));
       for (const d of p2.done) items.push(cardHTML(E.CARD_BY_ID.get(d.id), { left: 0, cls: 'done', done: true, badge: ic('check'), badgeCls: 'teal', attrs: 'data-mine="1"' }));
       html += '<div class="stage-play"><div class="board-tabs">' + s.players.map((p, i) =>
-        '<button data-seat="' + i + '" class="' + (i === app.viewSeat ? 'on' : '') + '" style="--seat:' + SEAT_COLORS[i] + '">' + seatDot(i) + esc(p.name) + (p.bot ? ic('cpu', 'inl') : '') + (i === me && app.mode === 'online' ? ' (toi)' : '') + (i === s.turn && s.status === 'playing' ? ic('dice', 'inl') : '') + '<b>' + scores[i].total + '</b></button>').join('') +
-        '<span class="spacer"></span><span class="board-info">' + E.emptyCount(p2.board) + ' vides</span></div>' +
+        '<button data-seat="' + i + '" class="' + (i === app.viewSeat ? 'on' : '') + '" style="--seat:' + SEAT_COLORS[i] + '">' + avatarHTML(p, i, 'xs') + esc(p.name) + (p.bot ? ic('cpu', 'inl') : '') + (i === me && app.mode === 'online' ? ' (you)' : '') + (i === s.turn && s.status === 'playing' ? ic('dice', 'inl') : '') + '<b>' + scores[i].total + '</b></button>').join('') +
+        '<span class="spacer"></span><span class="board-info">' + E.emptyCount(p2.board) + ' empty</span></div>' +
         '<div class="board-fit">' + R.boardSVG(p2.board, { legal, targets, last, readonly: !viewingMine, newTop: anim.newTop, newCube: anim.newCube }) + '</div>' +
         cardsBlock();
       // tiroir des cartes possédées : ouvert par défaut, bouton rond central pour l'ouvrir (+) / le fermer (×)
       function cardsBlock() {
-          const open = app.cardsOpen !== false;
-          return '<div class="drawer' + (open ? ' open' : '') + '" id="drawer"><button class="drawer-toggle" id="drawer-toggle" title="' + (open ? 'Fermer les cartes' : 'Ouvrir les cartes') + '">' + ic(open ? 'x' : 'plus') + '</button>' +
-            (open ? '<div class="stage-head">' + secTitle('teal', 'layers', viewingMine ? 'Tes cartes' : 'Cartes de ' + esc(p2.name)) +
-              '<span class="hint muted">' + E.activeCount(p2) + '/4' + (p2.done.length ? ' · ' + p2.done.length + ' finie' + (p2.done.length > 1 ? 's' : '') : '') + '</span><span class="spacer"></span>' +
-              '<button class="btn small secondary icon" id="cards-sheet" title="Voir en grand">' + ic('layers') + '</button></div>' +
-              '<div class="cards-strip compact">' + (items.length ? items.join('') : '<div class="card empty"><div class="empty-text">aucune carte</div></div>') + '</div>' : '') + '</div>';
+        const open = app.cardsOpen !== false;
+        return '<div class="drawer' + (open ? ' open' : '') + '" id="drawer"><button class="drawer-toggle" id="drawer-toggle" title="' + (open ? 'Hide the cards' : 'Show the cards') + '">' + ic(open ? 'x' : 'plus') + '</button>' +
+          (open ? '<div class="stage-head">' + secTitle('teal', 'layers', viewingMine ? 'Your cards' : esc(p2.name) + '\'s cards') +
+            '<span class="hint muted">' + E.activeCount(p2) + '/4' + (p2.done.length ? ' · ' + p2.done.length + ' completed' : '') + '</span><span class="spacer"></span>' +
+            '<button class="btn small secondary icon" id="cards-sheet" title="View large">' + ic('layers') + '</button></div>' +
+            '<div class="cards-strip compact">' + (items.length ? items.join('') : '<div class="card empty"><div class="empty-text">no cards</div></div>') + '</div>' : '') + '</div>';
       }
       html += '</div>';
     }
     html += '</div>';
 
     // ----- pied de page : vues | main, puis actions -----
-    const handLabel = replaying ? 'Main de ' + esc(E.current(s).name) : 'Main';
+    const handLabel = replaying ? curName + '\'s hand' : 'Hand';
     let handHTML;
-    if (s.status === 'finished') handHTML = '<span class="placeholder">Terminé</span>';
-    else if (replaying) handHTML = cur.tokens.length ? cur.tokens.map((t, i) => '<span class="tok' + (anim.arrivingHand ? ' arriving' : '') + '" data-tok="' + i + '">' + R.tokenSVG(t) + '</span>').join('') : '<span class="placeholder">' + esc(E.current(s).name) + ' joue…</span>';
-    else if (!mine) handHTML = '<span class="placeholder">' + (app.mode === 'online' ? 'Attente de ' + esc(E.current(s).name) : 'Tour de ' + esc(E.current(s).name)) + '</span>';
-    else if (cur.slot === null && cur.tokens.length === 0) handHTML = '<span class="placeholder">' + (s.market.every(m => !m.length) ? 'plus de jetons' : '3 jetons à prendre') + '</span>';
-    else if (cur.tokens.length === 0) handHTML = '<span class="placeholder ok">' + ic('check', 'inl') + 'posés</span>';
+    if (s.status === 'finished') handHTML = '<span class="placeholder">Finished</span>';
+    else if (replaying) handHTML = cur.tokens.length ? cur.tokens.map((t, i) => '<span class="tok' + (anim.arrivingHand ? ' arriving' : '') + '" data-tok="' + i + '">' + R.tokenSVG(t) + '</span>').join('') : '<span class="placeholder">' + curName + ' is playing…</span>';
+    else if (!mine) handHTML = '<span class="placeholder">' + (app.mode === 'online' ? 'Waiting for ' + curName : curName + '\'s turn') + '</span>';
+    else if (cur.slot === null && cur.tokens.length === 0) handHTML = '<span class="placeholder">' + (s.market.every(m => !m.length) ? 'no tokens left' : '3 tokens to take') + '</span>';
+    else if (cur.tokens.length === 0) handHTML = '<span class="placeholder ok">' + ic('check', 'inl') + 'placed</span>';
     else handHTML = cur.tokens.map((t, i) => {
       const dead = !E.legalCells(E.current(s).board, t).length;
       return '<button class="tok' + (i === app.selToken ? ' sel' : '') + (dead ? ' dead' : '') + (anim.arrivingHand ? ' arriving' : '') + '" data-tok="' + i + '" title="' + E.COLOR_NAMES[t] + '">' + R.tokenSVG(t) + '</button>';
@@ -911,17 +978,17 @@
     const myCount = E.activeCount(s.players[me >= 0 ? me : s.turn]);
     const folded = stage === 'play';
     const tabsHTML = '<div class="view-tabs">' +
-      '<button data-stage="choose" class="' + (stage === 'choose' ? 'on' : '') + '" title="Jetons et animaux">' + ic('grid') + '<span>Choisir</span>' + (mine && (step === 1 || (step === 3 && canTake)) ? '<i class="dotb"></i>' : '') + '</button>' +
-      '<button data-stage="play" class="' + (stage === 'play' ? 'on' : '') + '" title="Plateau et cartes">' + ic('layers') + '<span>Plateau</span>' + (mine && (step === 2 || app.cubeMode || placeable.length) ? '<i class="dotb"></i>' : '') + '<em class="cnt">' + myCount + '</em></button>' +
+      '<button data-stage="choose" class="' + (stage === 'choose' ? 'on' : '') + '" title="Tokens and animals">' + ic('grid') + '<span>Choose</span>' + (mine && (step === 1 || (step === 3 && canTake)) ? '<i class="dotb"></i>' : '') + '</button>' +
+      '<button data-stage="play" class="' + (stage === 'play' ? 'on' : '') + '" title="Board and cards">' + ic('layers') + '<span>Board</span>' + (mine && (step === 2 || app.cubeMode || placeable.length) ? '<i class="dotb"></i>' : '') + '<em class="cnt">' + myCount + '</em></button>' +
       '</div>';
     let actionsHTML = '';
-    if (s.status === 'finished') actionsHTML = '<button class="btn primary" id="results">' + ic('trophy') + '<span class="lbl">Résultats</span></button>';
-    else if (replaying) actionsHTML = folded ? '' : '<span class="placeholder">' + ic('film', 'inl') + 'Rejeu du tour…</span>';
-    else if (!mine) actionsHTML = (folded ? '' : '<span class="placeholder">' + ic('hourglass', 'inl') + 'Tu joues après ' + esc(E.current(s).name) + '</span>') + (app.mode === 'online' ? '<button class="btn secondary icon" id="reload" title="Actualiser">' + ic('refresh') + '</button>' : '');
+    if (s.status === 'finished') actionsHTML = '<button class="btn primary" id="results">' + ic('trophy') + '<span class="lbl">Results</span></button>';
+    else if (replaying) actionsHTML = folded ? '' : '<span class="placeholder">' + ic('film', 'inl') + 'Replaying the turn…</span>';
+    else if (!mine) actionsHTML = (folded ? '' : '<span class="placeholder">' + ic('hourglass', 'inl') + 'You play after ' + curName + '</span>') + (app.mode === 'online' ? '<button class="btn secondary icon" id="reload" title="Refresh">' + ic('refresh') + '</button>' : '');
     else {
       const st = E.turnStatus(s);
-      actionsHTML = '<button class="btn secondary' + (folded ? ' icon' : '') + '" id="undo" ' + (app.undo.length ? '' : 'disabled') + ' title="Annuler">' + ic('undo') + '<span class="lbl">Annuler</span></button>' +
-        '<button class="btn primary' + (st.ok ? ' ready' : '') + '" id="end" ' + (st.ok ? '' : 'disabled') + ' title="Fin du tour">' + (folded ? ic('flag') : '') + '<span class="lbl">' + (folded ? 'Fin' : 'Fin du tour') + '</span></button>';
+      actionsHTML = '<button class="btn secondary' + (folded ? ' icon' : '') + '" id="undo" ' + (app.undo.length ? '' : 'disabled') + ' title="Undo">' + ic('undo') + '<span class="lbl">Undo</span></button>' +
+        '<button class="btn primary' + (st.ok ? ' ready' : '') + '" id="end" ' + (st.ok ? '' : 'disabled') + ' title="End turn">' + (folded ? ic('flag') : '') + '<span class="lbl">' + (folded ? 'End' : 'End turn') + '</span></button>';
     }
     if (folded) {
       html += '<div class="footer folded"><div class="foot-row">' + tabsHTML + '<div class="foot-hand"><div class="tokens">' + handHTML + '</div></div><div class="foot-actions">' + actionsHTML + '</div></div>';
@@ -936,9 +1003,9 @@
     if (replaying) mountBanner();
 
     if (replaying) { /* bannière gérée par le rejeu */ }
-    else if (mine && app.cubeMode) showBanner('Pose le cube ' + miniAnimal(app.cubeMode.id) + ' ' + esc(E.CARD_BY_ID.get(app.cubeMode.id).fr) + ' : touche une case orange', () => { app.cubeMode = null; renderGame(); }, 'Annuler');
+    else if (mine && app.cubeMode) showBanner('Place the cube ' + miniAnimal(app.cubeMode.id) + ' ' + esc(E.CARD_BY_ID.get(app.cubeMode.id).en) + ': tap an orange space', () => { app.cubeMode = null; renderGame(); }, 'Cancel');
     else if (mine && stage === 'play' && app.selToken !== null && cur.tokens[app.selToken] !== undefined && !E.legalCells(E.current(s).board, cur.tokens[app.selToken]).length) {
-      showBanner('Aucune case possible pour ce jeton', () => { const sel = app.selToken; if (act(w => E.discardToken(w, sel))) Sfx.undo(); app.selToken = app.work.cur.tokens.length ? 0 : null; renderGame(); }, 'Défausser');
+      showBanner('No possible space for this token', () => { const sel = app.selToken; if (act(w => E.discardToken(w, sel))) Sfx.undo(); app.selToken = app.work.cur.tokens.length ? 0 : null; renderGame(); }, 'Discard');
     } else hideBanner();
 
     if (mine && E.current(s).spiritChoices && !app.spiritPrompted && !app.cubeMode) { app.spiritPrompted = true; showSpiritChoice(); }
@@ -947,12 +1014,13 @@
 
   function bindGame(s, mine, viewingMine, placeable) {
     $('#menu').onclick = showMenu;
-    $('#sound').onclick = () => { const on = Sfx.toggle(); $('#sound').innerHTML = ic(on ? 'sound' : 'mute'); toast(on ? 'Sons activés' : 'Sons coupés'); };
-    $('#music').onclick = () => { const on = Sfx.toggleMusic(); $('#music').innerHTML = ic(on ? 'music' : 'music-off'); toast(on ? 'Musique d\'ambiance' : 'Musique coupée'); };
+    $('#sound').onclick = () => { const on = Sfx.toggle(); $('#sound').innerHTML = ic(on ? 'sound' : 'mute'); toast(on ? 'Sounds on' : 'Sounds off'); };
+    $('#music').onclick = () => { const on = Sfx.toggleMusic(); $('#music').innerHTML = ic(on ? 'music' : 'music-off'); toast(on ? 'Ambient music on' : 'Music off'); };
     $('#hdr-toggle').onclick = () => { app.headerOpen = !app.headerOpen; renderGame(); };
+    const cb = $('#chat-btn'); if (cb) cb.onclick = openChat;
     $$('.view-tabs button').forEach(b => { b.onclick = () => { if (app.replay) return; setStage(b.dataset.stage, true); }; });
     $$('.board-tabs button').forEach(b => { b.onclick = () => { const seat = +b.dataset.seat; if (app.viewSeat === seat) showScores(); else { app.viewSeat = seat; renderGame(); } }; });
-    const reload = $('#reload'); if (reload) reload.onclick = () => { refresh(); toast('Mise à jour…'); };
+    const reload = $('#reload'); if (reload) reload.onclick = () => { refresh(); loadChat(false); toast('Refreshing…'); };
     const results = $('#results'); if (results) results.onclick = showResults;
     const cs = $('#cards-sheet'); if (cs) cs.onclick = () => showCardsSheet(app.viewSeat, mine, viewingMine, placeable);
     const dt = $('#drawer-toggle'); if (dt) dt.onclick = () => { app.cardsOpen = app.cardsOpen === false; ls.set('harmonies.cardsOpen', app.cardsOpen); renderGame(); };
@@ -962,7 +1030,7 @@
         const card = E.CARD_BY_ID.get(id);
         const pc = mine && viewingMine && !app.busy ? placeable.find(x => x.id === id) : null;
         if (pc && ev.target.closest('.badge')) { startCube(pc); return; }
-        cardDetail(card, pc ? '<button class="btn warn block" id="m-cube">' + ic('cube') + 'Poser un cube</button>' : '');
+        cardDetail(card, pc ? '<button class="btn warn block" id="m-cube">' + ic('cube') + 'Place a cube</button>' : '');
         const b = $('#m-cube'); if (b) b.onclick = () => { closeModal(); startCube(pc); };
       };
     });
@@ -974,7 +1042,7 @@
         const card = E.CARD_BY_ID.get(+c.dataset.card);
         const canTake = mine && !app.busy && E.canTakeCard(app.work);
         if (ev.target.closest('.badge') && canTake) { interactiveCard(+c.dataset.display); return; }
-        cardDetail(card, canTake ? '<button class="btn primary block" id="m-take">Prendre cette carte</button>' : (mine ? '<p class="note">' + (app.work.cur.cardTaken ? 'Tu as déjà pris une carte ce tour.' : 'Tu as déjà 4 cartes en cours.') + '</p>' : ''));
+        cardDetail(card, canTake ? '<button class="btn primary block" id="m-take">Take this card</button>' : (mine ? '<p class="note">' + (app.work.cur.cardTaken ? 'You already took a card this turn.' : 'You already have 4 cards in progress.') + '</p>' : ''));
         const b = $('#m-take'); if (b) b.onclick = () => { closeModal(); interactiveCard(+c.dataset.display); };
       };
     });
@@ -996,16 +1064,16 @@
         const idx = +hex.dataset.idx;
         const w = app.work;
         if (app.cubeMode) {
-          if (!app.cubeMode.targets.has(idx)) { toast('Cette case ne convient pas à cet habitat', true); return; }
+          if (!app.cubeMode.targets.has(idx)) { toast('This space does not fit that habitat', true); return; }
           interactiveCube(app.cubeMode.id, idx);
           return;
         }
         if (app.selToken === null || w.cur.tokens[app.selToken] === undefined) {
-          if (w.cur.slot === null) toast('Prends d\'abord 3 jetons (vue Choisir)', true);
+          if (w.cur.slot === null) toast('Take 3 tokens first (Choose view)', true);
           return;
         }
         const color = w.cur.tokens[app.selToken];
-        if (!E.canPlace(w.players[w.turn].board[idx], color)) { toast('Pose impossible ici (' + E.COLOR_NAMES[color] + ')', true); return; }
+        if (!E.canPlace(w.players[w.turn].board[idx], color)) { toast('Cannot place here (' + E.COLOR_NAMES[color] + ')', true); return; }
         interactivePlace(app.selToken, idx);
       });
     }
@@ -1023,14 +1091,14 @@
     const s = view();
     const p = s.players[seat];
     const items = [];
-    if (p.spiritChoices && viewingMine) items.push('<div class="card tone-sp spirit choose" data-choose-spirit="1"><div class="head">Esprit de la Nature</div><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '</div><div class="choose-body">' + ic('sparkles') + 'Choisis ton Esprit</div><div class="foot">2 cartes à découvrir</div></div>');
+    if (p.spiritChoices && viewingMine) items.push('<div class="card tone-sp spirit choose" data-choose-spirit="1"><div class="head">Nature\'s Spirit</div><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '</div><div class="choose-body">' + ic('sparkles') + 'Choose your Spirit</div><div class="foot">2 cards to reveal</div></div>');
     const pcOf = id => (mine && viewingMine ? placeable.find(x => x.id === id) : null);
-    if (p.spirit) items.push(cardHTML(E.CARD_BY_ID.get(p.spirit.id), { cls: (pcOf(p.spirit.id) ? 'placeable' : '') + (p.spirit.placed ? ' done' : ''), badge: pcOf(p.spirit.id) ? ic('cube') + 'Poser' : (p.spirit.placed ? ic('check') + 'posé' : ''), badgeCls: p.spirit.placed ? 'teal' : '', attrs: 'data-mine="1"' }));
-    for (const h of p.hand) items.push(cardHTML(E.CARD_BY_ID.get(h.id), { left: h.left, cls: pcOf(h.id) ? 'placeable' : '', badge: pcOf(h.id) ? ic('cube') + 'Poser' : '', attrs: 'data-mine="1"' }));
+    if (p.spirit) items.push(cardHTML(E.CARD_BY_ID.get(p.spirit.id), { cls: (pcOf(p.spirit.id) ? 'placeable' : '') + (p.spirit.placed ? ' done' : ''), badge: pcOf(p.spirit.id) ? ic('cube') + 'Place' : (p.spirit.placed ? ic('check') + 'placed' : ''), badgeCls: p.spirit.placed ? 'teal' : '', attrs: 'data-mine="1"' }));
+    for (const h of p.hand) items.push(cardHTML(E.CARD_BY_ID.get(h.id), { left: h.left, cls: pcOf(h.id) ? 'placeable' : '', badge: pcOf(h.id) ? ic('cube') + 'Place' : '', attrs: 'data-mine="1"' }));
     for (const d of p.done) items.push(cardHTML(E.CARD_BY_ID.get(d.id), { left: 0, cls: 'done', done: true, badge: ic('check'), badgeCls: 'teal', attrs: 'data-mine="1"' }));
-    modal('<h2>' + ic('layers', 'h') + (viewingMine ? 'Tes cartes' : 'Cartes de ' + esc(p.name)) + ' <span class="note">· ' + E.activeCount(p) + '/4 en cours' + (p.done.length ? ' · ' + p.done.length + ' terminée' + (p.done.length > 1 ? 's' : '') : '') + '</span></h2>' +
-      (items.length ? '<div class="cards-grid">' + items.join('') + '</div>' : '<p class="note">Aucune carte pour le moment. Prends-en dans l\'onglet Animaux (une par tour).</p>') +
-      '<div class="actions">' + (mine && E.canTakeCard(s) ? '<button class="btn secondary" id="m-animals">' + ic('star') + 'Voir les animaux</button>' : '') + '<button class="btn secondary" id="m-close">Fermer</button></div>', { cls: 'sheet' });
+    modal('<h2>' + ic('layers', 'h') + (viewingMine ? 'Your cards' : esc(p.name) + '\'s cards') + ' <span class="note">· ' + E.activeCount(p) + '/4 in progress' + (p.done.length ? ' · ' + p.done.length + ' completed' : '') + '</span></h2>' +
+      (items.length ? '<div class="cards-grid">' + items.join('') + '</div>' : '<p class="note">No cards yet. Take some from the Animals row (one per turn).</p>') +
+      '<div class="actions">' + (mine && E.canTakeCard(s) ? '<button class="btn secondary" id="m-animals">' + ic('star') + 'See the animals</button>' : '') + '<button class="btn secondary" id="m-close">Close</button></div>', { cls: 'sheet' });
     $('#m-close').onclick = closeModal;
     const ma = $('#m-animals'); if (ma) ma.onclick = () => { closeModal(); setStage('choose', true); };
     const cs = $('[data-choose-spirit]'); if (cs) cs.onclick = () => { closeModal(); showSpiritChoice(); };
@@ -1040,7 +1108,7 @@
         const card = E.CARD_BY_ID.get(id);
         const pc = pcOf(id);
         if (pc && ev.target.closest('.badge')) { bindGame.startCube(pc); return; }
-        cardDetail(card, pc ? '<button class="btn warn block" id="m-cube">' + ic('cube') + 'Poser un cube</button>' : '');
+        cardDetail(card, pc ? '<button class="btn warn block" id="m-cube">' + ic('cube') + 'Place a cube</button>' : '');
         const b = $('#m-cube'); if (b) b.onclick = () => { closeModal(); bindGame.startCube(pc); };
       };
     });
@@ -1144,7 +1212,7 @@
     withAnim(() => animatedPlace(app.work, handIdx, cellIdx)).then(() => {
       if (!app.work) return;
       const now = E.placeableCubes(app.work);
-      if (now.length && app.work.cur.tokens.length === 0) toast('Habitat réalisé : ' + now.map(x => miniAnimal(x.id) + ' ' + esc(E.CARD_BY_ID.get(x.id).fr)).join(', ') + ' → touche la carte pour poser le cube');
+      if (now.length && app.work.cur.tokens.length === 0) toast('Habitat built: ' + now.map(x => miniAnimal(x.id) + ' ' + esc(E.CARD_BY_ID.get(x.id).en)).join(', ') + ' → tap the card to place the cube');
     });
   }
   function interactiveCard(displayIdx) { withAnim(() => animatedCard(app.work, displayIdx)); }
@@ -1156,7 +1224,7 @@
     const slot = w.cur.slot;
     const prevDisplay = w.display.slice();
     try { E.endTurn(w); } catch (e) { toast(e.message, true); return; }
-    const btn = $('#end'); if (btn) { btn.disabled = true; btn.textContent = 'Envoi…'; }
+    const btn = $('#end'); if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
     app.busy = true;
     try {
       const r = await app.net.saveGame(app.gameId, w, app.version);
@@ -1172,13 +1240,14 @@
       app.stage = autoStage();
       if (app.mode === 'local' && !E.current(w).bot) {
         renderGame();
-        modal('<h2>' + ic('phone', 'h') + 'Au tour de ' + esc(E.current(w).name) + '</h2><p>Passe le téléphone à ' + esc(E.current(w).name) + '.</p><div class="actions"><button class="btn primary" id="m-ok">C\'est parti</button></div>', { sticky: true });
+        const nx = E.current(w);
+        modal('<h2>' + ic('phone', 'h') + esc(nx.name) + '\'s turn</h2><div class="pass-phone">' + avatarHTML(nx, w.turn, 'big') + '<p>Pass the phone to ' + esc(nx.name) + '.</p></div><div class="actions"><button class="btn primary" id="m-ok">Let\'s go</button></div>', { sticky: true });
         $('#m-ok').onclick = () => { closeModal(); render(); announceMyTurn(); };
       } else { render(); maybeRunBot(); }
     } catch (e) {
       app.busy = false;
-      if (e.code === 'conflict') { toast('La partie a changé entre-temps, rechargement…', true); app.work = null; await refresh(); render(); }
-      else { toast('Envoi impossible : ' + e.message + ' — réessaie', true); renderGame(); }
+      if (e.code === 'conflict') { toast('The game changed in the meantime, reloading…', true); app.work = null; await refresh(); render(); }
+      else { toast('Could not send: ' + e.message + ' — try again', true); renderGame(); }
     }
   }
 
@@ -1187,34 +1256,35 @@
     if (!app.work) return;
     const p = E.current(app.work);
     if (!p.spiritChoices) return;
-    modal('<h2>' + ic('sparkles', 'h') + 'Choisis ton Esprit de la Nature</h2><p class="note">Une seule carte est gardée, l\'autre retourne dans la boîte. Elle compte dans ta limite de 4 cartes tant que son cube n\'est pas posé.</p>' +
+    modal('<h2>' + ic('sparkles', 'h') + 'Choose your Nature\'s Spirit</h2><p class="note">Only one card is kept, the other goes back to the box. It counts towards your 4-card limit until its cube is placed.</p>' +
       '<div class="choice-grid">' + p.spiritChoices.map(id => cardHTML(E.CARD_BY_ID.get(id), { attrs: 'data-choose="' + id + '"' })).join('') + '</div>' +
-      '<div class="actions"><button class="btn secondary" id="m-later">Plus tard</button></div>');
+      '<div class="actions"><button class="btn secondary" id="m-later">Later</button></div>');
     $('#m-later').onclick = closeModal;
-    $$('[data-choose]').forEach(c => { c.onclick = () => { const id = +c.dataset.choose; closeModal(); if (act(w => E.chooseSpirit(w, id))) { Sfx.card(); toast('Esprit choisi : ' + esc(E.CARD_BY_ID.get(id).fr)); } renderGame(); }; });
+    $$('[data-choose]').forEach(c => { c.onclick = () => { const id = +c.dataset.choose; closeModal(); if (act(w => E.chooseSpirit(w, id))) { Sfx.card(); toast('Spirit chosen: ' + esc(E.CARD_BY_ID.get(id).en)); } renderGame(); }; });
   }
   function scoreTable(s) {
-    const rows = [['trees', miniTok(4) + 'Arbres'], ['mountains', miniTok(2) + 'Montagnes'], ['fields', miniTok(5) + 'Champs'], ['buildings', miniTok(6) + 'Bâtiments'], ['water', miniTok(1) + (s.opts.side === 'B' ? 'Îles' : 'Rivière')], ['animals', '<span class="mcube"></span>Animaux'], ['spirit', ic('sparkles', 'inl') + 'Esprit']];
+    const rows = [['trees', miniTok(4) + 'Trees'], ['mountains', miniTok(2) + 'Mountains'], ['fields', miniTok(5) + 'Fields'], ['buildings', miniTok(6) + 'Buildings'], ['water', miniTok(1) + (s.opts.side === 'B' ? 'Islands' : 'River')], ['animals', '<span class="mcube"></span>Animals'], ['spirit', ic('sparkles', 'inl') + 'Spirit']];
     const scores = s.players.map(p => E.scorePlayer(p, s.opts.side));
-    return '<table class="scores"><tr><th></th>' + s.players.map((p, i) => '<th style="color:' + SEAT_COLORS[i] + '">' + esc(p.name) + '</th>').join('') + '</tr>' +
+    return '<table class="scores"><tr><th></th>' + s.players.map((p, i) => '<th style="color:' + SEAT_COLORS[i] + '"><span class="th-player">' + avatarHTML(p, i, 'sm') + esc(p.name) + '</span></th>').join('') + '</tr>' +
       rows.filter(([k]) => k !== 'spirit' || s.opts.spirits).map(([k, label]) => '<tr><td>' + label + '</td>' + scores.map(sc => '<td>' + sc[k] + '</td>').join('') + '</tr>').join('') +
       '<tr class="total"><td>Total</td>' + scores.map(sc => '<td>' + sc.total + '</td>').join('') + '</tr>' +
-      '<tr><td class="note">cubes posés</td>' + s.players.map(p => '<td class="note">' + p.cubes + '</td>').join('') + '</tr></table>';
+      '<tr><td class="note">cubes placed</td>' + s.players.map(p => '<td class="note">' + p.cubes + '</td>').join('') + '</tr></table>';
   }
   function showScores() {
     const s = view();
-    modal('<h2>' + ic('chart', 'h') + 'Score en direct</h2>' + scoreTable(s) + '<p class="note">Estimation calculée sur l\'état actuel des plateaux (' + esc(SIDE_LABEL[s.opts.side]) + ').</p><div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>');
+    modal('<h2>' + ic('chart', 'h') + 'Live score</h2>' + scoreTable(s) + '<p class="note">Estimate based on the current boards (' + esc(SIDE_LABEL[s.opts.side]) + ').</p><div class="actions"><button class="btn secondary" id="m-close">Close</button></div>');
     $('#m-close').onclick = closeModal;
   }
   function showResults() {
     const s = app.committed;
     if (!s.result) return;
-    const winners = s.result.winners.map(i => s.players[i].name);
-    const iWon = app.mode === 'local' || s.result.winners.includes(mySeat());
-    const reason = s.endReason === 'bag' ? 'le sac était vide' : 'un plateau n\'avait plus que 2 cases vides ou moins';
-    modal('<h2>' + ic('flag', 'h') + 'Fin de partie</h2><div class="winner">' + ic('trophy', 'big') + (winners.length > 1 ? 'Égalité : ' + esc(winners.join(' & ')) : esc(winners[0]) + ' gagne !') + '</div>' +
-      scoreTable(s) + '<p class="note">Fin déclenchée car ' + reason + '. En cas d\'égalité, le plus grand nombre de cubes posés l\'emporte.</p>' +
-      '<div class="actions"><button class="btn secondary" id="m-close">Voir les plateaux</button><button class="btn primary" id="m-again">' + ic('refresh') + 'Revanche</button></div>');
+    const winners = s.result.winners;
+    const iWon = app.mode === 'local' || winners.includes(mySeat());
+    const reason = s.endReason === 'bag' ? 'the bag was empty' : 'a board had 2 empty spaces or fewer';
+    modal('<h2>' + ic('flag', 'h') + 'Game over</h2><div class="winner">' + ic('trophy', 'big') + '<div class="winner-row">' + winners.map(i => avatarHTML(s.players[i], i, 'md')).join('') + '</div>' +
+      (winners.length > 1 ? 'Tie: ' + esc(winners.map(i => s.players[i].name).join(' & ')) : esc(s.players[winners[0]].name) + ' wins!') + '</div>' +
+      scoreTable(s) + '<p class="note">The end was triggered because ' + reason + '. Ties are broken by the number of cubes placed.</p>' +
+      '<div class="actions"><button class="btn secondary" id="m-close">See the boards</button><button class="btn primary" id="m-again">' + ic('refresh') + 'Rematch</button></div>');
     $('#m-close').onclick = closeModal;
     $('#m-again').onclick = rematch;
     if (iWon) { confetti(); Sfx.win(); } else Sfx.lose();
@@ -1222,33 +1292,35 @@
   async function rematch() {
     const s = app.committed;
     closeModal();
-    if (app.mode === 'local') { startLocal(s.opts, s.players.map(p => ({ name: p.name, bot: p.bot || 0 }))); return; }
+    if (app.mode === 'local') { startLocal(s.opts, s.players.map(p => ({ name: p.name, bot: p.bot || 0, avatar: p.avatar || 0 }))); return; }
     if (s.rematch) { openOnline(s.rematch); return; }
     try {
       const id = randomId(5);
-      const state = { status: 'lobby', id, opts: s.opts, host: myPid(), players: s.players.map(p => ({ pid: p.pid, name: p.name })), createdAt: Date.now() };
+      const state = { status: 'lobby', id, opts: s.opts, host: myPid(), players: s.players.map(p => ({ pid: p.pid, name: p.name, avatar: p.avatar || 0, bot: p.bot || 0 })), createdAt: Date.now() };
       await app.net.createGame(id, state);
       const old = E.clone(s); old.rematch = id;
       try { await app.net.saveGame(app.gameId, old, app.version); } catch (e) { /* peu importe */ }
-      rememberGame({ id, mode: 'online', label: 'En ligne · ' + SIDE_LABEL[s.opts.side] });
+      rememberGame({ id, mode: 'online', label: 'Online · ' + SIDE_LABEL[s.opts.side] });
       history.replaceState(null, '', '?g=' + id);
       enterGame(id, state, 1);
-    } catch (e) { toast('Revanche impossible : ' + e.message, true); }
+    } catch (e) { toast('Rematch failed: ' + e.message, true); }
   }
   function showMenu() {
     const s = app.committed;
     const link = location.origin + location.pathname + '?g=' + (s.id || '');
     modal('<h2>' + ic('menu', 'h') + 'Menu</h2><ul class="menu">' +
-      (app.mode === 'online' ? '<li id="mn-share">' + ic('share') + 'Partager le lien de la partie</li>' : '') +
-      '<li id="mn-scores">' + ic('chart') + 'Score détaillé</li><li id="mn-journal">' + ic('scroll') + 'Journal de la partie</li><li id="mn-rules">' + ic('book') + 'Règles et légende</li>' +
-      (app.mode === 'online' && s.status === 'playing' && mySeat() < 0 ? '<li id="mn-claim">' + ic('users') + 'Je suis un des joueurs (reprendre ma place)</li>' : '') +
-      (app.mode === 'online' ? '<li id="mn-reload">' + ic('refresh') + 'Recharger la partie</li>' : '') +
-      '<li id="mn-home">' + ic('home') + 'Retour à l\'accueil</li></ul>' +
-      '<p class="note">' + (app.mode === 'online' ? 'Partie en ligne · code ' + esc(s.id) + ' · ' : 'Partie locale · ') + esc(SIDE_LABEL[s.opts.side]) + (s.opts.spirits ? ' · Esprits' : '') + '</p>' +
-      '<div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>');
+      (chatAvailable() ? '<li id="mn-chat">' + ic('chat') + 'Chat' + (chat.unread ? ' <span class="badge-n inl">' + chat.unread + '</span>' : '') + '</li>' : '') +
+      (app.mode === 'online' ? '<li id="mn-share">' + ic('share') + 'Share the game link</li>' : '') +
+      '<li id="mn-scores">' + ic('chart') + 'Detailed score</li><li id="mn-journal">' + ic('scroll') + 'Game log</li><li id="mn-rules">' + ic('book') + 'Rules and legend</li>' +
+      (app.mode === 'online' && s.status === 'playing' && mySeat() < 0 ? '<li id="mn-claim">' + ic('users') + 'I am one of the players (take my seat back)</li>' : '') +
+      (app.mode === 'online' ? '<li id="mn-reload">' + ic('refresh') + 'Reload the game</li>' : '') +
+      '<li id="mn-home">' + ic('home') + 'Back to home</li></ul>' +
+      '<p class="note">' + (app.mode === 'online' ? 'Online game · code ' + esc(s.id) + ' · ' : 'Local game · ') + esc(SIDE_LABEL[s.opts.side]) + (s.opts.spirits ? ' · Spirits' : '') + '</p>' +
+      '<div class="actions"><button class="btn secondary" id="m-close">Close</button></div>');
     $('#m-close').onclick = closeModal;
     const on = (id, fn) => { const e = $(id); if (e) e.onclick = fn; };
-    on('#mn-share', async () => { closeModal(); if (navigator.share) { try { await navigator.share({ title: 'Harmonies', text: 'Notre partie d\'Harmonies (code ' + s.id + ')', url: link }); } catch (e) { /* annulé */ } } else { await copyText(link); toast('Lien copié'); } });
+    on('#mn-chat', () => { closeModal(); openChat(); });
+    on('#mn-share', async () => { closeModal(); if (navigator.share) { try { await navigator.share({ title: 'Harmonies', text: 'Our Harmonies game (code ' + s.id + ')', url: link }); } catch (e) { /* annulé */ } } else { await copyText(link); toast('Link copied'); } });
     on('#mn-scores', () => { closeModal(); showScores(); });
     on('#mn-journal', () => { closeModal(); showJournal(); });
     on('#mn-rules', () => { closeModal(); showRules(); });
@@ -1256,42 +1328,114 @@
     on('#mn-home', () => { closeModal(); leaveGame(); renderHome(); });
     on('#mn-claim', () => {
       closeModal();
-      modal('<h2>' + ic('users', 'h') + 'Qui es-tu ?</h2><p class="note">Cet appareil n\'est associé à aucun joueur de la partie (nouveau téléphone, données effacées…).</p><ul class="menu">' +
-        s.players.map((p, i) => '<li data-seat="' + i + '">' + seatDot(i) + esc(p.name) + '</li>').join('') + '</ul><div class="actions"><button class="btn secondary" id="m-close">Annuler</button></div>');
+      modal('<h2>' + ic('users', 'h') + 'Who are you?</h2><p class="note">This device is not linked to any player of this game (new phone, cleared data…).</p><ul class="menu">' +
+        s.players.map((p, i) => '<li data-seat="' + i + '">' + avatarHTML(p, i, 'sm') + esc(p.name) + '</li>').join('') + '</ul><div class="actions"><button class="btn secondary" id="m-close">Cancel</button></div>');
       $('#m-close').onclick = closeModal;
       $$('.menu li[data-seat]').forEach(li => { li.onclick = async () => {
         const st = E.clone(app.committed); st.players[+li.dataset.seat].pid = myPid();
-        try { const r = await app.net.saveGame(app.gameId, st, app.version); app.committed = st; app.version = r.version; app.work = null; closeModal(); render(); toast('Bienvenue, ' + esc(st.players[+li.dataset.seat].name)); }
-        catch (e) { toast('Échec : ' + e.message, true); refresh(); }
+        try { const r = await app.net.saveGame(app.gameId, st, app.version); app.committed = st; app.version = r.version; app.work = null; closeModal(); render(); toast('Welcome back, ' + esc(st.players[+li.dataset.seat].name)); }
+        catch (e) { toast('Failed: ' + e.message, true); refresh(); }
       }; });
     });
   }
   function showJournal() {
     const s = view();
     const log = (s.log || []).slice().reverse();
-    modal('<h2>' + ic('scroll', 'h') + 'Journal</h2><ul class="log">' + (log.length ? log.map(l =>
-      '<li><span class="turnno">T' + l.n + '</span>' + seatDot(l.p) + '<b>' + esc(s.players[l.p].name) + '</b><span class="acts">' + (actionsHTML(l.actions) || '—') + '</span></li>').join('') : '<li>Début de partie.</li>') + '</ul>' +
-      '<div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>', { cls: 'sheet' });
+    modal('<h2>' + ic('scroll', 'h') + 'Game log</h2><ul class="log">' + (log.length ? log.map(l =>
+      '<li><span class="turnno">T' + l.n + '</span>' + avatarHTML(s.players[l.p], l.p, 'xs') + '<b>' + esc(s.players[l.p].name) + '</b><span class="acts">' + (actionsHTML(l.actions) || '—') + '</span></li>').join('') : '<li>Game start.</li>') + '</ul>' +
+      '<div class="actions"><button class="btn secondary" id="m-close">Close</button></div>', { cls: 'sheet' });
     $('#m-close').onclick = closeModal;
   }
   function showRules() {
     const tok = c => R.tokenSVG(c);
-    modal('<h2>' + ic('book', 'h') + 'Règles essentielles</h2><div class="rules">' +
-      '<p><b>Tour de jeu</b> — obligatoire : prendre les 3 jetons d\'un emplacement du plateau central et les poser. Optionnel (à tout moment, même entre deux jetons) : prendre 1 carte Animal (une par tour, max 4 cartes en cours) et poser des cubes (sans limite).</p>' +
-      '<p><b>Empilement</b> — bleu et jaune : uniquement au sol, rien dessus. Gris : au sol ou sur du gris (max 3). Marron : au sol ou sur 1 marron. Vert : au sol (buisson) ou sur 1 ou 2 marrons (arbre). Rouge : au sol ou sur 1 gris / marron / rouge (bâtiment). Jamais sur une case qui porte un cube.</p>' +
+    modal('<h2>' + ic('book', 'h') + 'Essential rules</h2><div class="rules">' +
+      '<p><b>Your turn</b> — mandatory: take the 3 tokens of one slot of the central board and place them. Optional (at any time, even between two tokens): take 1 Animal card (one per turn, max 4 cards in progress) and place cubes (no limit).</p>' +
+      '<p><b>Stacking</b> — blue and yellow: only on the ground, nothing on top. Gray: on the ground or on gray (max 3). Brown: on the ground or on 1 brown. Green: on the ground (bush) or on 1 or 2 browns (tree). Red: on the ground or on 1 gray / brown / red (building). Never on a space holding a cube.</p>' +
       '<div class="legend">' +
-      '<div>' + tok(4) + ' Arbre : 1 / 3 / 7 pts (hauteur 1, 2, 3)</div>' +
-      '<div>' + tok(2) + ' Montagne : 1 / 3 / 7 pts, si voisine d\'une autre montagne</div>' +
-      '<div>' + tok(5) + ' Champ : 5 pts par groupe d\'au moins 2 jaunes</div>' +
-      '<div>' + tok(6) + ' Bâtiment : 5 pts si entouré de 3 couleurs différentes</div>' +
-      '<div>' + tok(1) + ' Face A · rivière : 2 / 5 / 8 / 11 / 15 (+4 par jeton au-delà de 6), la meilleure rivière seulement</div>' +
-      '<div>' + tok(1) + ' Face B · îles : 5 pts par groupe de cases séparé par l\'eau</div>' +
+      '<div>' + tok(4) + ' Tree: 1 / 3 / 7 pts (height 1, 2, 3)</div>' +
+      '<div>' + tok(2) + ' Mountain: 1 / 3 / 7 pts, if next to another mountain</div>' +
+      '<div>' + tok(5) + ' Field: 5 pts per group of at least 2 yellows</div>' +
+      '<div>' + tok(6) + ' Building: 5 pts if surrounded by 3 different colors</div>' +
+      '<div>' + tok(1) + ' Side A · river: 2 / 5 / 8 / 11 / 15 (+4 per token beyond 6), best river only</div>' +
+      '<div>' + tok(1) + ' Side B · islands: 5 pts per group of spaces separated by water</div>' +
       '</div>' +
-      '<p><b>Cubes</b> — le motif de la carte doit être reproduit exactement (hauteurs comprises), dans n\'importe quelle orientation. Le cube va sur la case indiquée, qui doit être libre de cube. Un jeton peut servir à plusieurs habitats ; un cube posé est définitif et bloque sa case. Quand la carte n\'a plus de cube, elle est terminée et ne compte plus dans la limite de 4.</p>' +
-      '<p><b>Points des cartes</b> — la colonne de droite d\'une carte se découvre de bas en haut à chaque cube posé ; la carte vaut le dernier palier découvert (0 si aucun cube posé).</p>' +
-      '<p><b>Fin</b> — quand le sac est vide au moment de recharger, ou quand un joueur a 2 cases vides ou moins : on termine la manche. Égalité : le plus de cubes posés.</p>' +
-      '</div><div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>');
+      '<p><b>Cubes</b> — the card pattern must be reproduced exactly (heights included), in any orientation. The cube goes on the indicated space, which must be free of cubes. A token can serve several habitats; a placed cube is final and blocks its space. When a card has no cube left, it is completed and no longer counts towards the 4-card limit.</p>' +
+      '<p><b>Card points</b> — the column on the right of a card is revealed from bottom to top with each cube placed; the card is worth the last revealed step (0 if no cube placed).</p>' +
+      '<p><b>End</b> — when the bag is empty at refill time, or when a player has 2 empty spaces or fewer: the round is completed. Tie: most cubes placed.</p>' +
+      '</div><div class="actions"><button class="btn secondary" id="m-close">Close</button></div>');
     $('#m-close').onclick = closeModal;
+  }
+
+  // ---------- Chat (parties en ligne) : messages persistants, bulle éphémère sur l'écran des autres joueurs ----------
+  function chatAvailable() { return app.mode === 'online' && !!(app.net && app.net.chat) && !!app.gameId; }
+  async function loadChat(initial) {
+    if (!chatAvailable()) return;
+    try {
+      const rows = await app.net.loadChat(app.gameId, initial ? 0 : chat.lastId);
+      rows.forEach(r => addChatMsg(r, !initial));
+    } catch (e) { /* hors ligne : on réessaiera au prochain rafraîchissement */ }
+  }
+  function addChatMsg(m, notify) {
+    if (!m || typeof m.id !== 'number' || chat.msgs.some(x => x.id === m.id)) return false;
+    chat.msgs.push(m);
+    chat.msgs.sort((a, b) => a.id - b.id);
+    if (chat.msgs.length > 200) chat.msgs.splice(0, chat.msgs.length - 200);
+    chat.lastId = Math.max(chat.lastId, m.id);
+    const mine = m.pid === myPid();
+    if (chat.open) renderChatList();
+    else if (!mine && notify) { chat.unread++; updateChatBadge(); chatPop(m); Sfx.chat(); vibrate(15); }
+    return true;
+  }
+  function chatPop(m) {
+    let host = $('#chat-pops');
+    if (!host) { host = document.createElement('div'); host.id = 'chat-pops'; document.body.appendChild(host); }
+    const el = document.createElement('div');
+    el.className = 'chat-pop';
+    el.innerHTML = avatarHTML(m, seatOfPid(m.pid), 'sm') + '<div class="cp-body"><b>' + esc(m.name) + '</b><span>' + esc(m.text) + '</span></div>' + ic('chat', 'cp-ic');
+    el.onclick = () => { el.remove(); openChat(); };
+    host.appendChild(el);
+    while (host.children.length > 3) host.firstChild.remove();
+    setTimeout(() => el.classList.add('out'), 5200);
+    setTimeout(() => el.remove(), 5600);
+  }
+  function updateChatBadge() {
+    $$('.chat-btn').forEach(b => {
+      let badge = b.querySelector('.badge-n');
+      if (chat.unread) { if (!badge) { badge = document.createElement('i'); badge.className = 'badge-n'; b.appendChild(badge); } badge.textContent = chat.unread; }
+      else if (badge) badge.remove();
+    });
+  }
+  const timeOf = iso => { try { return new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } };
+  function renderChatList() {
+    const list = $('#chat-list'); if (!list) return;
+    const me = myPid();
+    list.innerHTML = chat.msgs.length ? chat.msgs.map(m => '<div class="cmsg' + (m.pid === me ? ' mine' : '') + '">' + avatarHTML(m, seatOfPid(m.pid), 'sm') +
+      '<div class="cbubble"><div class="cmeta"><b>' + esc(m.name) + '</b><span>' + timeOf(m.created_at) + '</span></div><div class="ctext">' + esc(m.text) + '</div></div></div>').join('') :
+      '<p class="note center">No messages yet. Say hi!</p>';
+    list.scrollTop = list.scrollHeight;
+  }
+  function openChat() {
+    if (!chatAvailable()) return;
+    chat.open = true; chat.unread = 0; updateChatBadge();
+    modal('<h2>' + ic('chat', 'h') + 'Chat <span class="note">· game ' + esc(app.gameId) + '</span></h2><div class="chat-list" id="chat-list"></div>' +
+      '<div class="chat-quick">' + QUICK_CHAT.map(q => '<button class="chip" data-q="' + esc(q) + '">' + esc(q) + '</button>').join('') + '</div>' +
+      '<form class="chat-form" id="chat-form" autocomplete="off"><input type="text" id="chat-input" maxlength="300" placeholder="Write a message…" autocomplete="off" enterkeyhint="send"><button class="btn primary icon" type="submit" title="Send">' + ic('send') + '</button></form>',
+      { cls: 'sheet chat-sheet', onClose: () => { chat.open = false; } });
+    renderChatList();
+    $$('.chat-quick .chip').forEach(b => { b.onclick = () => sendChat(b.dataset.q); });
+    $('#chat-form').onsubmit = ev => { ev.preventDefault(); sendChat($('#chat-input').value); };
+    $('#chat-input').addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); sendChat($('#chat-input').value); } });
+    loadChat(false);
+  }
+  async function sendChat(text) {
+    text = String(text || '').trim().slice(0, 300);
+    if (!text || !chatAvailable()) return;
+    const s = app.committed;
+    const me = s && s.players ? s.players.find(p => p.pid === myPid()) : null;
+    const msg = { pid: myPid(), name: (me && me.name) || myName() || 'Player', avatar: (me && me.avatar) || myAvatar(), text };
+    const inp = $('#chat-input'); if (inp) { inp.value = ''; inp.focus(); }
+    try { const row = await app.net.sendChat(app.gameId, msg); addChatMsg(row, false); Sfx.chat(); }
+    catch (e) { toast('Message not sent: ' + e.message, true); }
   }
 
   // ---------- Démarrage ----------
@@ -1301,17 +1445,20 @@
     const code = (params.get('g') || '').toUpperCase();
     if (params.get('pid')) { try { sessionStorage.setItem('harmonies.pid', params.get('pid')); } catch (e) { /* ignore */ } }
     if (params.get('name')) ls.set('harmonies.name', params.get('name'));
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && app.mode === 'online' && app.gameId) refresh(); });
+    if (params.get('avatar')) ls.set('harmonies.avatar', +params.get('avatar'));
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && app.mode === 'online' && app.gameId) { refresh(); loadChat(false); maybeRunBot(); } });
     document.addEventListener('pointerdown', () => { interacted = true; Sfx.unlock(); }, { once: true, passive: true });
+    // page publiée : service worker (installation sur l'écran d'accueil, cache de secours hors connexion)
+    if (CFG.build && 'serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js').catch(() => { /* facultatif */ }); } catch (e) { /* facultatif */ } }
     if (code && ONLINE_OK) {
       renderHome();
       openOnline(code).then(async () => {
         if (app.committed && app.committed.status === 'lobby' && !app.committed.players.some(p => p.pid === myPid()) && myName()) {
-          try { await joinLobby(myName()); render(); } catch (e) { toast('Impossible de rejoindre : ' + e.message, true); }
+          try { await joinLobby(myName()); render(); } catch (e) { toast('Could not join: ' + e.message, true); }
         }
       });
     } else renderHome();
   }
-  root.HarmoniesApp = { boot, app, render, act, endTurn, refresh, Sfx };
+  root.HarmoniesApp = { boot, app, render, act, endTurn, refresh, Sfx, chat, sendChat, openChat };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })(typeof self !== 'undefined' ? self : this);

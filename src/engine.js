@@ -7,7 +7,7 @@
   'use strict';
 
   // ---------- Constantes ----------
-  const COLOR_NAMES = { 1: 'eau', 2: 'montagne', 3: 'tronc', 4: 'feuillage', 5: 'champ', 6: 'bâtiment' };
+  const COLOR_NAMES = { 1: 'water', 2: 'mountain', 3: 'trunk', 4: 'foliage', 5: 'field', 6: 'building' };
   const TOKEN_COUNTS = { 1: 23, 2: 23, 3: 21, 4: 19, 5: 19, 6: 15 }; // 120 jetons
   const CARD_BY_ID = new Map(CARDS.map(c => [c.id, c]));
   const ANIMAL_IDS = CARDS.filter(c => !c.spirit).map(c => c.id);
@@ -239,7 +239,7 @@
       status: 'playing',
       opts: { side: opts.side === 'B' ? 'B' : 'A', spirits: !!opts.spirits },
       players: players.map((p, i) => ({
-        token: p.token, name: p.name, seat: i, bot: p.bot || 0,
+        token: p.token, name: p.name, seat: i, bot: p.bot || 0, avatar: p.avatar || 0,
         board: emptyBoard(), hand: [], done: [], cubes: 0,
         spirit: null,
         spiritChoices: opts.spirits ? spiritDeck.splice(-2, 2) : null,
@@ -266,9 +266,9 @@
   function assert(cond, msg) { if (!cond) throw new Error(msg); }
 
   function takeTokens(state, slot) {
-    assert(state.status === 'playing', 'partie terminée');
-    assert(state.cur.slot === null, 'jetons déjà pris ce tour');
-    assert(slot >= 0 && slot < 5 && state.market[slot].length > 0, 'emplacement vide');
+    assert(state.status === 'playing', 'the game is over');
+    assert(state.cur.slot === null, 'tokens already taken this turn');
+    assert(slot >= 0 && slot < 5 && state.market[slot].length > 0, 'empty slot');
     state.cur.slot = slot;
     state.cur.tokens = state.market[slot].slice();
     state.market[slot] = [];
@@ -276,10 +276,10 @@
   }
   function placeToken(state, handIdx, cellIdx) {
     const cur = state.cur;
-    assert(handIdx >= 0 && handIdx < cur.tokens.length, 'jeton invalide');
+    assert(handIdx >= 0 && handIdx < cur.tokens.length, 'invalid token');
     const color = cur.tokens[handIdx];
     const cell = current(state).board[cellIdx];
-    assert(cell && canPlace(cell, color), 'pose illégale');
+    assert(cell && canPlace(cell, color), 'illegal placement');
     cell.s.push(color);
     cur.tokens.splice(handIdx, 1);
     cur.actions.push({ a: 'place', color, cell: cellIdx });
@@ -288,8 +288,8 @@
   function discardToken(state, handIdx) {
     const cur = state.cur;
     const color = cur.tokens[handIdx];
-    assert(color !== undefined, 'jeton invalide');
-    assert(legalCells(current(state).board, color).length === 0, 'ce jeton peut encore être posé');
+    assert(color !== undefined, 'invalid token');
+    assert(legalCells(current(state).board, color).length === 0, 'this token can still be placed');
     cur.tokens.splice(handIdx, 1);
     cur.actions.push({ a: 'discard', color });
   }
@@ -297,9 +297,9 @@
     return state.status === 'playing' && !state.cur.cardTaken && activeCount(current(state)) < MAX_ACTIVE_CARDS;
   }
   function takeCard(state, displayIdx) {
-    assert(canTakeCard(state), 'carte impossible à prendre');
+    assert(canTakeCard(state), 'you cannot take a card now');
     const id = state.display[displayIdx];
-    assert(id, 'emplacement vide');
+    assert(id, 'empty slot');
     const card = CARD_BY_ID.get(id);
     state.display[displayIdx] = null;
     current(state).hand.push({ id, left: card.pts.length });
@@ -308,7 +308,7 @@
   }
   function chooseSpirit(state, id) {
     const p = current(state);
-    assert(p.spiritChoices && p.spiritChoices.includes(id), 'choix invalide');
+    assert(p.spiritChoices && p.spiritChoices.includes(id), 'invalid choice');
     p.spirit = { id, placed: false };
     p.spiritChoices = null;
     state.cur.actions.push({ a: 'spirit', id });
@@ -330,15 +330,15 @@
   function placeCube(state, cardId, cellIdx) {
     const p = current(state);
     const card = CARD_BY_ID.get(cardId);
-    assert(card, 'carte inconnue');
-    assert(cubeTargets(p.board, card).includes(cellIdx), 'habitat non réalisé sur cette case');
+    assert(card, 'unknown card');
+    assert(cubeTargets(p.board, card).includes(cellIdx), 'habitat not completed on that space');
     if (card.spirit) {
-      assert(p.spirit && p.spirit.id === cardId && !p.spirit.placed, 'esprit déjà posé');
+      assert(p.spirit && p.spirit.id === cardId && !p.spirit.placed, 'spirit cube already placed');
       p.spirit.placed = true;
       p.board[cellIdx].cube = { id: cardId, sp: true };
     } else {
       const hi = p.hand.findIndex(h => h.id === cardId);
-      assert(hi >= 0, 'carte non détenue');
+      assert(hi >= 0, 'card not in hand');
       const h = p.hand[hi];
       h.left -= 1;
       p.board[cellIdx].cube = { id: cardId };
@@ -351,9 +351,9 @@
     const p = current(state), cur = state.cur;
     const marketEmpty = state.market.every(m => m.length === 0);
     const reasons = [];
-    if (cur.slot === null && !marketEmpty) reasons.push('prends 3 jetons');
-    if (cur.tokens.length) reasons.push('pose tes jetons (' + cur.tokens.length + ')');
-    if (p.spiritChoices) reasons.push('choisis ton Esprit');
+    if (cur.slot === null && !marketEmpty) reasons.push('take 3 tokens');
+    if (cur.tokens.length) reasons.push('place your tokens (' + cur.tokens.length + ')');
+    if (p.spiritChoices) reasons.push('choose your Spirit');
     return { ok: reasons.length === 0, reasons };
   }
   function endTurn(state) {
@@ -397,10 +397,10 @@
     const parts = [];
     for (const a of actions) {
       if (a.a === 'take') parts.push(a.tokens.map(t => COLOR_EMOJI[t]).join(''));
-      else if (a.a === 'card') parts.push('carte ' + CARD_BY_ID.get(a.id).fr);
-      else if (a.a === 'cube') parts.push('cube ' + CARD_BY_ID.get(a.id).emoji + ' ' + CARD_BY_ID.get(a.id).fr);
-      else if (a.a === 'spirit') parts.push('esprit ' + CARD_BY_ID.get(a.id).fr);
-      else if (a.a === 'discard') parts.push('défausse ' + COLOR_EMOJI[a.color]);
+      else if (a.a === 'card') parts.push('card ' + CARD_BY_ID.get(a.id).en);
+      else if (a.a === 'cube') parts.push('cube ' + CARD_BY_ID.get(a.id).emoji + ' ' + CARD_BY_ID.get(a.id).en);
+      else if (a.a === 'spirit') parts.push('spirit ' + CARD_BY_ID.get(a.id).en);
+      else if (a.a === 'discard') parts.push('discards ' + COLOR_EMOJI[a.color]);
     }
     return parts.join(' · ');
   }

@@ -247,6 +247,68 @@
     return '<svg class="' + (cls || 'logo-svg') + '" viewBox="0 0 340 70"><text x="170" y="54" text-anchor="middle" textLength="322" lengthAdjust="spacingAndGlyphs" font-family="Fredoka, Nunito, Arial, sans-serif" font-weight="700" font-size="54" fill="#fff" stroke="#1e2a5a" stroke-width="6" stroke-linejoin="round" paint-order="stroke">HARMONIES</text></svg>';
   }
 
+  // Lion à la crinière de collines colorées (accueil, icône de l'application). viewBox 200x200, aucun texte ni police.
+  function wavyRing(cx, cy, r, amp, k, phase) {
+    let d = '';
+    const steps = 144;
+    for (let i = 0; i < steps; i++) {
+      const t = (i / steps) * Math.PI * 2;
+      const rr = r + amp * Math.sin(k * t + phase) + amp * 0.35 * Math.sin(3 * t + phase * 2);
+      d += (i ? 'L' : 'M') + n(cx + rr * Math.cos(t)) + ',' + n(cy + rr * Math.sin(t));
+    }
+    return d + 'Z';
+  }
+  const MANE = [
+    { r: 92, amp: 5.5, k: 9, c: '#1e2a5a', dy: 4 },
+    { r: 83, amp: 5, k: 11, c: '#2c4a8a', dy: 3 },
+    { r: 74, amp: 4.5, k: 13, c: '#2a8f8a', dy: 2 },
+    { r: 66, amp: 4, k: 15, c: '#5cc2b7', dy: 1 },
+    { r: 58, amp: 3.5, k: 12, c: '#f2c94c', dy: 0.5 },
+    { r: 52, amp: 3, k: 10, c: '#e8873a', dy: 0 },
+  ];
+  function lionSVG(cls, opts) {
+    opts = opts || {};
+    const uid = 'lion' + (++hillUid);
+    const cx = 100, cy = 104;
+    let out = '<svg class="' + (cls || 'lion') + '" viewBox="0 0 200 200" aria-hidden="true"><defs>' +
+      '<pattern id="' + uid + 's" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-28)"><rect width="2.6" height="7" fill="#fff" opacity=".14"/></pattern>' +
+      '<radialGradient id="' + uid + 'f" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fbd56a"/><stop offset="1" stop-color="#eeaf3a"/></radialGradient>' +
+      '<radialGradient id="' + uid + 'g" cx="50%" cy="50%" r="50%"><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></radialGradient></defs>';
+    if (opts.halo) out += '<circle cx="' + cx + '" cy="' + cy + '" r="99" fill="#fff" opacity=".25"/>';
+    // crinière : anneaux ondulés concentriques, du plus sombre (extérieur) au plus chaud (intérieur)
+    MANE.forEach((m, i) => { out += '<path d="' + wavyRing(cx, cy + m.dy, m.r, m.amp, m.k, i * 0.9) + '" fill="' + m.c + '"/>'; });
+    out += '<path d="' + wavyRing(cx, cy + MANE[0].dy, MANE[0].r, MANE[0].amp, MANE[0].k, 0) + '" fill="url(#' + uid + 's)"/>';
+    // étoiles sur l'anneau de nuit, arbres sur les collines vertes, roseaux sur le champ
+    const stars = [[60, 36], [86, 24], [118, 22], [146, 40], [30, 80], [172, 76], [44, 52], [160, 56]];
+    out += '<g fill="#fff7d6" opacity=".8">' + stars.map(([x, y], i) => '<circle cx="' + x + '" cy="' + y + '" r="' + (i % 3 === 0 ? 1.8 : 1.2) + '"/>').join('') + '</g>';
+    const trees = [200, 222, 245, 295, 318, 340];
+    out += '<g>' + trees.map(a => {
+      const t = a * Math.PI / 180, rr = 70;
+      const x = cx + rr * Math.cos(t), y = cy + 2 + rr * Math.sin(t);
+      const ex = cx + (rr - 6) * Math.cos(t), ey = cy + 2 + (rr - 6) * Math.sin(t);
+      return '<line x1="' + n(x) + '" y1="' + n(y) + '" x2="' + n(ex) + '" y2="' + n(ey) + '" stroke="#1e2a5a" stroke-width="1.6" stroke-linecap="round"/><circle cx="' + n(x) + '" cy="' + n(y) + '" r="3.2" fill="#6aa83c"/>';
+    }).join('') + '</g>';
+    const reeds = [150, 165, 180, 360, 375, 390];
+    out += '<g>' + reeds.map((a, i) => {
+      const t = a * Math.PI / 180, rr = 60;
+      const x = cx + rr * Math.cos(t), y = cy + rr * Math.sin(t);
+      return '<circle cx="' + n(x) + '" cy="' + n(y) + '" r="1.7" fill="' + (i % 2 ? '#d96a8e' : '#fff') + '" opacity=".85"/>';
+    }).join('') + '</g>';
+    // oreilles, tête, museau
+    out += '<g><circle cx="65" cy="69" r="12.5" fill="#e9a835"/><circle cx="65" cy="69" r="6.5" fill="#f4a55c"/><circle cx="135" cy="69" r="12.5" fill="#e9a835"/><circle cx="135" cy="69" r="6.5" fill="#f4a55c"/></g>' +
+      '<path d="M82,66 q6,-14 14,-4 q4,-10 8,0 q8,-10 14,4 Z" fill="#d9932c"/>' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="46" fill="url(#' + uid + 'f)"/><circle cx="' + cx + '" cy="' + cy + '" r="46" fill="url(#' + uid + 'g)"/>' +
+      '<path d="M86,146 q5,8 14,4 q9,4 14,-4 q-4,10 -14,10 q-10,0 -14,-10 Z" fill="#d9932c"/>' +
+      '<circle cx="90" cy="121" r="13" fill="#fbe6ad"/><circle cx="110" cy="121" r="13" fill="#fbe6ad"/>' +
+      '<circle cx="71" cy="114" r="6.5" fill="#f4a55c" opacity=".55"/><circle cx="129" cy="114" r="6.5" fill="#f4a55c" opacity=".55"/>' +
+      '<g fill="#1e2a5a"><ellipse cx="83" cy="97" rx="5.6" ry="6.6"/><ellipse cx="117" cy="97" rx="5.6" ry="6.6"/></g>' +
+      '<g fill="#fff"><circle cx="85.2" cy="94.4" r="2.1"/><circle cx="119.2" cy="94.4" r="2.1"/></g>' +
+      '<path d="M91,111 Q100,108 109,111 Q107,121 100,124.5 Q93,121 91,111 Z" fill="#1e2a5a"/>' +
+      '<path d="M100,124 Q95,133 87,128 M100,124 Q105,133 113,128" fill="none" stroke="#1e2a5a" stroke-width="2.4" stroke-linecap="round"/>' +
+      '<g fill="#1e2a5a" opacity=".45"><circle cx="79" cy="124" r="1.4"/><circle cx="75" cy="129" r="1.4"/><circle cx="121" cy="124" r="1.4"/><circle cx="125" cy="129" r="1.4"/></g>';
+    return out + '</svg>';
+  }
+
   // Couleur (CSS) de la case cube d'une carte, pour la bande de rappel.
   function cubeColorOf(card) {
     const step = card.pat.find(p => p.cube);
@@ -254,5 +316,5 @@
     return FILL[c];
   }
 
-  root.Render = { defsSVG, tokenSVG, slotSVG, pouchSVG, deckSVG, boardSVG, patternSVG, sceneSVG, hillsSVG, animalSVG, logoSVG, cubeColorOf, esc, FILL, DARK, LIGHT };
+  root.Render = { defsSVG, tokenSVG, slotSVG, pouchSVG, deckSVG, boardSVG, patternSVG, sceneSVG, hillsSVG, animalSVG, logoSVG, lionSVG, cubeColorOf, esc, FILL, DARK, LIGHT };
 })(typeof self !== 'undefined' ? self : this);

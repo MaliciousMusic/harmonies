@@ -1,18 +1,21 @@
 // Transport des parties : Supabase (en ligne) ou localStorage (même téléphone).
-// Interface commune : createGame, loadGame, saveGame (verrou optimiste), subscribe.
+// Interface commune : createGame, loadGame, saveGame (verrou optimiste), subscribe ; en ligne, aussi le chat (loadChat, sendChat, subscribeChat).
 (function (root) {
   'use strict';
 
   const TABLE = 'harmonies_games';
+  const CHAT = 'harmonies_chat';
   const LS_PREFIX = 'harmonies.game.';
 
+  let client = null; // un seul client Supabase par page
   function makeOnline(cfg) {
-    const client = root.supabase.createClient(cfg.url, cfg.key, {
+    if (!client) client = root.supabase.createClient(cfg.url, cfg.key, {
       realtime: { params: { eventsPerSecond: 5 } },
       auth: { persistSession: false, autoRefreshToken: false },
     });
     return {
       mode: 'online',
+      chat: true,
       async createGame(id, state) {
         const { data, error } = await client.from(TABLE).insert({ id, state, version: 1 }).select('version').single();
         if (error) throw new Error(error.message);
@@ -36,6 +39,25 @@
           .subscribe(status => { if (onStatus) onStatus(status === 'SUBSCRIBED'); });
         return () => { client.removeChannel(channel); };
       },
+      // ---- chat : messages persistants (les 60 derniers au chargement), diffusés par le temps réel ----
+      async loadChat(id, afterId) {
+        let q = client.from(CHAT).select('id, pid, name, avatar, text, created_at').eq('game', id).order('id', { ascending: false }).limit(60);
+        if (afterId) q = q.gt('id', afterId);
+        const { data, error } = await q;
+        if (error) throw new Error(error.message);
+        return (data || []).reverse();
+      },
+      async sendChat(id, msg) {
+        const { data, error } = await client.from(CHAT).insert({ game: id, pid: msg.pid, name: msg.name, avatar: msg.avatar || 0, text: msg.text }).select('id, pid, name, avatar, text, created_at').single();
+        if (error) throw new Error(error.message);
+        return data;
+      },
+      subscribeChat(id, onMessage) {
+        const channel = client.channel('chat-' + id)
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: CHAT, filter: 'game=eq.' + id }, payload => { if (payload.new) onMessage(payload.new); })
+          .subscribe();
+        return () => { client.removeChannel(channel); };
+      },
     };
   }
 
@@ -51,6 +73,7 @@
     });
     return {
       mode: 'local',
+      chat: false,
       async createGame(id, state) { write(id, { state, version: 1 }); return { version: 1 }; },
       async loadGame(id) { return read(id); },
       async saveGame(id, state, version) {

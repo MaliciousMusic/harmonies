@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Harmonies — icon generator (dev)</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #ddd; padding: 20px; }
+  .row { display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap; }
+  .box { background: #fff; padding: 10px; border-radius: 12px; text-align: center; font-size: 12px; }
+  canvas, svg { display: block; }
+  #log { white-space: pre; font-family: monospace; margin-top: 12px; }
+</style>
+</head>
+<body>
+<p>Lion preview at several sizes, then <button id="go">Generate PNG icons into assets/</button> (needs dev-server.py).</p>
+<div class="row" id="previews"></div>
+<div id="log"></div>
+<script src="../src/cards.js"></script>
+<script src="../src/engine.js"></script>
+<script src="../src/render.js"></script>
+<script>
+// Composition d'une icône : fond crème strié + lion centré à `scale` de la taille.
+function iconSVG(size, scale, radius) {
+  const r = radius || 0;
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">' +
+    '<defs><pattern id="bgst" width="' + (size / 32) + '" height="' + (size / 32) + '" patternUnits="userSpaceOnUse" patternTransform="rotate(-28)"><rect width="' + (size / 32 * 0.36) + '" height="' + (size / 32) + '" fill="#fff" opacity=".45"/></pattern>' +
+    '<clipPath id="rc"><rect width="' + size + '" height="' + size + '" rx="' + r + '"/></clipPath></defs>' +
+    '<g clip-path="url(#rc)"><rect width="' + size + '" height="' + size + '" fill="#f7efe0"/><rect width="' + size + '" height="' + size + '" fill="url(#bgst)"/>' +
+    '<circle cx="' + size / 2 + '" cy="' + size * 0.52 + '" r="' + size * 0.46 + '" fill="#fff" opacity=".35"/></g>' +
+    '<g transform="translate(' + (size * (1 - scale) / 2) + ',' + (size * (1 - scale) / 2) + ') scale(' + (scale * size / 200) + ')">' +
+    Render.lionSVG('lion').replace(/<svg[^>]*>/, '').replace('</svg>', '') + '</g></svg>';
+}
+const previews = document.getElementById('previews');
+[[256, 0.9, 0], [128, 0.9, 0], [64, 0.9, 0], [48, 0.76, 0], [180, 0.86, 0]].forEach(([s, sc, r]) => {
+  const box = document.createElement('div'); box.className = 'box';
+  box.innerHTML = iconSVG(s, sc, r) + s + ' / ' + sc;
+  previews.appendChild(box);
+});
+const big = document.createElement('div'); big.className = 'box'; big.innerHTML = Render.lionSVG('lion').replace('<svg ', '<svg width="400" height="400" ') + 'raw 400'; previews.appendChild(big);
+
+function render(svg, size) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas'); c.width = size; c.height = size;
+      c.getContext('2d').drawImage(img, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      c.toBlob(b => resolve(b), 'image/png');
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+async function save(name, blob) {
+  const r = await fetch('/__save?name=' + name, { method: 'POST', body: blob });
+  document.getElementById('log').textContent += name + ': ' + (await r.text()) + '\n';
+}
+document.getElementById('go').onclick = async () => {
+  await save('icon-512.png', await render(iconSVG(512, 0.9, 0), 512));
+  await save('icon-192.png', await render(iconSVG(192, 0.9, 0), 192));
+  await save('icon-maskable-512.png', await render(iconSVG(512, 0.74, 0), 512));
+  await save('apple-touch-icon.png', await render(iconSVG(180, 0.86, 0), 180));
+  await save('icon.svg', new Blob([iconSVG(512, 0.9, 0)], { type: 'image/svg+xml' }));
+  document.getElementById('log').textContent += 'done\n';
+};
+</script>
+</body>
+</html>

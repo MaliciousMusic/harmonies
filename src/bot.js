@@ -5,8 +5,11 @@
 })(typeof self !== 'undefined' ? self : this, function (E) {
   'use strict';
 
-  const NAMES = ['Fennec', 'Loutre', 'Hibou', 'Koala', 'Manchot', 'Alpaga', 'Castor', 'Panthère'];
-  const LEVELS = { 1: 'débutant', 2: 'confirmé', 3: 'expert' };
+  const NAMES = ['Fennec', 'Otter', 'Owl', 'Koala', 'Penguin', 'Alpaca', 'Beaver', 'Panther'];
+  const LEVELS = { 1: 'novice', 2: 'skilled', 3: 'expert' };
+  // Avatar (id de carte Animal) associé à chaque nom de bot
+  const AVATARS = { Fennec: 23, Otter: 4, Owl: 36, Koala: 18, Penguin: 21, Alpaca: 28, Beaver: 40, Panther: 32 };
+  const avatarFor = name => AVATARS[String(name || '').replace(/^Bot /, '')] || 26;
 
   // Pile actuelle compatible avec la pile requise (préfixe, du bas vers le haut) ?
   function compatible(cell, want) {
@@ -198,5 +201,5 @@
     return actions;
   }
 
-  return { playTurn, potential, evaluate, NAMES, LEVELS };
+  return { playTurn, potential, evaluate, NAMES, LEVELS, AVATARS, avatarFor };
 });
