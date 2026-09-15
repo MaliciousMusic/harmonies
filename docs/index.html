@@ -117,68 +117,80 @@ input[type=text]:focus { outline: none; border-color: var(--teal-l); box-shadow:
 .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex: none; box-shadow: inset 0 0 0 2px rgba(255,255,255,.5); }
 .credits { font-size: 11.5px; color: var(--muted); text-align: center; margin: 4px 0 0; }
 
-/* ---------- Partie ---------- */
-.game { padding-bottom: calc(96px + var(--safe-bottom)); }
+/* ---------- Partie : écran unique, sans défilement ---------- */
+body.in-game { overflow: hidden; height: 100vh; height: 100dvh; }
+.game { height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; max-width: 560px; margin: 0 auto; width: 100%; }
 .topbar {
-  position: sticky; top: 0; z-index: 20; background: linear-gradient(135deg, var(--navy), var(--blue) 70%, #3b5aa0); color: #f6e9cf;
-  display: flex; align-items: center; gap: 10px; padding: 8px 12px; box-shadow: 0 2px 8px rgba(30,42,90,.35);
+  flex: none; background: linear-gradient(135deg, var(--navy), var(--blue) 70%, #3b5aa0); color: #f6e9cf;
+  display: flex; align-items: center; gap: 10px; padding: 6px 12px; box-shadow: 0 2px 8px rgba(30,42,90,.35); z-index: 5;
 }
-.logo-small { width: 150px; height: auto; }
+.logo-small { width: 140px; height: auto; }
 .topbar .code { font-family: var(--display); letter-spacing: 3px; font-size: 13px; background: rgba(255,255,255,.14); padding: 3px 9px; border-radius: 999px; }
-.status {
-  display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--paper); border-bottom: 1px solid var(--line);
-  font-weight: 700; flex-wrap: wrap;
-}
-.status .msg { flex: 1; min-width: 160px; display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.status { flex: none; display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--paper); border-bottom: 1px solid var(--line); font-weight: 700; min-height: 40px; }
+.status .msg { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; line-height: 1.2; }
 .status.mine .msg { color: var(--teal-d); }
 .status .msg .ic { width: 20px; height: 20px; flex: none; }
-.score-chips { display: flex; gap: 6px; flex-wrap: wrap; }
-.score-chip {
-  display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 6px; border-radius: 999px; background: #fff; border: 2px solid var(--line);
-  font-family: var(--display); font-weight: 500; font-size: 13.5px; cursor: pointer; color: var(--ink);
-}
-.score-chip.active { border-color: var(--seat); box-shadow: 0 0 0 3px color-mix(in srgb, var(--seat) 22%, transparent); }
-.score-chip b { font-weight: 600; font-size: 15px; }
-.score-chip .ic { width: 16px; height: 16px; color: var(--orange-d); margin: 0; }
+.steps { display: inline-flex; gap: 4px; flex: none; }
+.stp { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px 2px 3px; border-radius: 999px; background: #eee6d4; color: var(--muted); font-size: 11px; font-weight: 700; }
+.stp b { width: 18px; height: 18px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-family: var(--display); font-size: 11px; }
+.stp b .ic { width: 12px; height: 12px; }
+.stp.cur { background: var(--teal); color: #fff; }
+.stp.cur b { background: #fff; color: var(--teal-d); }
+.stp.done { background: #dcefe9; color: var(--teal-d); }
+.stp.done b { background: var(--teal); color: #fff; }
+@media (max-width: 400px) { .stp em { display: none; } .stp { padding-right: 3px; } }
+.stp em { font-style: normal; }
 
-.section { padding: 12px 12px 4px; }
-.sec { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; min-height: 34px; }
-.pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px 5px 10px; border-radius: 999px; color: #fff; font-family: var(--display); font-weight: 500; font-size: 13.5px; letter-spacing: .3px; box-shadow: var(--shadow); }
-.pill .ic { width: 16px; height: 16px; }
+/* scène */
+.stage { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; padding: 6px 12px 4px; gap: 6px; }
+.stage-head { display: flex; align-items: center; gap: 8px; flex: none; min-height: 36px; }
+.stage-head .btn.small { min-height: 30px; padding: 4px 10px; font-size: 13px; }
+.hint { font-size: 12.5px; font-weight: 700; color: var(--orange-d); }
+.hint.muted { color: var(--muted); font-weight: 600; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px 4px 9px; border-radius: 999px; color: #fff; font-family: var(--display); font-weight: 500; font-size: 13px; letter-spacing: .3px; box-shadow: var(--shadow); white-space: nowrap; }
+.pill .ic { width: 15px; height: 15px; }
 .pill.blue { background: linear-gradient(135deg, var(--blue), var(--navy)); }
 .pill.orange { background: linear-gradient(135deg, #f4a55c, var(--orange)); }
 .pill.teal { background: linear-gradient(135deg, var(--teal-l), var(--teal)); }
 .pill.purple { background: linear-gradient(135deg, #8c6fc0, var(--purple)); }
-.hint { font-size: 13px; font-weight: 700; color: var(--orange-d); }
-.hint.muted { color: var(--muted); font-weight: 600; }
 .pouch-wrap { display: inline-flex; }
-.pouch-wrap .pouch { width: 40px; height: 44px; display: block; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
+.pouch-wrap .pouch { width: 36px; height: 40px; display: block; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
 
-/* Plateau central */
-.market { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+/* vue « choisir » : plateau central + animaux */
+.stage-choose { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px; }
+.choose-market { flex: none; display: flex; flex-direction: column; gap: 4px; }
+.market { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 .slot {
-  background: radial-gradient(ellipse at 50% 30%, #35508f, #1e2a5a); border-radius: 18px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px;
-  border: 2px solid transparent; min-height: 84px; justify-content: center; position: relative; box-shadow: inset 0 0 0 2px rgba(255,255,255,.08), var(--shadow);
+  background: radial-gradient(ellipse at 50% 30%, #35508f, #1e2a5a); border-radius: 16px; padding: 6px 3px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  border: 2px solid transparent; min-height: 80px; justify-content: center; position: relative; box-shadow: inset 0 0 0 2px rgba(255,255,255,.08), var(--shadow);
   transition: transform .12s, box-shadow .2s;
 }
 .slot.takeable { cursor: pointer; border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(242,201,76,.35), var(--shadow); }
 .slot.takeable:active { transform: scale(.96); }
 .slot.empty { background: rgba(30,42,90,.14); box-shadow: none; }
-.slot svg { width: 100%; height: auto; display: block; }
+.slot svg { width: 100%; height: auto; display: block; max-height: 150px; }
 .slot-empty { color: var(--muted); font-size: 12px; font-family: var(--display); }
+.choose-animals { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 2px; }
+.choose-animals .cards-strip { flex: 1; min-height: 0; align-items: center; padding: 6px 2px 8px; overflow-y: hidden; }
+.choose-animals .deck-wrap { width: 50px; }
+.choose-animals .deck-wrap .deck { width: 50px; height: 70px; }
 
-/* Plateau perso */
-.board-wrap { padding: 4px 8px 0; }
-.board-tabs { display: flex; gap: 6px; padding: 0 12px 8px; overflow-x: auto; }
+/* vue « plateau » : plateau perso + cartes possédées */
+.stage-play { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px; }
+.board-tabs { flex: none; display: flex; gap: 6px; overflow-x: auto; padding: 2px 0; align-items: center; }
 .board-tabs button {
-  border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px 6px 8px; font-family: var(--display); font-weight: 500; color: var(--ink); cursor: pointer; white-space: nowrap;
-  display: inline-flex; align-items: center; gap: 6px;
+  border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 4px 9px 4px 6px; font-family: var(--display); font-weight: 500; color: var(--ink); cursor: pointer; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 5px; font-size: 13px;
 }
-.board-tabs button em { font-style: normal; font-size: 12px; color: var(--muted); font-family: var(--body); font-weight: 700; }
+.board-tabs button b { font-weight: 600; background: rgba(30,42,90,.08); border-radius: 999px; padding: 0 7px; }
+.board-tabs button .ic { width: 14px; height: 14px; color: var(--orange-d); margin: 0; }
 .board-tabs button.on { background: var(--seat); color: #fff; border-color: var(--seat); }
-.board-tabs button.on em { color: rgba(255,255,255,.85); }
+.board-tabs button.on b { background: rgba(255,255,255,.25); }
+.board-tabs button.on .ic { color: #fff; }
 .board-tabs button.on .dot { box-shadow: 0 0 0 2px #fff; }
-.board { width: 100%; max-width: 440px; margin: 0 auto; display: block; border-radius: 26px; box-shadow: 0 0 0 5px #efe3cc, 0 8px 22px rgba(30,42,90,.28); }
+.board-info { font-size: 12px; color: var(--muted); font-weight: 700; white-space: nowrap; }
+.board-fit { flex: 1; min-height: 120px; display: flex; align-items: center; justify-content: center; }
+.board { display: block; border-radius: 22px; box-shadow: 0 0 0 4px #efe3cc, 0 6px 18px rgba(30,42,90,.25); }
 .board .hex { fill: var(--hex); stroke: var(--hex-line); stroke-width: .07; cursor: pointer; transition: fill .15s; }
 .board .hex-inner { fill: #f6e8ca; opacity: .55; pointer-events: none; }
 .board .hex.legal { stroke: var(--teal); stroke-width: .13; fill: #dff2ec; }
@@ -190,25 +202,73 @@ input[type=text]:focus { outline: none; border-color: var(--teal-l); box-shadow:
 .board.readonly .hex { cursor: default; }
 @keyframes pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
 .board .hex.legal, .board .hex.target { animation: pulse 1.4s ease-in-out infinite; }
+.my-cards { flex: none; display: flex; flex-direction: column; gap: 2px; }
+.my-cards .stage-head .btn.small { padding: 4px 8px; min-height: 30px; }
+.my-cards .minis { display: flex; gap: 8px; align-items: center; min-height: 54px; padding: 2px 4px 6px; overflow-x: auto; }
+.minis .placeholder { color: var(--muted); font-size: 13px; font-weight: 700; }
+.mini { position: relative; width: 50px; height: 52px; border: 0; background: #fff; border-radius: 12px; padding: 2px 0 0; cursor: pointer; box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center; flex: none; }
+.mini .animal { width: 30px; height: 30px; }
+.mini .lbl { font-size: 8.5px; font-weight: 800; color: var(--muted); max-width: 48px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; }
+.mini .left { position: absolute; top: -5px; right: -4px; min-width: 17px; height: 17px; border-radius: 999px; background: linear-gradient(180deg, #4a3a2c 0 35%, #2b2118 35%); color: #fff; font-family: var(--display); font-size: 10.5px; font-weight: 600; display: grid; place-items: center; padding: 0 4px; box-shadow: 0 1px 2px rgba(0,0,0,.4); }
+.mini .left .ic { width: 11px; height: 11px; }
+.mini.spirit { background: linear-gradient(180deg, #fff8e6, #fbe9c2); }
+.mini.spirit .left { background: linear-gradient(180deg, #f0c975 0 35%, #d9a441 35%); color: var(--navy); }
+.mini.done { opacity: .6; }
+.mini.done .left { background: var(--teal); }
+.mini.placeable { box-shadow: 0 0 0 2px var(--orange), var(--shadow); animation: placeable 1.6s ease-in-out infinite; }
+.mini .go { position: absolute; left: -5px; top: -6px; width: 18px; height: 18px; border-radius: 50%; background: var(--orange); color: #fff; display: grid; place-items: center; }
+.mini .go .ic { width: 11px; height: 11px; }
+.mini.choose { color: var(--orange-d); }
+.mini.choose .ic { width: 24px; height: 24px; }
+.my-cards .cards-strip { padding: 6px 2px 6px; }
+.cards-strip.compact .card { width: 118px; }
+.cards-strip.compact .card .head { font-size: 12px; padding: 5px 6px 4px; }
+.cards-strip.compact .card .art { height: 46px; margin: 0 5px; }
+.cards-strip.compact .card .art .animal { width: 40px; height: 40px; }
+.cards-strip.compact .card .pattern { height: 50px; }
+.cards-strip.compact .card .track .step { width: 21px; height: 22px; font-size: 11px; }
+.cards-strip.compact .card .foot, .cards-strip.compact .card .rule { font-size: 10px; }
+.cards-strip.compact .card .badge { top: 28px; right: 4px; font-size: 11.5px; padding: 3px 8px; }
+.cards-strip.compact .card.empty { min-height: 150px; }
+.cards-strip.compact .card .choose-body { font-size: 12px; padding: 4px; }
 
-/* Barre de jeu (bas) */
-.handbar {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
-  background: var(--paper); border-top: 1px solid var(--line); padding: 8px 12px calc(8px + var(--safe-bottom));
-  display: flex; align-items: center; gap: 10px; box-shadow: 0 -6px 18px rgba(30,42,90,.12); border-radius: 22px 22px 0 0;
+/* pied de page : vues | main, puis actions */
+.footer { flex: none; background: var(--paper); border-top: 1px solid var(--line); padding: 6px 10px calc(8px + var(--safe-bottom)); box-shadow: 0 -6px 18px rgba(30,42,90,.12); border-radius: 22px 22px 0 0; display: flex; flex-direction: column; gap: 6px; z-index: 5; }
+.foot-row { display: flex; gap: 8px; align-items: stretch; }
+.view-tabs { display: flex; gap: 6px; flex: none; }
+.view-tabs button {
+  position: relative; width: 74px; border: 2px solid var(--line); background: #fff; border-radius: 16px; padding: 6px 4px 4px; font-family: var(--display); font-weight: 500; font-size: 12px; color: var(--muted); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
 }
-.handbar .tokens { display: flex; gap: 8px; flex: 1; align-items: center; min-height: 48px; }
-.handbar .tokens .placeholder { color: var(--muted); font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; }
-.tok {
-  width: 48px; height: 48px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; padding: 0; background: transparent;
-  display: grid; place-items: center; transition: transform .12s;
-}
-.tok svg { width: 42px; height: 42px; display: block; }
+.view-tabs button .ic { width: 22px; height: 22px; }
+.view-tabs button.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+.view-tabs button.pop { animation: pop .35s cubic-bezier(.2,.9,.3,1.3); }
+.view-tabs .dotb { position: absolute; top: -5px; right: -4px; width: 12px; height: 12px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 0 2px #fff; animation: pulse 1.4s ease-in-out infinite; }
+.view-tabs .cnt { position: absolute; top: -6px; left: -5px; font-style: normal; font-size: 10.5px; font-weight: 600; min-width: 18px; height: 18px; border-radius: 999px; background: var(--teal); color: #fff; display: grid; place-items: center; padding: 0 5px; box-shadow: 0 0 0 2px #fff; }
+.foot-hand { flex: 1; min-width: 0; background: var(--cream); border-radius: 14px; padding: 4px 8px 6px; display: flex; flex-direction: column; gap: 2px; }
+.foot-lbl { font-family: var(--display); font-size: 11px; letter-spacing: .3px; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+.tokens { display: flex; gap: 6px; align-items: center; min-height: 48px; }
+.tokens .placeholder { color: var(--muted); font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; line-height: 1.2; }
+.tokens .placeholder.ok { color: var(--teal-d); }
+.tok { width: 46px; height: 46px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; padding: 0; background: transparent; display: grid; place-items: center; transition: transform .12s; }
+.tok svg { width: 40px; height: 40px; display: block; }
 .tok.sel { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(42,143,138,.25); transform: translateY(-3px); }
 .tok.dead { opacity: .5; }
-.handbar .actions { display: flex; gap: 8px; }
-.handbar .actions .btn { white-space: nowrap; padding: 10px 14px; }
-@media (max-width: 380px) { .handbar .actions .lbl { display: none; } }
+.foot-actions { display: flex; gap: 8px; align-items: center; }
+.foot-actions .btn { flex: 1; white-space: nowrap; padding: 9px 12px; min-height: 42px; }
+.foot-actions .btn.icon { flex: 0 0 auto; }
+.foot-actions .placeholder { flex: 1; color: var(--muted); font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; }
+@media (max-width: 380px) { .foot-actions .lbl { display: none; } .view-tabs button { width: 64px; } }
+@media (max-height: 700px) {
+  .cards-strip.compact .card .art { height: 40px; } .cards-strip.compact .card .pattern { height: 44px; }
+  .tokens { min-height: 42px; } .tok { width: 40px; height: 40px; } .tok svg { width: 34px; height: 34px; } .logo-small { width: 120px; }
+  .slot svg { max-height: 110px; }
+}
+
+/* volet cartes en grand */
+.modal.sheet { max-height: 92vh; }
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.cards-grid .card { width: auto; }
 
 /* Cartes */
 .cards-strip { display: flex; gap: 10px; overflow-x: auto; padding: 8px 12px 12px; scroll-snap-type: x proximity; align-items: stretch; }
@@ -341,6 +401,7 @@ table.scores tr.total td { font-family: var(--display); font-weight: 600; font-s
   position: fixed; left: 10px; right: 10px; top: 100px; z-index: 40; background: linear-gradient(135deg, #f4a55c, var(--orange)); color: #fff; padding: 10px 14px; border-radius: 16px;
   box-shadow: var(--shadow-lg); font-weight: 700; display: flex; gap: 10px; align-items: center; justify-content: space-between; animation: toast-in .2s ease-out;
 }
+.banner.in-stage { position: absolute; left: 8px; right: 8px; top: 6px; z-index: 6; }
 .banner span { flex: 1; display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .banner button { background: rgba(255,255,255,.22); border: 0; color: #fff; border-radius: 999px; padding: 6px 12px; cursor: pointer; font-family: var(--display); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
 .menu { list-style: none; margin: 0; padding: 0; }
@@ -1397,7 +1458,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     screen: 'home', net: null, mode: null, gameId: null, version: 0,
     committed: null, work: null, undo: [], viewSeat: 0, selToken: null, cubeMode: null,
     unsub: null, poll: null, rtOk: false, endShown: false, spiritPrompted: false, lastLogLen: 0,
-    replay: null, busy: false,
+    replay: null, busy: false, stage: 'play', stageManual: false, cardsOpen: null,
   };
   const view = () => (app.replay ? app.replay.state : (app.work || app.committed));
   const isMine = () => {
@@ -1429,7 +1490,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     closeModal();
     const bg = document.createElement('div');
     bg.className = 'modal-bg'; bg.id = 'modal';
-    bg.innerHTML = '<div class="modal">' + html + '</div>';
+    bg.innerHTML = '<div class="modal' + (opts && opts.cls ? ' ' + opts.cls : '') + '">' + html + '</div>';
     bg.addEventListener('click', ev => { if (ev.target === bg && !(opts && opts.sticky)) closeModal(); });
     document.body.appendChild(bg);
     return bg;
@@ -1438,12 +1499,20 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
   let interacted = false;
   function vibrate(ms) { if (interacted && navigator.vibrate) try { navigator.vibrate(ms); } catch (e) { /* ignore */ } }
   function showBanner(html, onClick, label) {
-    let b = $('#banner');
-    if (!b) { b = document.createElement('div'); b.id = 'banner'; b.className = 'banner'; document.body.appendChild(b); }
-    b.innerHTML = '<span>' + html + '</span>' + (onClick ? '<button>' + label + '</button>' : '');
-    if (onClick) b.querySelector('button').onclick = onClick;
+    app.banner = { html, onClick, label };
+    mountBanner();
   }
-  function hideBanner() { const b = $('#banner'); if (b) b.remove(); }
+  function mountBanner() {
+    const old = $('#banner'); if (old) old.remove();
+    if (!app.banner) return;
+    const host = $('.stage') || document.body;
+    const b = document.createElement('div');
+    b.id = 'banner'; b.className = 'banner' + (host !== document.body ? ' in-stage' : '');
+    b.innerHTML = '<span>' + app.banner.html + '</span>' + (app.banner.onClick ? '<button>' + app.banner.label + '</button>' : '');
+    if (app.banner.onClick) b.querySelector('button').onclick = app.banner.onClick;
+    host.appendChild(b);
+  }
+  function hideBanner() { app.banner = null; const b = $('#banner'); if (b) b.remove(); }
   const seatDot = i => '<span class="dot" style="background:' + SEAT_COLORS[i] + '"></span>';
   const miniTok = c => '<span class="mtok">' + R.tokenSVG(c) + '</span>';
   const miniAnimal = id => '<span class="manimal">' + R.animalSVG(id) + '</span>';
@@ -1501,6 +1570,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
   }
   function renderHome() {
     app.screen = 'home';
+    document.body.classList.remove('in-game');
     document.title = 'Harmonies';
     hideBanner();
     const recent = ls.get('harmonies.recent', []);
@@ -1614,7 +1684,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     clearInterval(app.poll);
     app.gameId = id; app.committed = state; app.version = version; app.work = null; app.undo = []; app.replay = null; app.busy = false;
     app.selToken = null; app.cubeMode = null; app.endShown = false; app.spiritPrompted = false; app.lastLogLen = (state.log || []).length;
-    app.viewSeat = 0;
+    app.viewSeat = 0; app.stageManual = false;
     app.unsub = app.net.subscribe(id, () => refresh(), ok => { app.rtOk = ok; const d = $('#conn'); if (d) d.className = 'conn ' + (ok ? 'on' : 'off'); });
     if (app.mode === 'online') {
       app.poll = setInterval(() => { if (document.visibilityState === 'visible') refresh(); }, 15000);
@@ -1634,7 +1704,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     const wasMine = isMine();
     app.committed = rec.state; app.version = rec.version;
     if (app.replay) app.replay.abort = true;
-    if (!wasMine || !isMine()) { app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; ls.del('harmonies.draft.' + app.gameId); }
+    if (!wasMine || !isMine()) { app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.stageManual = false; app.cardsOpen = null; ls.del('harmonies.draft.' + app.gameId); }
     // rejeu animé du tour adverse si l'on dispose de l'état exact qui le précédait
     const s = app.committed;
     const entry = s.log && s.log.length > app.lastLogLen ? s.log[s.log.length - 1] : null;
@@ -1660,24 +1730,26 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     app.replay = token;
     app.viewSeat = entry.p;
     const name = next.players[entry.p].name;
+    app.stage = 'play'; app.stageManual = false;
     renderGame();
     showBanner(ic('film', 'inl') + ' ' + esc(name) + ' joue son tour…', () => { token.abort = true; }, ic('skip') + 'Passer');
     await wait(500);
+    const goStage = async st => { if (app.stage !== st) { app.stage = st; renderGame(); await wait(450); } };
     for (const a of entry.actions) {
       if (token.abort) break;
       try {
         if (a.a === 'take') {
           let slot = a.slot;
           if (slot === undefined) slot = state.market.findIndex(m => m.length === a.tokens.length && m.every((t, i) => t === a.tokens[i]));
-          if (slot >= 0) await animatedTake(state, slot);
+          if (slot >= 0) { await goStage('choose'); await animatedTake(state, slot); }
         } else if (a.a === 'place') {
           const idx = state.cur.tokens.indexOf(a.color);
-          if (idx >= 0) await animatedPlace(state, idx, a.cell);
+          if (idx >= 0) { await goStage('play'); await animatedPlace(state, idx, a.cell); }
         } else if (a.a === 'card') {
           const idx = a.slot !== undefined && state.display[a.slot] === a.id ? a.slot : state.display.indexOf(a.id);
-          if (idx >= 0) await animatedCard(state, idx);
+          if (idx >= 0) { await goStage('choose'); await animatedCard(state, idx); }
         } else if (a.a === 'cube') {
-          await animatedCube(state, a.id, a.cell);
+          await goStage('play'); await animatedCube(state, a.id, a.cell);
         } else if (a.a === 'spirit') {
           E.chooseSpirit(state, a.id); renderGame(); toast(esc(name) + ' choisit l\'esprit ' + esc(E.CARD_BY_ID.get(a.id).fr));
         } else if (a.a === 'discard') {
@@ -1697,8 +1769,9 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     next.display.forEach((id, i) => { if (id && prev.display[i] !== id) newDisplay.push(i); });
     const mineNow = isMine();
     if (mineNow) ensureWork(); else app.viewSeat = mySeat() >= 0 ? mySeat() : entry.p;
-    renderGame(aborted ? {} : { refillSlot: take ? take.slot : undefined, newDisplay });
     if (!aborted) await animateRefill(take ? take.slot : undefined, newDisplay);
+    app.stageManual = false; app.stage = autoStage();
+    renderGame();
     if (mineNow && next.status === 'playing') announceMyTurn();
     if (next.status === 'finished' && !app.endShown) { app.endShown = true; showResults(); }
   }
@@ -1722,6 +1795,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
   }
   function renderLobby() {
     app.screen = 'lobby';
+    document.body.classList.remove('in-game');
     hideBanner();
     const s = app.committed;
     const host = s.host === myPid();
@@ -1777,6 +1851,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
   // ---------- Rendu principal ----------
   function render() {
     const s = app.committed;
+    document.body.classList.toggle('in-game', !!s && s.status !== 'lobby');
     if (!s) return renderHome();
     if (s.status === 'lobby') return renderLobby();
     renderGame();
@@ -1807,11 +1882,59 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     return true;
   }
   function scoreOf(seat) { const s = view(); return E.scorePlayer(s.players[seat], s.opts.side).total; }
-  const secTitle = (color, icon, text, extra) => '<h3 class="sec"><span class="pill ' + color + '">' + ic(icon) + text + '</span>' + (extra || '') + '</h3>';
+  const secTitle = (color, icon, text) => '<span class="pill ' + color + '">' + ic(icon) + text + '</span>';
+  // Scène proposée selon l'étape du tour (le joueur peut toujours changer d'onglet)
+  function autoStage() {
+    const s = view();
+    if (!s || s.status !== 'playing' || app.replay) return 'play';
+    if (!isMine()) return 'play';
+    const cur = s.cur;
+    if (cur.slot === null && !s.market.every(m => !m.length)) return 'choose';
+    return 'play';
+  }
+  function setStage(st, manual) {
+    app.stage = st;
+    if (manual) app.stageManual = true;
+    renderGame();
+  }
+  function stepOf(s, mine) {
+    if (!mine || s.status !== 'playing') return 0;
+    const cur = s.cur;
+    if (cur.slot === null && !s.market.every(m => !m.length)) return 1;
+    if (cur.tokens.length) return 2;
+    return 3;
+  }
+  // Ajuste la taille du plateau à l'espace disponible (sans défilement)
+  let fitObserver = null;
+  function fitBoard() {
+    const box = $('.board-fit'), svg = $('.board-fit .board');
+    if (!box || !svg) return;
+    const ratio = 10.09 / 8.5; // hauteur / largeur de la viewBox du plateau
+    const w = Math.min(box.clientWidth, Math.max(120, box.clientHeight) / ratio);
+    svg.style.width = Math.floor(w) + 'px';
+    svg.style.height = Math.floor(w * ratio) + 'px';
+  }
+  function watchFit() {
+    if (fitObserver) fitObserver.disconnect();
+    const box = $('.board-fit');
+    if (!box || typeof ResizeObserver === 'undefined') return;
+    fitObserver = new ResizeObserver(() => fitBoard());
+    fitObserver.observe(box);
+  }
+
+  function miniCardHTML(card, left, opts) {
+    opts = opts || {};
+    const placed = card.pts.length - left;
+    return '<button class="mini' + (opts.placeable ? ' placeable' : '') + (opts.done ? ' done' : '') + (card.spirit ? ' spirit' : '') + (opts.arriving ? ' arriving' : '') + '" data-card="' + card.id + '" title="' + esc(card.fr) + '">' +
+      R.animalSVG(card.id) + (card.spirit ? '' : '<span class="left">' + (opts.done ? ic('check') : left) + '</span>') +
+      (opts.placeable ? '<span class="go">' + ic('cube') + '</span>' : '') +
+      '<span class="lbl">' + esc(card.fr) + '</span></button>';
+  }
 
   function renderGame(anim) {
     anim = anim || {};
     app.screen = 'game';
+    document.body.classList.add('in-game');
     ensureWork();
     const s = view();
     const mine = isMine();
@@ -1822,9 +1945,11 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     const viewingMine = mine && app.viewSeat === s.turn;
     const replaying = !!app.replay;
     const side = s.opts.side;
+    if (!app.stageManual && !replaying) app.stage = anim.stage || autoStage();
+    const stage = app.stage;
     document.title = (mine && s.status === 'playing' ? 'À toi · ' : '') + 'Harmonies · ' + (s.id || '');
-
     const scores = s.players.map(p => E.scorePlayer(p, side));
+    const step = stepOf(s, mine);
 
     // Message d'état
     let msg, msgIcon = 'hourglass', msgCls = '';
@@ -1834,10 +1959,10 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       const st = E.turnStatus(s);
       msgIcon = 'hand'; msgCls = ' mine';
       if (app.cubeMode) { msg = 'Tape une case orange pour poser le cube'; msgIcon = 'cube'; }
-      else if (cur.slot === null && !s.market.every(m => !m.length)) msg = 'À toi : prends un groupe de 3 jetons';
-      else if (cur.tokens.length) msg = 'Pose tes jetons (' + cur.tokens.length + ' restant' + (cur.tokens.length > 1 ? 's' : '') + ')';
+      else if (step === 1) msg = 'Prends un groupe de 3 jetons';
+      else if (step === 2) msg = 'Pose tes jetons (' + cur.tokens.length + ')';
       else if (!st.ok) msg = st.reasons[0];
-      else { msg = 'Une carte ou un cube à poser ? Sinon, termine ton tour'; msgIcon = 'check'; }
+      else { msg = 'Carte ou cube ? Sinon, fin du tour'; msgIcon = 'check'; }
     } else msg = 'Tour de ' + esc(E.current(s).name) + (app.mode === 'online' ? '…' : '');
 
     const legal = new Set(), targets = new Set(), last = new Set();
@@ -1850,93 +1975,107 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       const lastLog = (s.log || []).slice().reverse().find(l => l.p === app.viewSeat);
       if (lastLog) lastLog.actions.forEach(a => { if (a.a === 'place') last.add(a.cell); });
     }
-
     const placeable = mine ? E.placeableCubes(s) : [];
     const placeableIds = new Set(placeable.map(p => p.id));
     const canTake = mine && E.canTakeCard(s);
 
+    // ----- barre haute + état -----
+    const steps = mine && s.status === 'playing' ? '<span class="steps">' + [['1', 'Jetons'], ['2', 'Poser'], ['3', 'Animaux']].map(([n, l], i) =>
+      '<span class="stp' + (step === i + 1 ? ' cur' : (step > i + 1 ? ' done' : '')) + '"><b>' + (step > i + 1 ? ic('check') : n) + '</b><em>' + l + '</em></span>').join('') + '</span>' : '';
     let html = '<div class="screen game">' +
       '<div class="topbar">' + R.logoSVG('logo-small') + '<span class="code">' + esc(s.id || '') + '</span>' +
       (app.mode === 'online' ? '<span class="conn ' + (app.rtOk ? 'on' : 'off') + '" id="conn" title="temps réel"></span>' : '') +
       '<span class="spacer"></span><button class="icon-btn" id="sound" title="Sons">' + ic(Sfx.enabled ? 'sound' : 'mute') + '</button><button class="icon-btn" id="menu" title="Menu">' + ic('menu') + '</button></div>' +
-      '<div class="status' + msgCls + '"><span class="msg">' + ic(msgIcon, 'inl') + '<span>' + msg + '</span></span><span class="score-chips">' +
-      s.players.map((p, i) => '<span class="score-chip' + (i === app.viewSeat ? ' active' : '') + '" data-seat="' + i + '" style="--seat:' + SEAT_COLORS[i] + '">' + seatDot(i) + esc(p.name) + (i === s.turn && s.status === 'playing' ? ic('dice', 'inl') : '') + ' <b>' + scores[i].total + '</b></span>').join('') +
-      '</span></div>';
+      '<div class="status' + msgCls + '"><span class="msg">' + ic(msgIcon, 'inl') + '<span>' + msg + '</span></span>' + steps + '</div>';
 
-    // Plateau central + sac
-    html += '<div class="section">' + secTitle('blue', 'grid', 'Plateau central', (mine && cur.slot === null && s.status === 'playing' && !app.cubeMode ? '<span class="hint">choisis un groupe</span>' : '') +
-      '<span class="spacer"></span><span class="pouch-wrap" title="Jetons restants dans le sac">' + R.pouchSVG(s.bag ? s.bag.length : 0) + '</span>') + '<div class="market">' +
-      s.market.map((m, i) => {
-        const takeable = mine && cur.slot === null && m.length > 0 && !app.cubeMode;
-        const arriving = anim.refillSlot === i;
-        return '<div class="slot' + (takeable ? ' takeable' : '') + (m.length ? '' : ' empty') + '" data-slot="' + i + '">' + (m.length ? R.slotSVG(m, arriving) : (cur && cur.slot === i ? '<span class="slot-empty">pris</span>' : '')) + '</div>';
-      }).join('') + '</div></div>';
-
-    // Plateaux
-    html += '<div class="board-tabs">' + s.players.map((p, i) => '<button data-seat="' + i + '" class="' + (i === app.viewSeat ? 'on' : '') + '" style="--seat:' + SEAT_COLORS[i] + '">' + seatDot(i) + esc(p.name) + (i === me && app.mode === 'online' ? ' (toi)' : '') + '<em>' + E.emptyCount(p.board) + ' vides</em></button>').join('') + '</div>' +
-      '<div class="board-wrap">' + R.boardSVG(viewing.board, { legal, targets, last, readonly: !viewingMine, newTop: anim.newTop, newCube: anim.newCube }) + '</div>';
-
-    // Cartes disponibles + pioche
-    html += '<div class="section">' + secTitle('orange', 'star', 'Animaux disponibles', (canTake ? '<span class="hint">tu peux en prendre une</span>' : (mine && cur.cardTaken ? '<span class="hint muted">carte prise ce tour</span>' : ''))) + '<div class="cards-strip">' +
-      '<div class="deck-wrap" title="Pioche">' + R.deckSVG(s.deck.length) + '</div>' +
-      s.display.map((id, i) => {
-        if (!id) return '<div class="card empty" data-display="' + i + '"></div>';
-        const card = E.CARD_BY_ID.get(id);
-        const arriving = anim.newDisplay && anim.newDisplay.includes(i);
-        return cardHTML(card, { cls: (canTake ? 'takeable' : '') + (arriving ? ' arriving' : ''), badge: canTake ? 'Prendre' : '', badgeCls: 'teal', attrs: 'data-display="' + i + '"' });
-      }).join('') + '</div></div>';
-
-    // Cartes du joueur affiché
-    const p = viewing;
-    const items = [];
-    if (p.spiritChoices && viewingMine) items.push('<div class="card tone-sp spirit choose" id="spirit-choose"><div class="head">Esprit de la Nature</div><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '</div><div class="choose-body">' + ic('sparkles') + 'Choisis ton Esprit</div><div class="foot">2 cartes à découvrir</div></div>');
-    if (p.spirit) {
-      const card = E.CARD_BY_ID.get(p.spirit.id);
-      const pl = placeableIds.has(card.id) && viewingMine;
-      items.push(cardHTML(card, { cls: (pl ? 'placeable' : '') + (p.spirit.placed ? ' done' : ''), badge: pl ? 'Poser' : (p.spirit.placed ? ic('check') + 'posé' : ''), badgeCls: p.spirit.placed ? 'teal' : '', attrs: 'data-mine="1"' }));
-    }
-    for (const h of p.hand) {
-      const card = E.CARD_BY_ID.get(h.id);
-      const pl = placeableIds.has(h.id) && viewingMine;
-      items.push(cardHTML(card, { left: h.left, cls: (pl ? 'placeable' : '') + (anim.arrivingCard === h.id ? ' arriving' : ''), badge: pl ? 'Poser' : '', attrs: 'data-mine="1"' }));
-    }
-    for (const d of p.done) items.push(cardHTML(E.CARD_BY_ID.get(d.id), { left: 0, cls: 'done', done: true, badge: ic('check'), badgeCls: 'teal', attrs: 'data-mine="1"' }));
-    const active = E.activeCount(p);
-    html += '<div class="section">' + secTitle('teal', 'layers', 'Cartes de ' + esc(p.name), '<span class="hint muted">' + active + '/4 en cours' + (p.done.length ? ' · ' + p.done.length + ' terminée' + (p.done.length > 1 ? 's' : '') : '') + '</span>') + '<div class="cards-strip">' +
-      (items.length ? items.join('') : '<div class="card empty"><div class="empty-text">aucune carte</div></div>') + '</div></div>';
-
-    // Journal
-    const log = (s.log || []).slice(-8).reverse();
-    html += '<div class="section">' + secTitle('purple', 'scroll', 'Journal') + '</div><ul class="log">' + (log.length ? log.map(l =>
-      '<li><span class="turnno">T' + l.n + '</span>' + seatDot(l.p) + '<b>' + esc(s.players[l.p].name) + '</b><span class="acts">' + (actionsHTML(l.actions) || '—') + '</span></li>').join('') : '<li>Début de partie.</li>') + '</ul>';
-
-    // Barre du bas
-    html += '<div class="handbar">';
-    if (s.status === 'finished') {
-      html += '<div class="tokens"><span class="placeholder">Partie terminée</span></div><div class="actions"><button class="btn primary" id="results">' + ic('trophy') + 'Résultats</button></div>';
-    } else if (replaying) {
-      html += '<div class="tokens">' + (cur.tokens.length ? cur.tokens.map((t, i) => '<span class="tok' + (anim.arrivingHand ? ' arriving' : '') + '" data-tok="' + i + '">' + R.tokenSVG(t) + '</span>').join('') : '<span class="placeholder">' + esc(E.current(s).name) + ' joue…</span>') + '</div>';
-    } else if (!mine) {
-      html += '<div class="tokens"><span class="placeholder">' + (app.mode === 'online' ? 'En attente de ' + esc(E.current(s).name) + '…' : 'Tour de ' + esc(E.current(s).name)) + '</span></div><div class="actions">' +
-        (app.mode === 'online' ? '<button class="btn secondary icon" id="reload" title="Actualiser">' + ic('refresh') + '</button>' : '') + '</div>';
+    // ----- scène : choisir (jetons + animaux) ou jouer (plateau + cartes) -----
+    html += '<div class="stage">';
+    if (stage === 'choose') {
+      html += '<div class="stage-choose"><div class="choose-market"><div class="stage-head">' + secTitle('blue', 'grid', 'Plateau central') +
+        (mine && step === 1 ? '<span class="hint">prends un groupe</span>' : (mine && cur.slot !== null ? '<span class="hint muted">jetons pris</span>' : '')) +
+        '<span class="spacer"></span><span class="pouch-wrap" title="Jetons restants dans le sac">' + R.pouchSVG(s.bag ? s.bag.length : 0) + '</span></div>' +
+        '<div class="market">' + s.market.map((m, i) => {
+          const takeable = mine && cur.slot === null && m.length > 0 && !app.cubeMode;
+          const arriving = anim.refillSlot === i;
+          return '<div class="slot' + (takeable ? ' takeable' : '') + (m.length ? '' : ' empty') + '" data-slot="' + i + '">' + (m.length ? R.slotSVG(m, arriving) : (cur && cur.slot === i ? '<span class="slot-empty">pris</span>' : '')) + '</div>';
+        }).join('') + '</div></div>' +
+        '<div class="choose-animals"><div class="stage-head">' + secTitle('orange', 'star', 'Animaux') +
+        '<span class="hint' + (canTake ? '' : ' muted') + '">' + (canTake ? 'tu peux en prendre une' : (mine && cur.cardTaken ? 'carte prise ce tour' : (mine ? 'limite de 4 atteinte' : 'une par tour, 4 max'))) + '</span></div>' +
+        '<div class="cards-strip compact"><div class="deck-wrap" title="Pioche">' + R.deckSVG(s.deck.length) + '</div>' +
+        s.display.map((id, i) => {
+          if (!id) return '<div class="card empty" data-display="' + i + '"></div>';
+          const card = E.CARD_BY_ID.get(id);
+          const arriving = anim.newDisplay && anim.newDisplay.includes(i);
+          return cardHTML(card, { cls: (canTake ? 'takeable' : '') + (arriving ? ' arriving' : ''), badge: canTake ? 'Prendre' : '', badgeCls: 'teal', attrs: 'data-display="' + i + '"' });
+        }).join('') + '</div></div></div>';
     } else {
-      const st = E.turnStatus(s);
-      html += '<div class="tokens">' + (cur.slot === null && cur.tokens.length === 0 ?
-        '<span class="placeholder">' + (s.market.every(m => !m.length) ? 'Plus de jetons à prendre' : 'Prends 3 jetons en haut') + '</span>' :
-        cur.tokens.map((t, i) => {
-          const dead = !E.legalCells(E.current(s).board, t).length;
-          return '<button class="tok' + (i === app.selToken ? ' sel' : '') + (dead ? ' dead' : '') + (anim.arrivingHand ? ' arriving' : '') + '" data-tok="' + i + '" title="' + E.COLOR_NAMES[t] + '">' + R.tokenSVG(t) + '</button>';
-        }).join('') + (cur.tokens.length === 0 ? '<span class="placeholder">' + ic('check', 'inl') + 'Jetons posés</span>' : '')) + '</div>' +
-        '<div class="actions"><button class="btn secondary" id="undo" ' + (app.undo.length ? '' : 'disabled') + '>' + ic('undo') + '<span class="lbl">Annuler</span></button>' +
-        '<button class="btn primary' + (st.ok ? ' ready' : '') + '" id="end" ' + (st.ok ? '' : 'disabled') + '>Fin du tour</button></div>';
+      const p2 = viewing;
+      const items = [];
+      const pcOf = id => (viewingMine ? placeable.find(x => x.id === id) : null);
+      if (p2.spiritChoices && viewingMine) items.push('<div class="card tone-sp spirit choose" id="spirit-choose"><div class="head">Esprit</div><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '</div><div class="choose-body">' + ic('sparkles') + 'À choisir</div></div>');
+      if (p2.spirit) items.push(cardHTML(E.CARD_BY_ID.get(p2.spirit.id), { cls: (pcOf(p2.spirit.id) ? 'placeable' : '') + (p2.spirit.placed ? ' done' : ''), badge: pcOf(p2.spirit.id) ? ic('cube') + 'Poser' : (p2.spirit.placed ? ic('check') : ''), badgeCls: p2.spirit.placed ? 'teal' : '', attrs: 'data-mine="1"' }));
+      for (const h of p2.hand) items.push(cardHTML(E.CARD_BY_ID.get(h.id), { left: h.left, cls: (pcOf(h.id) ? 'placeable' : '') + (anim.arrivingCard === h.id ? ' arriving' : ''), badge: pcOf(h.id) ? ic('cube') + 'Poser' : '', attrs: 'data-mine="1"' }));
+      for (const d of p2.done) items.push(cardHTML(E.CARD_BY_ID.get(d.id), { left: 0, cls: 'done', done: true, badge: ic('check'), badgeCls: 'teal', attrs: 'data-mine="1"' }));
+      html += '<div class="stage-play"><div class="board-tabs">' + s.players.map((p, i) =>
+        '<button data-seat="' + i + '" class="' + (i === app.viewSeat ? 'on' : '') + '" style="--seat:' + SEAT_COLORS[i] + '">' + seatDot(i) + esc(p.name) + (i === me && app.mode === 'online' ? ' (toi)' : '') + (i === s.turn && s.status === 'playing' ? ic('dice', 'inl') : '') + '<b>' + scores[i].total + '</b></button>').join('') +
+        '<span class="spacer"></span><span class="board-info">' + E.emptyCount(p2.board) + ' vides</span></div>' +
+        '<div class="board-fit">' + R.boardSVG(p2.board, { legal, targets, last, readonly: !viewingMine, newTop: anim.newTop, newCube: anim.newCube }) + '</div>' +
+        cardsBlock();
+      // cartes possédées : repliées pendant la pose des jetons (sauf cube posable), dépliables d'un tap
+      function cardsBlock() {
+          const open = app.cardsOpen !== null ? app.cardsOpen : (!(mine && step === 2) || placeable.length > 0);
+          const minis = [];
+          if (p2.spiritChoices && viewingMine) minis.push('<button class="mini spirit choose" id="spirit-choose-mini">' + ic('sparkles') + '<span class="lbl">Esprit ?</span></button>');
+          if (p2.spirit) minis.push(miniCardHTML(E.CARD_BY_ID.get(p2.spirit.id), 1, { placeable: !!pcOf(p2.spirit.id), done: p2.spirit.placed }));
+          for (const h of p2.hand) minis.push(miniCardHTML(E.CARD_BY_ID.get(h.id), h.left, { placeable: !!pcOf(h.id) }));
+          for (const d of p2.done) minis.push(miniCardHTML(E.CARD_BY_ID.get(d.id), 0, { done: true }));
+          return '<div class="my-cards' + (open ? '' : ' folded') + '"><div class="stage-head" id="cards-head">' + secTitle('teal', 'layers', viewingMine ? 'Tes cartes' : 'Cartes de ' + esc(p2.name)) +
+            '<span class="hint muted">' + E.activeCount(p2) + '/4' + (p2.done.length ? ' · ' + p2.done.length + ' finie' + (p2.done.length > 1 ? 's' : '') : '') + '</span><span class="spacer"></span>' +
+            '<button class="btn small secondary" id="cards-sheet" title="Voir en grand">' + ic('layers') + '</button><button class="btn small secondary" id="cards-fold" title="' + (open ? 'Replier' : 'Déplier') + '">' + ic(open ? 'minus' : 'plus') + '</button></div>' +
+            (open ? '<div class="cards-strip compact">' + (items.length ? items.join('') : '<div class="card empty"><div class="empty-text">aucune carte</div></div>') + '</div>' :
+              '<div class="minis">' + (minis.length ? minis.join('') : '<span class="placeholder">aucune carte</span>') + '</div>') + '</div>';
+      }
+      html += '</div>';
     }
-    html += '</div></div>';
+    html += '</div>';
+
+    // ----- pied de page : vues | main, puis actions -----
+    const handLabel = replaying ? 'Main de ' + esc(E.current(s).name) : 'Main';
+    let handHTML;
+    if (s.status === 'finished') handHTML = '<span class="placeholder">Terminé</span>';
+    else if (replaying) handHTML = cur.tokens.length ? cur.tokens.map((t, i) => '<span class="tok' + (anim.arrivingHand ? ' arriving' : '') + '" data-tok="' + i + '">' + R.tokenSVG(t) + '</span>').join('') : '<span class="placeholder">' + esc(E.current(s).name) + ' joue…</span>';
+    else if (!mine) handHTML = '<span class="placeholder">' + (app.mode === 'online' ? 'Attente de ' + esc(E.current(s).name) : 'Tour de ' + esc(E.current(s).name)) + '</span>';
+    else if (cur.slot === null && cur.tokens.length === 0) handHTML = '<span class="placeholder">' + (s.market.every(m => !m.length) ? 'plus de jetons' : '3 jetons à prendre') + '</span>';
+    else if (cur.tokens.length === 0) handHTML = '<span class="placeholder ok">' + ic('check', 'inl') + 'posés</span>';
+    else handHTML = cur.tokens.map((t, i) => {
+      const dead = !E.legalCells(E.current(s).board, t).length;
+      return '<button class="tok' + (i === app.selToken ? ' sel' : '') + (dead ? ' dead' : '') + (anim.arrivingHand ? ' arriving' : '') + '" data-tok="' + i + '" title="' + E.COLOR_NAMES[t] + '">' + R.tokenSVG(t) + '</button>';
+    }).join('');
+    const myCount = E.activeCount(s.players[me >= 0 ? me : s.turn]);
+    html += '<div class="footer"><div class="foot-row">' +
+      '<div class="view-tabs">' +
+      '<button data-stage="choose" class="' + (stage === 'choose' ? 'on' : '') + '">' + ic('grid') + '<span>Choisir</span>' + (mine && (step === 1 || (step === 3 && canTake)) ? '<i class="dotb"></i>' : '') + '</button>' +
+      '<button data-stage="play" class="' + (stage === 'play' ? 'on' : '') + '">' + ic('layers') + '<span>Plateau</span>' + (mine && (step === 2 || app.cubeMode || placeable.length) ? '<i class="dotb"></i>' : '') + '<em class="cnt">' + myCount + '</em></button>' +
+      '</div>' +
+      '<div class="foot-hand"><div class="foot-lbl">' + handLabel + '</div><div class="tokens">' + handHTML + '</div></div></div>';
+    html += '<div class="foot-actions">';
+    if (s.status === 'finished') html += '<button class="btn primary block" id="results">' + ic('trophy') + 'Résultats</button>';
+    else if (replaying) html += '<span class="placeholder">' + ic('film', 'inl') + 'Rejeu du tour…</span>';
+    else if (!mine) html += '<span class="placeholder">' + ic('hourglass', 'inl') + 'Tu joues après ' + esc(E.current(s).name) + '</span>' + (app.mode === 'online' ? '<button class="btn secondary icon" id="reload" title="Actualiser">' + ic('refresh') + '</button>' : '');
+    else {
+      const st = E.turnStatus(s);
+      html += '<button class="btn secondary" id="undo" ' + (app.undo.length ? '' : 'disabled') + '>' + ic('undo') + '<span class="lbl">Annuler</span></button>' +
+        '<button class="btn primary' + (st.ok ? ' ready' : '') + '" id="end" ' + (st.ok ? '' : 'disabled') + '>Fin du tour</button>';
+    }
+    html += '</div></div></div>';
     $('#app').innerHTML = html;
+    if (stage === 'play') { fitBoard(); watchFit(); }
     bindGame(s, mine, viewingMine, placeable);
+    if (replaying) mountBanner();
 
     if (replaying) { /* bannière gérée par le rejeu */ }
-    else if (mine && app.cubeMode) showBanner('Pose le cube ' + miniAnimal(app.cubeMode.id) + ' ' + esc(E.CARD_BY_ID.get(app.cubeMode.id).fr) + ' : tape une case orange', () => { app.cubeMode = null; renderGame(); }, 'Annuler');
-    else if (mine && app.selToken !== null && cur.tokens[app.selToken] !== undefined && !E.legalCells(E.current(s).board, cur.tokens[app.selToken]).length) {
+    else if (mine && app.cubeMode) showBanner('Pose le cube ' + miniAnimal(app.cubeMode.id) + ' ' + esc(E.CARD_BY_ID.get(app.cubeMode.id).fr) + ' : touche une case orange', () => { app.cubeMode = null; renderGame(); }, 'Annuler');
+    else if (mine && stage === 'play' && app.selToken !== null && cur.tokens[app.selToken] !== undefined && !E.legalCells(E.current(s).board, cur.tokens[app.selToken]).length) {
       showBanner('Aucune case possible pour ce jeton', () => { const sel = app.selToken; if (act(w => E.discardToken(w, sel))) Sfx.undo(); app.selToken = app.work.cur.tokens.length ? 0 : null; renderGame(); }, 'Défausser');
     } else hideBanner();
 
@@ -1947,10 +2086,32 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
   function bindGame(s, mine, viewingMine, placeable) {
     $('#menu').onclick = showMenu;
     $('#sound').onclick = () => { const on = Sfx.toggle(); $('#sound').innerHTML = ic(on ? 'sound' : 'mute'); toast(on ? 'Sons activés' : 'Sons coupés'); };
-    $$('.score-chip').forEach(chip => { chip.onclick = () => { const seat = +chip.dataset.seat; if (app.viewSeat === seat) showScores(); else { app.viewSeat = seat; renderGame(); } }; });
-    $$('.board-tabs button').forEach(b => { b.onclick = () => { app.viewSeat = +b.dataset.seat; renderGame(); }; });
+    $$('.view-tabs button').forEach(b => { b.onclick = () => { if (app.replay) return; setStage(b.dataset.stage, true); }; });
+    $$('.board-tabs button').forEach(b => { b.onclick = () => { const seat = +b.dataset.seat; if (app.viewSeat === seat) showScores(); else { app.viewSeat = seat; renderGame(); } }; });
     const reload = $('#reload'); if (reload) reload.onclick = () => { refresh(); toast('Mise à jour…'); };
     const results = $('#results'); if (results) results.onclick = showResults;
+    const cs = $('#cards-sheet'); if (cs) cs.onclick = () => showCardsSheet(app.viewSeat, mine, viewingMine, placeable);
+    const cf = $('#cards-fold'); if (cf) cf.onclick = () => { app.cardsOpen = !!$('.my-cards.folded'); renderGame(); };
+    $$('.my-cards .mini[data-card]').forEach(m => {
+      m.onclick = () => {
+        const id = +m.dataset.card;
+        const pc = mine && viewingMine && !app.busy ? placeable.find(x => x.id === id) : null;
+        if (pc) { startCube(pc); return; }
+        cardDetail(E.CARD_BY_ID.get(id), '');
+      };
+    });
+    const spm = $('#spirit-choose-mini'); if (spm) spm.onclick = () => showSpiritChoice();
+    $$('.stage .card[data-mine]').forEach(c => {
+      c.onclick = ev => {
+        const id = +c.dataset.card;
+        const card = E.CARD_BY_ID.get(id);
+        const pc = mine && viewingMine && !app.busy ? placeable.find(x => x.id === id) : null;
+        if (pc && ev.target.closest('.badge')) { startCube(pc); return; }
+        cardDetail(card, pc ? '<button class="btn warn block" id="m-cube">' + ic('cube') + 'Poser un cube</button>' : '');
+        const b = $('#m-cube'); if (b) b.onclick = () => { closeModal(); startCube(pc); };
+      };
+    });
+    const sp = $('#spirit-choose'); if (sp) sp.onclick = ev => { ev.stopPropagation(); showSpiritChoice(); };
     // cartes disponibles : détail toujours consultable
     $$('.card[data-display]').forEach(c => {
       if (!c.dataset.card) return;
@@ -1962,24 +2123,16 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
         const b = $('#m-take'); if (b) b.onclick = () => { closeModal(); interactiveCard(+c.dataset.display); };
       };
     });
-    $$('.card[data-mine]').forEach(c => {
-      c.onclick = ev => {
-        const id = +c.dataset.card;
-        const card = E.CARD_BY_ID.get(id);
-        const pc = mine && !app.busy ? placeable.find(x => x.id === id) : null;
-        if (pc && viewingMine && ev.target.closest('.badge')) { startCube(pc); return; }
-        cardDetail(card, pc && viewingMine ? '<button class="btn warn block" id="m-cube">' + ic('cube') + 'Poser un cube</button>' : '');
-        const b = $('#m-cube'); if (b) b.onclick = () => { closeModal(); startCube(pc); };
-      };
-    });
+    function startCube(pc) {
+      closeModal();
+      if (pc.targets.length === 1) { interactiveCube(pc.id, pc.targets[0]); return; }
+      app.cubeMode = { id: pc.id, targets: new Set(pc.targets) };
+      setStage('play', true);
+    }
+    bindGame.startCube = startCube;
     if (!mine) return;
-    // Marché
-    $$('.slot.takeable').forEach(sl => {
-      sl.onclick = () => { if (app.busy) return; Sfx.unlock(); interactiveTake(+sl.dataset.slot); };
-    });
-    // Jetons en main
-    $$('.tok').forEach(b => { b.onclick = () => { if (app.busy) return; app.selToken = +b.dataset.tok; app.cubeMode = null; renderGame(); }; });
-    // Plateau
+    $$('.slot.takeable').forEach(sl => { sl.onclick = () => { if (app.busy) return; Sfx.unlock(); interactiveTake(+sl.dataset.slot); }; });
+    $$('.tok').forEach(b => { b.onclick = () => { if (app.busy) return; app.selToken = +b.dataset.tok; app.cubeMode = null; app.stage = 'play'; renderGame(); }; });
     const board = $('.board');
     if (board && viewingMine) {
       board.addEventListener('click', ev => {
@@ -1993,7 +2146,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
           return;
         }
         if (app.selToken === null || w.cur.tokens[app.selToken] === undefined) {
-          if (w.cur.slot === null) toast('Prends d\'abord 3 jetons sur le plateau central', true);
+          if (w.cur.slot === null) toast('Prends d\'abord 3 jetons (vue Choisir)', true);
           return;
         }
         const color = w.cur.tokens[app.selToken];
@@ -2001,39 +2154,61 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
         interactivePlace(app.selToken, idx);
       });
     }
-    const spiritBtn = $('#spirit-choose'); if (spiritBtn) spiritBtn.onclick = showSpiritChoice;
-    function startCube(pc) {
-      if (pc.targets.length === 1) { interactiveCube(pc.id, pc.targets[0]); return; }
-      app.cubeMode = { id: pc.id, targets: new Set(pc.targets) };
-      renderGame(); scrollToBoard();
-    }
-    // Annuler / Fin du tour
     const undo = $('#undo'); if (undo) undo.onclick = () => {
       if (!app.undo.length || app.busy) return;
       app.work = app.undo.pop();
-      app.selToken = app.work.cur.tokens.length ? 0 : null; app.cubeMode = null;
+      app.selToken = app.work.cur.tokens.length ? 0 : null; app.cubeMode = null; app.stageManual = false;
       saveDraft(); Sfx.undo(); renderGame();
     };
     const end = $('#end'); if (end) end.onclick = endTurn;
   }
-  function scrollToBoard() { const b = $('.board-wrap'); if (b) b.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+
+  // Volet « cartes en grand » (siège affiché)
+  function showCardsSheet(seat, mine, viewingMine, placeable) {
+    const s = view();
+    const p = s.players[seat];
+    const items = [];
+    if (p.spiritChoices && viewingMine) items.push('<div class="card tone-sp spirit choose" data-choose-spirit="1"><div class="head">Esprit de la Nature</div><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '</div><div class="choose-body">' + ic('sparkles') + 'Choisis ton Esprit</div><div class="foot">2 cartes à découvrir</div></div>');
+    const pcOf = id => (mine && viewingMine ? placeable.find(x => x.id === id) : null);
+    if (p.spirit) items.push(cardHTML(E.CARD_BY_ID.get(p.spirit.id), { cls: (pcOf(p.spirit.id) ? 'placeable' : '') + (p.spirit.placed ? ' done' : ''), badge: pcOf(p.spirit.id) ? ic('cube') + 'Poser' : (p.spirit.placed ? ic('check') + 'posé' : ''), badgeCls: p.spirit.placed ? 'teal' : '', attrs: 'data-mine="1"' }));
+    for (const h of p.hand) items.push(cardHTML(E.CARD_BY_ID.get(h.id), { left: h.left, cls: pcOf(h.id) ? 'placeable' : '', badge: pcOf(h.id) ? ic('cube') + 'Poser' : '', attrs: 'data-mine="1"' }));
+    for (const d of p.done) items.push(cardHTML(E.CARD_BY_ID.get(d.id), { left: 0, cls: 'done', done: true, badge: ic('check'), badgeCls: 'teal', attrs: 'data-mine="1"' }));
+    modal('<h2>' + ic('layers', 'h') + (viewingMine ? 'Tes cartes' : 'Cartes de ' + esc(p.name)) + ' <span class="note">· ' + E.activeCount(p) + '/4 en cours' + (p.done.length ? ' · ' + p.done.length + ' terminée' + (p.done.length > 1 ? 's' : '') : '') + '</span></h2>' +
+      (items.length ? '<div class="cards-grid">' + items.join('') + '</div>' : '<p class="note">Aucune carte pour le moment. Prends-en dans l\'onglet Animaux (une par tour).</p>') +
+      '<div class="actions">' + (mine && E.canTakeCard(s) ? '<button class="btn secondary" id="m-animals">' + ic('star') + 'Voir les animaux</button>' : '') + '<button class="btn secondary" id="m-close">Fermer</button></div>', { cls: 'sheet' });
+    $('#m-close').onclick = closeModal;
+    const ma = $('#m-animals'); if (ma) ma.onclick = () => { closeModal(); setStage('choose', true); };
+    const cs = $('[data-choose-spirit]'); if (cs) cs.onclick = () => { closeModal(); showSpiritChoice(); };
+    $$('#modal .card[data-mine]').forEach(c => {
+      c.onclick = ev => {
+        const id = +c.dataset.card;
+        const card = E.CARD_BY_ID.get(id);
+        const pc = pcOf(id);
+        if (pc && ev.target.closest('.badge')) { bindGame.startCube(pc); return; }
+        cardDetail(card, pc ? '<button class="btn warn block" id="m-cube">' + ic('cube') + 'Poser un cube</button>' : '');
+        const b = $('#m-cube'); if (b) b.onclick = () => { closeModal(); bindGame.startCube(pc); };
+      };
+    });
+  }
 
   // ---------- Actions animées (partagées entre le joueur actif et le rejeu) ----------
   async function animatedTake(state, slot) {
     const from = $$('.slot[data-slot="' + slot + '"] .disc').map(rectOf);
     const colors = state.market[slot].slice();
     E.takeTokens(state, slot);
-    if (state === app.work) app.selToken = 0;
+    if (state === app.work) { app.selToken = 0; app.stageManual = false; }
+    app.stage = 'play';
     renderGame({ arrivingHand: true });
     Sfx.take();
-    const toks = $$('.handbar .tok');
-    await Promise.all(toks.map((t, i) => fly(from[i] || from[0], rectOf(t), R.tokenSVG(colors[i]), { duration: 420 + i * 60, arc: -30 }).then(() => reveal(t, 'pop'))));
+    const toks = $$('.footer .tok');
+    await Promise.all(toks.map((t, i) => fly(from[i] || from[0], rectOf(t), R.tokenSVG(colors[i]), { duration: 460 + i * 70, arc: -40 }).then(() => reveal(t, 'pop'))));
   }
   async function animatedPlace(state, handIdx, cellIdx) {
-    const from = rectOf($('.handbar .tok[data-tok="' + handIdx + '"]'));
+    const from = rectOf($('.footer .tok[data-tok="' + handIdx + '"]'));
     const color = state.cur.tokens[handIdx];
     E.placeToken(state, handIdx, cellIdx);
     if (state === app.work) app.selToken = state.cur.tokens.length ? Math.min(handIdx, state.cur.tokens.length - 1) : null;
+    app.stage = 'play';
     renderGame({ newTop: cellIdx });
     const target = $('.board .stack[data-cell="' + cellIdx + '"] .disc.arriving');
     await fly(from, rectOf(target), R.tokenSVG(color), { duration: 380, arc: -50 });
@@ -2045,41 +2220,49 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     const card = E.CARD_BY_ID.get(id);
     const from = rectOf($('.card[data-display="' + displayIdx + '"]'));
     E.takeCard(state, displayIdx);
-    renderGame({ arrivingCard: id });
+    app.stage = 'choose';
+    renderGame({ stage: 'choose' });
     Sfx.card();
-    const target = $('.card.arriving[data-card="' + id + '"]');
-    await fly(from, rectOf(target), '<div class="ghost-card" style="border-color:' + R.cubeColorOf(card) + '">' + R.animalSVG(card.id) + '</div>', { duration: 520, arc: -30 });
-    reveal(target, 'pop');
+    const target = $('.view-tabs button[data-stage="play"]');
+    await fly(from, rectOf(target), '<div class="ghost-card" style="border-color:' + R.cubeColorOf(card) + '">' + R.animalSVG(card.id) + '</div>', { duration: 560, arc: -30 });
+    if (target) { target.classList.add('pop'); setTimeout(() => target.classList.remove('pop'), 700); }
   }
   async function animatedCube(state, cardId, cellIdx) {
-    const steps = $$('.card[data-mine][data-card="' + cardId + '"] .track .step.cube');
-    const from = rectOf(steps.length ? steps[0] : $('.card[data-mine][data-card="' + cardId + '"]'));
+    const steps = $$('.stage .card[data-mine][data-card="' + cardId + '"] .track .step.cube');
+    const from = rectOf(steps.length ? steps[0] : $('.stage .card[data-mine][data-card="' + cardId + '"]'));
     const spirit = E.CARD_BY_ID.get(cardId).spirit;
     E.placeCube(state, cardId, cellIdx);
+    app.stage = 'play';
     renderGame({ newCube: cellIdx });
     const target = $('.board .stack[data-cell="' + cellIdx + '"] .cube.arriving');
     await fly(from, rectOf(target), '<div class="ghost-cube' + (spirit ? ' spirit' : '') + '"></div>', { duration: 480, arc: -60 });
     reveal(target, 'bounce');
     Sfx.cube(); vibrate(20);
   }
+  // Recharge de fin de tour (vue « choisir ») : sac → plateau central, puis pioche → animaux
   async function animateRefill(slot, displayIdxs) {
-    const jobs = [];
-    if (slot !== undefined && slot !== null) {
+    const hasSlot = slot !== undefined && slot !== null;
+    if (!hasSlot && !(displayIdxs && displayIdxs.length)) return;
+    app.stage = 'choose';
+    renderGame({ refillSlot: hasSlot ? slot : undefined, newDisplay: displayIdxs, stage: 'choose' });
+    await wait(250);
+    if (hasSlot) {
       const pouch = rectOf($('.pouch-wrap'));
       const discs = $$('.slot[data-slot="' + slot + '"] .disc.arriving');
       const colors = view().market[slot] || [];
-      discs.forEach((d, i) => jobs.push(wait(i * 90).then(() => fly(pouch, rectOf(d), R.tokenSVG(colors[i]), { duration: 520, arc: -40 })).then(() => reveal(d, 'drop'))));
       if (discs.length) Sfx.draw();
+      await Promise.all(discs.map((d, i) => wait(i * 90).then(() => fly(pouch, rectOf(d), R.tokenSVG(colors[i]), { duration: 520, arc: -40 })).then(() => reveal(d, 'drop'))));
+      await wait(200);
     }
     if (displayIdxs && displayIdxs.length) {
       const deck = rectOf($('.deck-wrap'));
-      displayIdxs.forEach((i, k) => {
+      await Promise.all(displayIdxs.map((i, k) => {
         const target = $('.card.arriving[data-display="' + i + '"]');
-        if (!target) return;
-        jobs.push(wait(200 + k * 120).then(() => { Sfx.card(); return fly(deck, rectOf(target), '<div class="ghost-card back"></div>', { duration: 560, arc: -20 }); }).then(() => reveal(target, 'flip')));
-      });
+        if (!target) return Promise.resolve();
+        return wait(k * 120).then(() => { Sfx.card(); return fly(deck, rectOf(target), '<div class="ghost-card back"></div>', { duration: 560, arc: -20 }); }).then(() => reveal(target, 'flip'));
+      }));
     }
-    await Promise.all(jobs);
+    await wait(450);
   }
 
   // Versions interactives (tour du joueur actif) : instantané pour Annuler + brouillon + score flottant
@@ -2094,7 +2277,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       app.undo.push(snap);
       saveDraft();
       const after = scoreOf(seat);
-      if (after !== before) floatText($('.score-chip[data-seat="' + seat + '"]'), (after > before ? '+' : '') + (after - before), after > before ? 'up' : 'down');
+      if (after !== before) floatText($('.board-tabs button[data-seat="' + seat + '"] b') || $('.status .msg'), (after > before ? '+' : '') + (after - before), after > before ? 'up' : 'down');
     } catch (e) {
       app.work = snap; toast(e.message, true);
     } finally {
@@ -2102,12 +2285,12 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       renderGame();
     }
   }
-  function interactiveTake(slot) { withAnim(() => animatedTake(app.work, slot)).then(() => scrollToBoard()); }
+  function interactiveTake(slot) { withAnim(() => animatedTake(app.work, slot)); }
   function interactivePlace(handIdx, cellIdx) {
     withAnim(() => animatedPlace(app.work, handIdx, cellIdx)).then(() => {
       if (!app.work) return;
       const now = E.placeableCubes(app.work);
-      if (now.length && app.work.cur.tokens.length === 0) toast('Habitat réalisé : ' + now.map(x => miniAnimal(x.id) + ' ' + esc(E.CARD_BY_ID.get(x.id).fr)).join(', ') + ' → « Poser »');
+      if (now.length && app.work.cur.tokens.length === 0) toast('Habitat réalisé : ' + now.map(x => miniAnimal(x.id) + ' ' + esc(E.CARD_BY_ID.get(x.id).fr)).join(', ') + ' → touche la carte pour poser le cube');
     });
   }
   function interactiveCard(displayIdx) { withAnim(() => animatedCard(app.work, displayIdx)); }
@@ -2123,7 +2306,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     app.busy = true;
     try {
       const r = await app.net.saveGame(app.gameId, w, app.version);
-      app.committed = w; app.version = r.version; app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.spiritPrompted = false;
+      app.committed = w; app.version = r.version; app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.spiritPrompted = false; app.stageManual = false; app.cardsOpen = null;
       app.lastLogLen = w.log.length;
       ls.del('harmonies.draft.' + app.gameId);
       app.busy = false;
@@ -2131,9 +2314,10 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       w.display.forEach((id, i) => { if (id && prevDisplay[i] !== id) newDisplay.push(i); });
       if (w.status === 'finished') { render(); return; }
       if (app.mode === 'local') app.viewSeat = w.turn;
-      renderGame({ refillSlot: slot, newDisplay });
       await animateRefill(slot, newDisplay);
+      app.stage = autoStage();
       if (app.mode === 'local') {
+        renderGame();
         modal('<h2>' + ic('phone', 'h') + 'Au tour de ' + esc(E.current(w).name) + '</h2><p>Passe le téléphone à ' + esc(E.current(w).name) + '.</p><div class="actions"><button class="btn primary" id="m-ok">C\'est parti</button></div>', { sticky: true });
         $('#m-ok').onclick = () => { closeModal(); render(); announceMyTurn(); };
       } else render();
@@ -2202,7 +2386,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     const link = location.origin + location.pathname + '?g=' + (s.id || '');
     modal('<h2>' + ic('menu', 'h') + 'Menu</h2><ul class="menu">' +
       (app.mode === 'online' ? '<li id="mn-share">' + ic('share') + 'Partager le lien de la partie</li>' : '') +
-      '<li id="mn-scores">' + ic('chart') + 'Score détaillé</li><li id="mn-rules">' + ic('book') + 'Règles et légende</li>' +
+      '<li id="mn-scores">' + ic('chart') + 'Score détaillé</li><li id="mn-journal">' + ic('scroll') + 'Journal de la partie</li><li id="mn-rules">' + ic('book') + 'Règles et légende</li>' +
       (app.mode === 'online' && s.status === 'playing' && mySeat() < 0 ? '<li id="mn-claim">' + ic('users') + 'Je suis un des joueurs (reprendre ma place)</li>' : '') +
       (app.mode === 'online' ? '<li id="mn-reload">' + ic('refresh') + 'Recharger la partie</li>' : '') +
       '<li id="mn-home">' + ic('home') + 'Retour à l\'accueil</li></ul>' +
@@ -2212,6 +2396,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     const on = (id, fn) => { const e = $(id); if (e) e.onclick = fn; };
     on('#mn-share', async () => { closeModal(); if (navigator.share) { try { await navigator.share({ title: 'Harmonies', text: 'Notre partie d\'Harmonies (code ' + s.id + ')', url: link }); } catch (e) { /* annulé */ } } else { await copyText(link); toast('Lien copié'); } });
     on('#mn-scores', () => { closeModal(); showScores(); });
+    on('#mn-journal', () => { closeModal(); showJournal(); });
     on('#mn-rules', () => { closeModal(); showRules(); });
     on('#mn-reload', () => { closeModal(); app.version = 0; refresh(); });
     on('#mn-home', () => { closeModal(); leaveGame(); renderHome(); });
@@ -2226,6 +2411,14 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
         catch (e) { toast('Échec : ' + e.message, true); refresh(); }
       }; });
     });
+  }
+  function showJournal() {
+    const s = view();
+    const log = (s.log || []).slice().reverse();
+    modal('<h2>' + ic('scroll', 'h') + 'Journal</h2><ul class="log">' + (log.length ? log.map(l =>
+      '<li><span class="turnno">T' + l.n + '</span>' + seatDot(l.p) + '<b>' + esc(s.players[l.p].name) + '</b><span class="acts">' + (actionsHTML(l.actions) || '—') + '</span></li>').join('') : '<li>Début de partie.</li>') + '</ul>' +
+      '<div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>', { cls: 'sheet' });
+    $('#m-close').onclick = closeModal;
   }
   function showRules() {
     const tok = c => R.tokenSVG(c);

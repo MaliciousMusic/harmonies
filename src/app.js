@@ -164,7 +164,7 @@
     screen: 'home', net: null, mode: null, gameId: null, version: 0,
     committed: null, work: null, undo: [], viewSeat: 0, selToken: null, cubeMode: null,
     unsub: null, poll: null, rtOk: false, endShown: false, spiritPrompted: false, lastLogLen: 0,
-    replay: null, busy: false,
+    replay: null, busy: false, stage: 'play', stageManual: false, cardsOpen: null,
   };
   const view = () => (app.replay ? app.replay.state : (app.work || app.committed));
   const isMine = () => {
@@ -196,7 +196,7 @@
     closeModal();
     const bg = document.createElement('div');
     bg.className = 'modal-bg'; bg.id = 'modal';
-    bg.innerHTML = '<div class="modal">' + html + '</div>';
+    bg.innerHTML = '<div class="modal' + (opts && opts.cls ? ' ' + opts.cls : '') + '">' + html + '</div>';
     bg.addEventListener('click', ev => { if (ev.target === bg && !(opts && opts.sticky)) closeModal(); });
     document.body.appendChild(bg);
     return bg;
@@ -205,12 +205,20 @@
   let interacted = false;
   function vibrate(ms) { if (interacted && navigator.vibrate) try { navigator.vibrate(ms); } catch (e) { /* ignore */ } }
   function showBanner(html, onClick, label) {
-    let b = $('#banner');
-    if (!b) { b = document.createElement('div'); b.id = 'banner'; b.className = 'banner'; document.body.appendChild(b); }
-    b.innerHTML = '<span>' + html + '</span>' + (onClick ? '<button>' + label + '</button>' : '');
-    if (onClick) b.querySelector('button').onclick = onClick;
+    app.banner = { html, onClick, label };
+    mountBanner();
   }
-  function hideBanner() { const b = $('#banner'); if (b) b.remove(); }
+  function mountBanner() {
+    const old = $('#banner'); if (old) old.remove();
+    if (!app.banner) return;
+    const host = $('.stage') || document.body;
+    const b = document.createElement('div');
+    b.id = 'banner'; b.className = 'banner' + (host !== document.body ? ' in-stage' : '');
+    b.innerHTML = '<span>' + app.banner.html + '</span>' + (app.banner.onClick ? '<button>' + app.banner.label + '</button>' : '');
+    if (app.banner.onClick) b.querySelector('button').onclick = app.banner.onClick;
+    host.appendChild(b);
+  }
+  function hideBanner() { app.banner = null; const b = $('#banner'); if (b) b.remove(); }
   const seatDot = i => '<span class="dot" style="background:' + SEAT_COLORS[i] + '"></span>';
   const miniTok = c => '<span class="mtok">' + R.tokenSVG(c) + '</span>';
   const miniAnimal = id => '<span class="manimal">' + R.animalSVG(id) + '</span>';
@@ -268,6 +276,7 @@
   }
   function renderHome() {
     app.screen = 'home';
+    document.body.classList.remove('in-game');
     document.title = 'Harmonies';
     hideBanner();
     const recent = ls.get('harmonies.recent', []);
@@ -381,7 +390,7 @@
     clearInterval(app.poll);
     app.gameId = id; app.committed = state; app.version = version; app.work = null; app.undo = []; app.replay = null; app.busy = false;
     app.selToken = null; app.cubeMode = null; app.endShown = false; app.spiritPrompted = false; app.lastLogLen = (state.log || []).length;
-    app.viewSeat = 0;
+    app.viewSeat = 0; app.stageManual = false;
     app.unsub = app.net.subscribe(id, () => refresh(), ok => { app.rtOk = ok; const d = $('#conn'); if (d) d.className = 'conn ' + (ok ? 'on' : 'off'); });
     if (app.mode === 'online') {
       app.poll = setInterval(() => { if (document.visibilityState === 'visible') refresh(); }, 15000);
@@ -401,7 +410,7 @@
     const wasMine = isMine();
     app.committed = rec.state; app.version = rec.version;
     if (app.replay) app.replay.abort = true;
-    if (!wasMine || !isMine()) { app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; ls.del('harmonies.draft.' + app.gameId); }
+    if (!wasMine || !isMine()) { app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.stageManual = false; app.cardsOpen = null; ls.del('harmonies.draft.' + app.gameId); }
     // rejeu animé du tour adverse si l'on dispose de l'état exact qui le précédait
     const s = app.committed;
     const entry = s.log && s.log.length > app.lastLogLen ? s.log[s.log.length - 1] : null;
@@ -427,24 +436,26 @@
     app.replay = token;
     app.viewSeat = entry.p;
     const name = next.players[entry.p].name;
+    app.stage = 'play'; app.stageManual = false;
     renderGame();
     showBanner(ic('film', 'inl') + ' ' + esc(name) + ' joue son tour…', () => { token.abort = true; }, ic('skip') + 'Passer');
     await wait(500);
+    const goStage = async st => { if (app.stage !== st) { app.stage = st; renderGame(); await wait(450); } };
     for (const a of entry.actions) {
       if (token.abort) break;
       try {
         if (a.a === 'take') {
           let slot = a.slot;
           if (slot === undefined) slot = state.market.findIndex(m => m.length === a.tokens.length && m.every((t, i) => t === a.tokens[i]));
-          if (slot >= 0) await animatedTake(state, slot);
+          if (slot >= 0) { await goStage('choose'); await animatedTake(state, slot); }
         } else if (a.a === 'place') {
           const idx = state.cur.tokens.indexOf(a.color);
-          if (idx >= 0) await animatedPlace(state, idx, a.cell);
+          if (idx >= 0) { await goStage('play'); await animatedPlace(state, idx, a.cell); }
         } else if (a.a === 'card') {
           const idx = a.slot !== undefined && state.display[a.slot] === a.id ? a.slot : state.display.indexOf(a.id);
-          if (idx >= 0) await animatedCard(state, idx);
+          if (idx >= 0) { await goStage('choose'); await animatedCard(state, idx); }
         } else if (a.a === 'cube') {
-          await animatedCube(state, a.id, a.cell);
+          await goStage('play'); await animatedCube(state, a.id, a.cell);
         } else if (a.a === 'spirit') {
           E.chooseSpirit(state, a.id); renderGame(); toast(esc(name) + ' choisit l\'esprit ' + esc(E.CARD_BY_ID.get(a.id).fr));
         } else if (a.a === 'discard') {
@@ -464,8 +475,9 @@
     next.display.forEach((id, i) => { if (id && prev.display[i] !== id) newDisplay.push(i); });
     const mineNow = isMine();
     if (mineNow) ensureWork(); else app.viewSeat = mySeat() >= 0 ? mySeat() : entry.p;
-    renderGame(aborted ? {} : { refillSlot: take ? take.slot : undefined, newDisplay });
     if (!aborted) await animateRefill(take ? take.slot : undefined, newDisplay);
+    app.stageManual = false; app.stage = autoStage();
+    renderGame();
     if (mineNow && next.status === 'playing') announceMyTurn();
     if (next.status === 'finished' && !app.endShown) { app.endShown = true; showResults(); }
   }
@@ -489,6 +501,7 @@
   }
   function renderLobby() {
     app.screen = 'lobby';
+    document.body.classList.remove('in-game');
     hideBanner();
     const s = app.committed;
     const host = s.host === myPid();
@@ -544,6 +557,7 @@
   // ---------- Rendu principal ----------
   function render() {
     const s = app.committed;
+    document.body.classList.toggle('in-game', !!s && s.status !== 'lobby');
     if (!s) return renderHome();
     if (s.status === 'lobby') return renderLobby();
     renderGame();
@@ -574,11 +588,59 @@
     return true;
   }
   function scoreOf(seat) { const s = view(); return E.scorePlayer(s.players[seat], s.opts.side).total; }
-  const secTitle = (color, icon, text, extra) => '<h3 class="sec"><span class="pill ' + color + '">' + ic(icon) + text + '</span>' + (extra || '') + '</h3>';
+  const secTitle = (color, icon, text) => '<span class="pill ' + color + '">' + ic(icon) + text + '</span>';
+  // Scène proposée selon l'étape du tour (le joueur peut toujours changer d'onglet)
+  function autoStage() {
+    const s = view();
+    if (!s || s.status !== 'playing' || app.replay) return 'play';
+    if (!isMine()) return 'play';
+    const cur = s.cur;
+    if (cur.slot === null && !s.market.every(m => !m.length)) return 'choose';
+    return 'play';
+  }
+  function setStage(st, manual) {
+    app.stage = st;
+    if (manual) app.stageManual = true;
+    renderGame();
+  }
+  function stepOf(s, mine) {
+    if (!mine || s.status !== 'playing') return 0;
+    const cur = s.cur;
+    if (cur.slot === null && !s.market.every(m => !m.length)) return 1;
+    if (cur.tokens.length) return 2;
+    return 3;
+  }
+  // Ajuste la taille du plateau à l'espace disponible (sans défilement)
+  let fitObserver = null;
+  function fitBoard() {
+    const box = $('.board-fit'), svg = $('.board-fit .board');
+    if (!box || !svg) return;
+    const ratio = 10.09 / 8.5; // hauteur / largeur de la viewBox du plateau
+    const w = Math.min(box.clientWidth, Math.max(120, box.clientHeight) / ratio);
+    svg.style.width = Math.floor(w) + 'px';
+    svg.style.height = Math.floor(w * ratio) + 'px';
+  }
+  function watchFit() {
+    if (fitObserver) fitObserver.disconnect();
+    const box = $('.board-fit');
+    if (!box || typeof ResizeObserver === 'undefined') return;
+    fitObserver = new ResizeObserver(() => fitBoard());
+    fitObserver.observe(box);
+  }
+
+  function miniCardHTML(card, left, opts) {
+    opts = opts || {};
+    const placed = card.pts.length - left;
+    return '<button class="mini' + (opts.placeable ? ' placeable' : '') + (opts.done ? ' done' : '') + (card.spirit ? ' spirit' : '') + (opts.arriving ? ' arriving' : '') + '" data-card="' + card.id + '" title="' + esc(card.fr) + '">' +
+      R.animalSVG(card.id) + (card.spirit ? '' : '<span class="left">' + (opts.done ? ic('check') : left) + '</span>') +
+      (opts.placeable ? '<span class="go">' + ic('cube') + '</span>' : '') +
+      '<span class="lbl">' + esc(card.fr) + '</span></button>';
+  }
 
   function renderGame(anim) {
     anim = anim || {};
     app.screen = 'game';
+    document.body.classList.add('in-game');
     ensureWork();
     const s = view();
     const mine = isMine();
@@ -589,9 +651,11 @@
     const viewingMine = mine && app.viewSeat === s.turn;
     const replaying = !!app.replay;
     const side = s.opts.side;
+    if (!app.stageManual && !replaying) app.stage = anim.stage || autoStage();
+    const stage = app.stage;
     document.title = (mine && s.status === 'playing' ? 'À toi · ' : '') + 'Harmonies · ' + (s.id || '');
-
     const scores = s.players.map(p => E.scorePlayer(p, side));
+    const step = stepOf(s, mine);
 
     // Message d'état
     let msg, msgIcon = 'hourglass', msgCls = '';
@@ -601,10 +665,10 @@
       const st = E.turnStatus(s);
       msgIcon = 'hand'; msgCls = ' mine';
       if (app.cubeMode) { msg = 'Tape une case orange pour poser le cube'; msgIcon = 'cube'; }
-      else if (cur.slot === null && !s.market.every(m => !m.length)) msg = 'À toi : prends un groupe de 3 jetons';
-      else if (cur.tokens.length) msg = 'Pose tes jetons (' + cur.tokens.length + ' restant' + (cur.tokens.length > 1 ? 's' : '') + ')';
+      else if (step === 1) msg = 'Prends un groupe de 3 jetons';
+      else if (step === 2) msg = 'Pose tes jetons (' + cur.tokens.length + ')';
       else if (!st.ok) msg = st.reasons[0];
-      else { msg = 'Une carte ou un cube à poser ? Sinon, termine ton tour'; msgIcon = 'check'; }
+      else { msg = 'Carte ou cube ? Sinon, fin du tour'; msgIcon = 'check'; }
     } else msg = 'Tour de ' + esc(E.current(s).name) + (app.mode === 'online' ? '…' : '');
 
     const legal = new Set(), targets = new Set(), last = new Set();
@@ -617,93 +681,107 @@
       const lastLog = (s.log || []).slice().reverse().find(l => l.p === app.viewSeat);
       if (lastLog) lastLog.actions.forEach(a => { if (a.a === 'place') last.add(a.cell); });
     }
-
     const placeable = mine ? E.placeableCubes(s) : [];
     const placeableIds = new Set(placeable.map(p => p.id));
     const canTake = mine && E.canTakeCard(s);
 
+    // ----- barre haute + état -----
+    const steps = mine && s.status === 'playing' ? '<span class="steps">' + [['1', 'Jetons'], ['2', 'Poser'], ['3', 'Animaux']].map(([n, l], i) =>
+      '<span class="stp' + (step === i + 1 ? ' cur' : (step > i + 1 ? ' done' : '')) + '"><b>' + (step > i + 1 ? ic('check') : n) + '</b><em>' + l + '</em></span>').join('') + '</span>' : '';
     let html = '<div class="screen game">' +
       '<div class="topbar">' + R.logoSVG('logo-small') + '<span class="code">' + esc(s.id || '') + '</span>' +
       (app.mode === 'online' ? '<span class="conn ' + (app.rtOk ? 'on' : 'off') + '" id="conn" title="temps réel"></span>' : '') +
       '<span class="spacer"></span><button class="icon-btn" id="sound" title="Sons">' + ic(Sfx.enabled ? 'sound' : 'mute') + '</button><button class="icon-btn" id="menu" title="Menu">' + ic('menu') + '</button></div>' +
-      '<div class="status' + msgCls + '"><span class="msg">' + ic(msgIcon, 'inl') + '<span>' + msg + '</span></span><span class="score-chips">' +
-      s.players.map((p, i) => '<span class="score-chip' + (i === app.viewSeat ? ' active' : '') + '" data-seat="' + i + '" style="--seat:' + SEAT_COLORS[i] + '">' + seatDot(i) + esc(p.name) + (i === s.turn && s.status === 'playing' ? ic('dice', 'inl') : '') + ' <b>' + scores[i].total + '</b></span>').join('') +
-      '</span></div>';
+      '<div class="status' + msgCls + '"><span class="msg">' + ic(msgIcon, 'inl') + '<span>' + msg + '</span></span>' + steps + '</div>';
 
-    // Plateau central + sac
-    html += '<div class="section">' + secTitle('blue', 'grid', 'Plateau central', (mine && cur.slot === null && s.status === 'playing' && !app.cubeMode ? '<span class="hint">choisis un groupe</span>' : '') +
-      '<span class="spacer"></span><span class="pouch-wrap" title="Jetons restants dans le sac">' + R.pouchSVG(s.bag ? s.bag.length : 0) + '</span>') + '<div class="market">' +
-      s.market.map((m, i) => {
-        const takeable = mine && cur.slot === null && m.length > 0 && !app.cubeMode;
-        const arriving = anim.refillSlot === i;
-        return '<div class="slot' + (takeable ? ' takeable' : '') + (m.length ? '' : ' empty') + '" data-slot="' + i + '">' + (m.length ? R.slotSVG(m, arriving) : (cur && cur.slot === i ? '<span class="slot-empty">pris</span>' : '')) + '</div>';
-      }).join('') + '</div></div>';
-
-    // Plateaux
-    html += '<div class="board-tabs">' + s.players.map((p, i) => '<button data-seat="' + i + '" class="' + (i === app.viewSeat ? 'on' : '') + '" style="--seat:' + SEAT_COLORS[i] + '">' + seatDot(i) + esc(p.name) + (i === me && app.mode === 'online' ? ' (toi)' : '') + '<em>' + E.emptyCount(p.board) + ' vides</em></button>').join('') + '</div>' +
-      '<div class="board-wrap">' + R.boardSVG(viewing.board, { legal, targets, last, readonly: !viewingMine, newTop: anim.newTop, newCube: anim.newCube }) + '</div>';
-
-    // Cartes disponibles + pioche
-    html += '<div class="section">' + secTitle('orange', 'star', 'Animaux disponibles', (canTake ? '<span class="hint">tu peux en prendre une</span>' : (mine && cur.cardTaken ? '<span class="hint muted">carte prise ce tour</span>' : ''))) + '<div class="cards-strip">' +
-      '<div class="deck-wrap" title="Pioche">' + R.deckSVG(s.deck.length) + '</div>' +
-      s.display.map((id, i) => {
-        if (!id) return '<div class="card empty" data-display="' + i + '"></div>';
-        const card = E.CARD_BY_ID.get(id);
-        const arriving = anim.newDisplay && anim.newDisplay.includes(i);
-        return cardHTML(card, { cls: (canTake ? 'takeable' : '') + (arriving ? ' arriving' : ''), badge: canTake ? 'Prendre' : '', badgeCls: 'teal', attrs: 'data-display="' + i + '"' });
-      }).join('') + '</div></div>';
-
-    // Cartes du joueur affiché
-    const p = viewing;
-    const items = [];
-    if (p.spiritChoices && viewingMine) items.push('<div class="card tone-sp spirit choose" id="spirit-choose"><div class="head">Esprit de la Nature</div><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '</div><div class="choose-body">' + ic('sparkles') + 'Choisis ton Esprit</div><div class="foot">2 cartes à découvrir</div></div>');
-    if (p.spirit) {
-      const card = E.CARD_BY_ID.get(p.spirit.id);
-      const pl = placeableIds.has(card.id) && viewingMine;
-      items.push(cardHTML(card, { cls: (pl ? 'placeable' : '') + (p.spirit.placed ? ' done' : ''), badge: pl ? 'Poser' : (p.spirit.placed ? ic('check') + 'posé' : ''), badgeCls: p.spirit.placed ? 'teal' : '', attrs: 'data-mine="1"' }));
-    }
-    for (const h of p.hand) {
-      const card = E.CARD_BY_ID.get(h.id);
-      const pl = placeableIds.has(h.id) && viewingMine;
-      items.push(cardHTML(card, { left: h.left, cls: (pl ? 'placeable' : '') + (anim.arrivingCard === h.id ? ' arriving' : ''), badge: pl ? 'Poser' : '', attrs: 'data-mine="1"' }));
-    }
-    for (const d of p.done) items.push(cardHTML(E.CARD_BY_ID.get(d.id), { left: 0, cls: 'done', done: true, badge: ic('check'), badgeCls: 'teal', attrs: 'data-mine="1"' }));
-    const active = E.activeCount(p);
-    html += '<div class="section">' + secTitle('teal', 'layers', 'Cartes de ' + esc(p.name), '<span class="hint muted">' + active + '/4 en cours' + (p.done.length ? ' · ' + p.done.length + ' terminée' + (p.done.length > 1 ? 's' : '') : '') + '</span>') + '<div class="cards-strip">' +
-      (items.length ? items.join('') : '<div class="card empty"><div class="empty-text">aucune carte</div></div>') + '</div></div>';
-
-    // Journal
-    const log = (s.log || []).slice(-8).reverse();
-    html += '<div class="section">' + secTitle('purple', 'scroll', 'Journal') + '</div><ul class="log">' + (log.length ? log.map(l =>
-      '<li><span class="turnno">T' + l.n + '</span>' + seatDot(l.p) + '<b>' + esc(s.players[l.p].name) + '</b><span class="acts">' + (actionsHTML(l.actions) || '—') + '</span></li>').join('') : '<li>Début de partie.</li>') + '</ul>';
-
-    // Barre du bas
-    html += '<div class="handbar">';
-    if (s.status === 'finished') {
-      html += '<div class="tokens"><span class="placeholder">Partie terminée</span></div><div class="actions"><button class="btn primary" id="results">' + ic('trophy') + 'Résultats</button></div>';
-    } else if (replaying) {
-      html += '<div class="tokens">' + (cur.tokens.length ? cur.tokens.map((t, i) => '<span class="tok' + (anim.arrivingHand ? ' arriving' : '') + '" data-tok="' + i + '">' + R.tokenSVG(t) + '</span>').join('') : '<span class="placeholder">' + esc(E.current(s).name) + ' joue…</span>') + '</div>';
-    } else if (!mine) {
-      html += '<div class="tokens"><span class="placeholder">' + (app.mode === 'online' ? 'En attente de ' + esc(E.current(s).name) + '…' : 'Tour de ' + esc(E.current(s).name)) + '</span></div><div class="actions">' +
-        (app.mode === 'online' ? '<button class="btn secondary icon" id="reload" title="Actualiser">' + ic('refresh') + '</button>' : '') + '</div>';
+    // ----- scène : choisir (jetons + animaux) ou jouer (plateau + cartes) -----
+    html += '<div class="stage">';
+    if (stage === 'choose') {
+      html += '<div class="stage-choose"><div class="choose-market"><div class="stage-head">' + secTitle('blue', 'grid', 'Plateau central') +
+        (mine && step === 1 ? '<span class="hint">prends un groupe</span>' : (mine && cur.slot !== null ? '<span class="hint muted">jetons pris</span>' : '')) +
+        '<span class="spacer"></span><span class="pouch-wrap" title="Jetons restants dans le sac">' + R.pouchSVG(s.bag ? s.bag.length : 0) + '</span></div>' +
+        '<div class="market">' + s.market.map((m, i) => {
+          const takeable = mine && cur.slot === null && m.length > 0 && !app.cubeMode;
+          const arriving = anim.refillSlot === i;
+          return '<div class="slot' + (takeable ? ' takeable' : '') + (m.length ? '' : ' empty') + '" data-slot="' + i + '">' + (m.length ? R.slotSVG(m, arriving) : (cur && cur.slot === i ? '<span class="slot-empty">pris</span>' : '')) + '</div>';
+        }).join('') + '</div></div>' +
+        '<div class="choose-animals"><div class="stage-head">' + secTitle('orange', 'star', 'Animaux') +
+        '<span class="hint' + (canTake ? '' : ' muted') + '">' + (canTake ? 'tu peux en prendre une' : (mine && cur.cardTaken ? 'carte prise ce tour' : (mine ? 'limite de 4 atteinte' : 'une par tour, 4 max'))) + '</span></div>' +
+        '<div class="cards-strip compact"><div class="deck-wrap" title="Pioche">' + R.deckSVG(s.deck.length) + '</div>' +
+        s.display.map((id, i) => {
+          if (!id) return '<div class="card empty" data-display="' + i + '"></div>';
+          const card = E.CARD_BY_ID.get(id);
+          const arriving = anim.newDisplay && anim.newDisplay.includes(i);
+          return cardHTML(card, { cls: (canTake ? 'takeable' : '') + (arriving ? ' arriving' : ''), badge: canTake ? 'Prendre' : '', badgeCls: 'teal', attrs: 'data-display="' + i + '"' });
+        }).join('') + '</div></div></div>';
     } else {
-      const st = E.turnStatus(s);
-      html += '<div class="tokens">' + (cur.slot === null && cur.tokens.length === 0 ?
-        '<span class="placeholder">' + (s.market.every(m => !m.length) ? 'Plus de jetons à prendre' : 'Prends 3 jetons en haut') + '</span>' :
-        cur.tokens.map((t, i) => {
-          const dead = !E.legalCells(E.current(s).board, t).length;
-          return '<button class="tok' + (i === app.selToken ? ' sel' : '') + (dead ? ' dead' : '') + (anim.arrivingHand ? ' arriving' : '') + '" data-tok="' + i + '" title="' + E.COLOR_NAMES[t] + '">' + R.tokenSVG(t) + '</button>';
-        }).join('') + (cur.tokens.length === 0 ? '<span class="placeholder">' + ic('check', 'inl') + 'Jetons posés</span>' : '')) + '</div>' +
-        '<div class="actions"><button class="btn secondary" id="undo" ' + (app.undo.length ? '' : 'disabled') + '>' + ic('undo') + '<span class="lbl">Annuler</span></button>' +
-        '<button class="btn primary' + (st.ok ? ' ready' : '') + '" id="end" ' + (st.ok ? '' : 'disabled') + '>Fin du tour</button></div>';
+      const p2 = viewing;
+      const items = [];
+      const pcOf = id => (viewingMine ? placeable.find(x => x.id === id) : null);
+      if (p2.spiritChoices && viewingMine) items.push('<div class="card tone-sp spirit choose" id="spirit-choose"><div class="head">Esprit</div><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '</div><div class="choose-body">' + ic('sparkles') + 'À choisir</div></div>');
+      if (p2.spirit) items.push(cardHTML(E.CARD_BY_ID.get(p2.spirit.id), { cls: (pcOf(p2.spirit.id) ? 'placeable' : '') + (p2.spirit.placed ? ' done' : ''), badge: pcOf(p2.spirit.id) ? ic('cube') + 'Poser' : (p2.spirit.placed ? ic('check') : ''), badgeCls: p2.spirit.placed ? 'teal' : '', attrs: 'data-mine="1"' }));
+      for (const h of p2.hand) items.push(cardHTML(E.CARD_BY_ID.get(h.id), { left: h.left, cls: (pcOf(h.id) ? 'placeable' : '') + (anim.arrivingCard === h.id ? ' arriving' : ''), badge: pcOf(h.id) ? ic('cube') + 'Poser' : '', attrs: 'data-mine="1"' }));
+      for (const d of p2.done) items.push(cardHTML(E.CARD_BY_ID.get(d.id), { left: 0, cls: 'done', done: true, badge: ic('check'), badgeCls: 'teal', attrs: 'data-mine="1"' }));
+      html += '<div class="stage-play"><div class="board-tabs">' + s.players.map((p, i) =>
+        '<button data-seat="' + i + '" class="' + (i === app.viewSeat ? 'on' : '') + '" style="--seat:' + SEAT_COLORS[i] + '">' + seatDot(i) + esc(p.name) + (i === me && app.mode === 'online' ? ' (toi)' : '') + (i === s.turn && s.status === 'playing' ? ic('dice', 'inl') : '') + '<b>' + scores[i].total + '</b></button>').join('') +
+        '<span class="spacer"></span><span class="board-info">' + E.emptyCount(p2.board) + ' vides</span></div>' +
+        '<div class="board-fit">' + R.boardSVG(p2.board, { legal, targets, last, readonly: !viewingMine, newTop: anim.newTop, newCube: anim.newCube }) + '</div>' +
+        cardsBlock();
+      // cartes possédées : repliées pendant la pose des jetons (sauf cube posable), dépliables d'un tap
+      function cardsBlock() {
+          const open = app.cardsOpen !== null ? app.cardsOpen : (!(mine && step === 2) || placeable.length > 0);
+          const minis = [];
+          if (p2.spiritChoices && viewingMine) minis.push('<button class="mini spirit choose" id="spirit-choose-mini">' + ic('sparkles') + '<span class="lbl">Esprit ?</span></button>');
+          if (p2.spirit) minis.push(miniCardHTML(E.CARD_BY_ID.get(p2.spirit.id), 1, { placeable: !!pcOf(p2.spirit.id), done: p2.spirit.placed }));
+          for (const h of p2.hand) minis.push(miniCardHTML(E.CARD_BY_ID.get(h.id), h.left, { placeable: !!pcOf(h.id) }));
+          for (const d of p2.done) minis.push(miniCardHTML(E.CARD_BY_ID.get(d.id), 0, { done: true }));
+          return '<div class="my-cards' + (open ? '' : ' folded') + '"><div class="stage-head" id="cards-head">' + secTitle('teal', 'layers', viewingMine ? 'Tes cartes' : 'Cartes de ' + esc(p2.name)) +
+            '<span class="hint muted">' + E.activeCount(p2) + '/4' + (p2.done.length ? ' · ' + p2.done.length + ' finie' + (p2.done.length > 1 ? 's' : '') : '') + '</span><span class="spacer"></span>' +
+            '<button class="btn small secondary" id="cards-sheet" title="Voir en grand">' + ic('layers') + '</button><button class="btn small secondary" id="cards-fold" title="' + (open ? 'Replier' : 'Déplier') + '">' + ic(open ? 'minus' : 'plus') + '</button></div>' +
+            (open ? '<div class="cards-strip compact">' + (items.length ? items.join('') : '<div class="card empty"><div class="empty-text">aucune carte</div></div>') + '</div>' :
+              '<div class="minis">' + (minis.length ? minis.join('') : '<span class="placeholder">aucune carte</span>') + '</div>') + '</div>';
+      }
+      html += '</div>';
     }
-    html += '</div></div>';
+    html += '</div>';
+
+    // ----- pied de page : vues | main, puis actions -----
+    const handLabel = replaying ? 'Main de ' + esc(E.current(s).name) : 'Main';
+    let handHTML;
+    if (s.status === 'finished') handHTML = '<span class="placeholder">Terminé</span>';
+    else if (replaying) handHTML = cur.tokens.length ? cur.tokens.map((t, i) => '<span class="tok' + (anim.arrivingHand ? ' arriving' : '') + '" data-tok="' + i + '">' + R.tokenSVG(t) + '</span>').join('') : '<span class="placeholder">' + esc(E.current(s).name) + ' joue…</span>';
+    else if (!mine) handHTML = '<span class="placeholder">' + (app.mode === 'online' ? 'Attente de ' + esc(E.current(s).name) : 'Tour de ' + esc(E.current(s).name)) + '</span>';
+    else if (cur.slot === null && cur.tokens.length === 0) handHTML = '<span class="placeholder">' + (s.market.every(m => !m.length) ? 'plus de jetons' : '3 jetons à prendre') + '</span>';
+    else if (cur.tokens.length === 0) handHTML = '<span class="placeholder ok">' + ic('check', 'inl') + 'posés</span>';
+    else handHTML = cur.tokens.map((t, i) => {
+      const dead = !E.legalCells(E.current(s).board, t).length;
+      return '<button class="tok' + (i === app.selToken ? ' sel' : '') + (dead ? ' dead' : '') + (anim.arrivingHand ? ' arriving' : '') + '" data-tok="' + i + '" title="' + E.COLOR_NAMES[t] + '">' + R.tokenSVG(t) + '</button>';
+    }).join('');
+    const myCount = E.activeCount(s.players[me >= 0 ? me : s.turn]);
+    html += '<div class="footer"><div class="foot-row">' +
+      '<div class="view-tabs">' +
+      '<button data-stage="choose" class="' + (stage === 'choose' ? 'on' : '') + '">' + ic('grid') + '<span>Choisir</span>' + (mine && (step === 1 || (step === 3 && canTake)) ? '<i class="dotb"></i>' : '') + '</button>' +
+      '<button data-stage="play" class="' + (stage === 'play' ? 'on' : '') + '">' + ic('layers') + '<span>Plateau</span>' + (mine && (step === 2 || app.cubeMode || placeable.length) ? '<i class="dotb"></i>' : '') + '<em class="cnt">' + myCount + '</em></button>' +
+      '</div>' +
+      '<div class="foot-hand"><div class="foot-lbl">' + handLabel + '</div><div class="tokens">' + handHTML + '</div></div></div>';
+    html += '<div class="foot-actions">';
+    if (s.status === 'finished') html += '<button class="btn primary block" id="results">' + ic('trophy') + 'Résultats</button>';
+    else if (replaying) html += '<span class="placeholder">' + ic('film', 'inl') + 'Rejeu du tour…</span>';
+    else if (!mine) html += '<span class="placeholder">' + ic('hourglass', 'inl') + 'Tu joues après ' + esc(E.current(s).name) + '</span>' + (app.mode === 'online' ? '<button class="btn secondary icon" id="reload" title="Actualiser">' + ic('refresh') + '</button>' : '');
+    else {
+      const st = E.turnStatus(s);
+      html += '<button class="btn secondary" id="undo" ' + (app.undo.length ? '' : 'disabled') + '>' + ic('undo') + '<span class="lbl">Annuler</span></button>' +
+        '<button class="btn primary' + (st.ok ? ' ready' : '') + '" id="end" ' + (st.ok ? '' : 'disabled') + '>Fin du tour</button>';
+    }
+    html += '</div></div></div>';
     $('#app').innerHTML = html;
+    if (stage === 'play') { fitBoard(); watchFit(); }
     bindGame(s, mine, viewingMine, placeable);
+    if (replaying) mountBanner();
 
     if (replaying) { /* bannière gérée par le rejeu */ }
-    else if (mine && app.cubeMode) showBanner('Pose le cube ' + miniAnimal(app.cubeMode.id) + ' ' + esc(E.CARD_BY_ID.get(app.cubeMode.id).fr) + ' : tape une case orange', () => { app.cubeMode = null; renderGame(); }, 'Annuler');
-    else if (mine && app.selToken !== null && cur.tokens[app.selToken] !== undefined && !E.legalCells(E.current(s).board, cur.tokens[app.selToken]).length) {
+    else if (mine && app.cubeMode) showBanner('Pose le cube ' + miniAnimal(app.cubeMode.id) + ' ' + esc(E.CARD_BY_ID.get(app.cubeMode.id).fr) + ' : touche une case orange', () => { app.cubeMode = null; renderGame(); }, 'Annuler');
+    else if (mine && stage === 'play' && app.selToken !== null && cur.tokens[app.selToken] !== undefined && !E.legalCells(E.current(s).board, cur.tokens[app.selToken]).length) {
       showBanner('Aucune case possible pour ce jeton', () => { const sel = app.selToken; if (act(w => E.discardToken(w, sel))) Sfx.undo(); app.selToken = app.work.cur.tokens.length ? 0 : null; renderGame(); }, 'Défausser');
     } else hideBanner();
 
@@ -714,10 +792,32 @@
   function bindGame(s, mine, viewingMine, placeable) {
     $('#menu').onclick = showMenu;
     $('#sound').onclick = () => { const on = Sfx.toggle(); $('#sound').innerHTML = ic(on ? 'sound' : 'mute'); toast(on ? 'Sons activés' : 'Sons coupés'); };
-    $$('.score-chip').forEach(chip => { chip.onclick = () => { const seat = +chip.dataset.seat; if (app.viewSeat === seat) showScores(); else { app.viewSeat = seat; renderGame(); } }; });
-    $$('.board-tabs button').forEach(b => { b.onclick = () => { app.viewSeat = +b.dataset.seat; renderGame(); }; });
+    $$('.view-tabs button').forEach(b => { b.onclick = () => { if (app.replay) return; setStage(b.dataset.stage, true); }; });
+    $$('.board-tabs button').forEach(b => { b.onclick = () => { const seat = +b.dataset.seat; if (app.viewSeat === seat) showScores(); else { app.viewSeat = seat; renderGame(); } }; });
     const reload = $('#reload'); if (reload) reload.onclick = () => { refresh(); toast('Mise à jour…'); };
     const results = $('#results'); if (results) results.onclick = showResults;
+    const cs = $('#cards-sheet'); if (cs) cs.onclick = () => showCardsSheet(app.viewSeat, mine, viewingMine, placeable);
+    const cf = $('#cards-fold'); if (cf) cf.onclick = () => { app.cardsOpen = !!$('.my-cards.folded'); renderGame(); };
+    $$('.my-cards .mini[data-card]').forEach(m => {
+      m.onclick = () => {
+        const id = +m.dataset.card;
+        const pc = mine && viewingMine && !app.busy ? placeable.find(x => x.id === id) : null;
+        if (pc) { startCube(pc); return; }
+        cardDetail(E.CARD_BY_ID.get(id), '');
+      };
+    });
+    const spm = $('#spirit-choose-mini'); if (spm) spm.onclick = () => showSpiritChoice();
+    $$('.stage .card[data-mine]').forEach(c => {
+      c.onclick = ev => {
+        const id = +c.dataset.card;
+        const card = E.CARD_BY_ID.get(id);
+        const pc = mine && viewingMine && !app.busy ? placeable.find(x => x.id === id) : null;
+        if (pc && ev.target.closest('.badge')) { startCube(pc); return; }
+        cardDetail(card, pc ? '<button class="btn warn block" id="m-cube">' + ic('cube') + 'Poser un cube</button>' : '');
+        const b = $('#m-cube'); if (b) b.onclick = () => { closeModal(); startCube(pc); };
+      };
+    });
+    const sp = $('#spirit-choose'); if (sp) sp.onclick = ev => { ev.stopPropagation(); showSpiritChoice(); };
     // cartes disponibles : détail toujours consultable
     $$('.card[data-display]').forEach(c => {
       if (!c.dataset.card) return;
@@ -729,24 +829,16 @@
         const b = $('#m-take'); if (b) b.onclick = () => { closeModal(); interactiveCard(+c.dataset.display); };
       };
     });
-    $$('.card[data-mine]').forEach(c => {
-      c.onclick = ev => {
-        const id = +c.dataset.card;
-        const card = E.CARD_BY_ID.get(id);
-        const pc = mine && !app.busy ? placeable.find(x => x.id === id) : null;
-        if (pc && viewingMine && ev.target.closest('.badge')) { startCube(pc); return; }
-        cardDetail(card, pc && viewingMine ? '<button class="btn warn block" id="m-cube">' + ic('cube') + 'Poser un cube</button>' : '');
-        const b = $('#m-cube'); if (b) b.onclick = () => { closeModal(); startCube(pc); };
-      };
-    });
+    function startCube(pc) {
+      closeModal();
+      if (pc.targets.length === 1) { interactiveCube(pc.id, pc.targets[0]); return; }
+      app.cubeMode = { id: pc.id, targets: new Set(pc.targets) };
+      setStage('play', true);
+    }
+    bindGame.startCube = startCube;
     if (!mine) return;
-    // Marché
-    $$('.slot.takeable').forEach(sl => {
-      sl.onclick = () => { if (app.busy) return; Sfx.unlock(); interactiveTake(+sl.dataset.slot); };
-    });
-    // Jetons en main
-    $$('.tok').forEach(b => { b.onclick = () => { if (app.busy) return; app.selToken = +b.dataset.tok; app.cubeMode = null; renderGame(); }; });
-    // Plateau
+    $$('.slot.takeable').forEach(sl => { sl.onclick = () => { if (app.busy) return; Sfx.unlock(); interactiveTake(+sl.dataset.slot); }; });
+    $$('.tok').forEach(b => { b.onclick = () => { if (app.busy) return; app.selToken = +b.dataset.tok; app.cubeMode = null; app.stage = 'play'; renderGame(); }; });
     const board = $('.board');
     if (board && viewingMine) {
       board.addEventListener('click', ev => {
@@ -760,7 +852,7 @@
           return;
         }
         if (app.selToken === null || w.cur.tokens[app.selToken] === undefined) {
-          if (w.cur.slot === null) toast('Prends d\'abord 3 jetons sur le plateau central', true);
+          if (w.cur.slot === null) toast('Prends d\'abord 3 jetons (vue Choisir)', true);
           return;
         }
         const color = w.cur.tokens[app.selToken];
@@ -768,39 +860,61 @@
         interactivePlace(app.selToken, idx);
       });
     }
-    const spiritBtn = $('#spirit-choose'); if (spiritBtn) spiritBtn.onclick = showSpiritChoice;
-    function startCube(pc) {
-      if (pc.targets.length === 1) { interactiveCube(pc.id, pc.targets[0]); return; }
-      app.cubeMode = { id: pc.id, targets: new Set(pc.targets) };
-      renderGame(); scrollToBoard();
-    }
-    // Annuler / Fin du tour
     const undo = $('#undo'); if (undo) undo.onclick = () => {
       if (!app.undo.length || app.busy) return;
       app.work = app.undo.pop();
-      app.selToken = app.work.cur.tokens.length ? 0 : null; app.cubeMode = null;
+      app.selToken = app.work.cur.tokens.length ? 0 : null; app.cubeMode = null; app.stageManual = false;
       saveDraft(); Sfx.undo(); renderGame();
     };
     const end = $('#end'); if (end) end.onclick = endTurn;
   }
-  function scrollToBoard() { const b = $('.board-wrap'); if (b) b.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+
+  // Volet « cartes en grand » (siège affiché)
+  function showCardsSheet(seat, mine, viewingMine, placeable) {
+    const s = view();
+    const p = s.players[seat];
+    const items = [];
+    if (p.spiritChoices && viewingMine) items.push('<div class="card tone-sp spirit choose" data-choose-spirit="1"><div class="head">Esprit de la Nature</div><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '</div><div class="choose-body">' + ic('sparkles') + 'Choisis ton Esprit</div><div class="foot">2 cartes à découvrir</div></div>');
+    const pcOf = id => (mine && viewingMine ? placeable.find(x => x.id === id) : null);
+    if (p.spirit) items.push(cardHTML(E.CARD_BY_ID.get(p.spirit.id), { cls: (pcOf(p.spirit.id) ? 'placeable' : '') + (p.spirit.placed ? ' done' : ''), badge: pcOf(p.spirit.id) ? ic('cube') + 'Poser' : (p.spirit.placed ? ic('check') + 'posé' : ''), badgeCls: p.spirit.placed ? 'teal' : '', attrs: 'data-mine="1"' }));
+    for (const h of p.hand) items.push(cardHTML(E.CARD_BY_ID.get(h.id), { left: h.left, cls: pcOf(h.id) ? 'placeable' : '', badge: pcOf(h.id) ? ic('cube') + 'Poser' : '', attrs: 'data-mine="1"' }));
+    for (const d of p.done) items.push(cardHTML(E.CARD_BY_ID.get(d.id), { left: 0, cls: 'done', done: true, badge: ic('check'), badgeCls: 'teal', attrs: 'data-mine="1"' }));
+    modal('<h2>' + ic('layers', 'h') + (viewingMine ? 'Tes cartes' : 'Cartes de ' + esc(p.name)) + ' <span class="note">· ' + E.activeCount(p) + '/4 en cours' + (p.done.length ? ' · ' + p.done.length + ' terminée' + (p.done.length > 1 ? 's' : '') : '') + '</span></h2>' +
+      (items.length ? '<div class="cards-grid">' + items.join('') + '</div>' : '<p class="note">Aucune carte pour le moment. Prends-en dans l\'onglet Animaux (une par tour).</p>') +
+      '<div class="actions">' + (mine && E.canTakeCard(s) ? '<button class="btn secondary" id="m-animals">' + ic('star') + 'Voir les animaux</button>' : '') + '<button class="btn secondary" id="m-close">Fermer</button></div>', { cls: 'sheet' });
+    $('#m-close').onclick = closeModal;
+    const ma = $('#m-animals'); if (ma) ma.onclick = () => { closeModal(); setStage('choose', true); };
+    const cs = $('[data-choose-spirit]'); if (cs) cs.onclick = () => { closeModal(); showSpiritChoice(); };
+    $$('#modal .card[data-mine]').forEach(c => {
+      c.onclick = ev => {
+        const id = +c.dataset.card;
+        const card = E.CARD_BY_ID.get(id);
+        const pc = pcOf(id);
+        if (pc && ev.target.closest('.badge')) { bindGame.startCube(pc); return; }
+        cardDetail(card, pc ? '<button class="btn warn block" id="m-cube">' + ic('cube') + 'Poser un cube</button>' : '');
+        const b = $('#m-cube'); if (b) b.onclick = () => { closeModal(); bindGame.startCube(pc); };
+      };
+    });
+  }
 
   // ---------- Actions animées (partagées entre le joueur actif et le rejeu) ----------
   async function animatedTake(state, slot) {
     const from = $$('.slot[data-slot="' + slot + '"] .disc').map(rectOf);
     const colors = state.market[slot].slice();
     E.takeTokens(state, slot);
-    if (state === app.work) app.selToken = 0;
+    if (state === app.work) { app.selToken = 0; app.stageManual = false; }
+    app.stage = 'play';
     renderGame({ arrivingHand: true });
     Sfx.take();
-    const toks = $$('.handbar .tok');
-    await Promise.all(toks.map((t, i) => fly(from[i] || from[0], rectOf(t), R.tokenSVG(colors[i]), { duration: 420 + i * 60, arc: -30 }).then(() => reveal(t, 'pop'))));
+    const toks = $$('.footer .tok');
+    await Promise.all(toks.map((t, i) => fly(from[i] || from[0], rectOf(t), R.tokenSVG(colors[i]), { duration: 460 + i * 70, arc: -40 }).then(() => reveal(t, 'pop'))));
   }
   async function animatedPlace(state, handIdx, cellIdx) {
-    const from = rectOf($('.handbar .tok[data-tok="' + handIdx + '"]'));
+    const from = rectOf($('.footer .tok[data-tok="' + handIdx + '"]'));
     const color = state.cur.tokens[handIdx];
     E.placeToken(state, handIdx, cellIdx);
     if (state === app.work) app.selToken = state.cur.tokens.length ? Math.min(handIdx, state.cur.tokens.length - 1) : null;
+    app.stage = 'play';
     renderGame({ newTop: cellIdx });
     const target = $('.board .stack[data-cell="' + cellIdx + '"] .disc.arriving');
     await fly(from, rectOf(target), R.tokenSVG(color), { duration: 380, arc: -50 });
@@ -812,41 +926,49 @@
     const card = E.CARD_BY_ID.get(id);
     const from = rectOf($('.card[data-display="' + displayIdx + '"]'));
     E.takeCard(state, displayIdx);
-    renderGame({ arrivingCard: id });
+    app.stage = 'choose';
+    renderGame({ stage: 'choose' });
     Sfx.card();
-    const target = $('.card.arriving[data-card="' + id + '"]');
-    await fly(from, rectOf(target), '<div class="ghost-card" style="border-color:' + R.cubeColorOf(card) + '">' + R.animalSVG(card.id) + '</div>', { duration: 520, arc: -30 });
-    reveal(target, 'pop');
+    const target = $('.view-tabs button[data-stage="play"]');
+    await fly(from, rectOf(target), '<div class="ghost-card" style="border-color:' + R.cubeColorOf(card) + '">' + R.animalSVG(card.id) + '</div>', { duration: 560, arc: -30 });
+    if (target) { target.classList.add('pop'); setTimeout(() => target.classList.remove('pop'), 700); }
   }
   async function animatedCube(state, cardId, cellIdx) {
-    const steps = $$('.card[data-mine][data-card="' + cardId + '"] .track .step.cube');
-    const from = rectOf(steps.length ? steps[0] : $('.card[data-mine][data-card="' + cardId + '"]'));
+    const steps = $$('.stage .card[data-mine][data-card="' + cardId + '"] .track .step.cube');
+    const from = rectOf(steps.length ? steps[0] : $('.stage .card[data-mine][data-card="' + cardId + '"]'));
     const spirit = E.CARD_BY_ID.get(cardId).spirit;
     E.placeCube(state, cardId, cellIdx);
+    app.stage = 'play';
     renderGame({ newCube: cellIdx });
     const target = $('.board .stack[data-cell="' + cellIdx + '"] .cube.arriving');
     await fly(from, rectOf(target), '<div class="ghost-cube' + (spirit ? ' spirit' : '') + '"></div>', { duration: 480, arc: -60 });
     reveal(target, 'bounce');
     Sfx.cube(); vibrate(20);
   }
+  // Recharge de fin de tour (vue « choisir ») : sac → plateau central, puis pioche → animaux
   async function animateRefill(slot, displayIdxs) {
-    const jobs = [];
-    if (slot !== undefined && slot !== null) {
+    const hasSlot = slot !== undefined && slot !== null;
+    if (!hasSlot && !(displayIdxs && displayIdxs.length)) return;
+    app.stage = 'choose';
+    renderGame({ refillSlot: hasSlot ? slot : undefined, newDisplay: displayIdxs, stage: 'choose' });
+    await wait(250);
+    if (hasSlot) {
       const pouch = rectOf($('.pouch-wrap'));
       const discs = $$('.slot[data-slot="' + slot + '"] .disc.arriving');
       const colors = view().market[slot] || [];
-      discs.forEach((d, i) => jobs.push(wait(i * 90).then(() => fly(pouch, rectOf(d), R.tokenSVG(colors[i]), { duration: 520, arc: -40 })).then(() => reveal(d, 'drop'))));
       if (discs.length) Sfx.draw();
+      await Promise.all(discs.map((d, i) => wait(i * 90).then(() => fly(pouch, rectOf(d), R.tokenSVG(colors[i]), { duration: 520, arc: -40 })).then(() => reveal(d, 'drop'))));
+      await wait(200);
     }
     if (displayIdxs && displayIdxs.length) {
       const deck = rectOf($('.deck-wrap'));
-      displayIdxs.forEach((i, k) => {
+      await Promise.all(displayIdxs.map((i, k) => {
         const target = $('.card.arriving[data-display="' + i + '"]');
-        if (!target) return;
-        jobs.push(wait(200 + k * 120).then(() => { Sfx.card(); return fly(deck, rectOf(target), '<div class="ghost-card back"></div>', { duration: 560, arc: -20 }); }).then(() => reveal(target, 'flip')));
-      });
+        if (!target) return Promise.resolve();
+        return wait(k * 120).then(() => { Sfx.card(); return fly(deck, rectOf(target), '<div class="ghost-card back"></div>', { duration: 560, arc: -20 }); }).then(() => reveal(target, 'flip'));
+      }));
     }
-    await Promise.all(jobs);
+    await wait(450);
   }
 
   // Versions interactives (tour du joueur actif) : instantané pour Annuler + brouillon + score flottant
@@ -861,7 +983,7 @@
       app.undo.push(snap);
       saveDraft();
       const after = scoreOf(seat);
-      if (after !== before) floatText($('.score-chip[data-seat="' + seat + '"]'), (after > before ? '+' : '') + (after - before), after > before ? 'up' : 'down');
+      if (after !== before) floatText($('.board-tabs button[data-seat="' + seat + '"] b') || $('.status .msg'), (after > before ? '+' : '') + (after - before), after > before ? 'up' : 'down');
     } catch (e) {
       app.work = snap; toast(e.message, true);
     } finally {
@@ -869,12 +991,12 @@
       renderGame();
     }
   }
-  function interactiveTake(slot) { withAnim(() => animatedTake(app.work, slot)).then(() => scrollToBoard()); }
+  function interactiveTake(slot) { withAnim(() => animatedTake(app.work, slot)); }
   function interactivePlace(handIdx, cellIdx) {
     withAnim(() => animatedPlace(app.work, handIdx, cellIdx)).then(() => {
       if (!app.work) return;
       const now = E.placeableCubes(app.work);
-      if (now.length && app.work.cur.tokens.length === 0) toast('Habitat réalisé : ' + now.map(x => miniAnimal(x.id) + ' ' + esc(E.CARD_BY_ID.get(x.id).fr)).join(', ') + ' → « Poser »');
+      if (now.length && app.work.cur.tokens.length === 0) toast('Habitat réalisé : ' + now.map(x => miniAnimal(x.id) + ' ' + esc(E.CARD_BY_ID.get(x.id).fr)).join(', ') + ' → touche la carte pour poser le cube');
     });
   }
   function interactiveCard(displayIdx) { withAnim(() => animatedCard(app.work, displayIdx)); }
@@ -890,7 +1012,7 @@
     app.busy = true;
     try {
       const r = await app.net.saveGame(app.gameId, w, app.version);
-      app.committed = w; app.version = r.version; app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.spiritPrompted = false;
+      app.committed = w; app.version = r.version; app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.spiritPrompted = false; app.stageManual = false; app.cardsOpen = null;
       app.lastLogLen = w.log.length;
       ls.del('harmonies.draft.' + app.gameId);
       app.busy = false;
@@ -898,9 +1020,10 @@
       w.display.forEach((id, i) => { if (id && prevDisplay[i] !== id) newDisplay.push(i); });
       if (w.status === 'finished') { render(); return; }
       if (app.mode === 'local') app.viewSeat = w.turn;
-      renderGame({ refillSlot: slot, newDisplay });
       await animateRefill(slot, newDisplay);
+      app.stage = autoStage();
       if (app.mode === 'local') {
+        renderGame();
         modal('<h2>' + ic('phone', 'h') + 'Au tour de ' + esc(E.current(w).name) + '</h2><p>Passe le téléphone à ' + esc(E.current(w).name) + '.</p><div class="actions"><button class="btn primary" id="m-ok">C\'est parti</button></div>', { sticky: true });
         $('#m-ok').onclick = () => { closeModal(); render(); announceMyTurn(); };
       } else render();
@@ -969,7 +1092,7 @@
     const link = location.origin + location.pathname + '?g=' + (s.id || '');
     modal('<h2>' + ic('menu', 'h') + 'Menu</h2><ul class="menu">' +
       (app.mode === 'online' ? '<li id="mn-share">' + ic('share') + 'Partager le lien de la partie</li>' : '') +
-      '<li id="mn-scores">' + ic('chart') + 'Score détaillé</li><li id="mn-rules">' + ic('book') + 'Règles et légende</li>' +
+      '<li id="mn-scores">' + ic('chart') + 'Score détaillé</li><li id="mn-journal">' + ic('scroll') + 'Journal de la partie</li><li id="mn-rules">' + ic('book') + 'Règles et légende</li>' +
       (app.mode === 'online' && s.status === 'playing' && mySeat() < 0 ? '<li id="mn-claim">' + ic('users') + 'Je suis un des joueurs (reprendre ma place)</li>' : '') +
       (app.mode === 'online' ? '<li id="mn-reload">' + ic('refresh') + 'Recharger la partie</li>' : '') +
       '<li id="mn-home">' + ic('home') + 'Retour à l\'accueil</li></ul>' +
@@ -979,6 +1102,7 @@
     const on = (id, fn) => { const e = $(id); if (e) e.onclick = fn; };
     on('#mn-share', async () => { closeModal(); if (navigator.share) { try { await navigator.share({ title: 'Harmonies', text: 'Notre partie d\'Harmonies (code ' + s.id + ')', url: link }); } catch (e) { /* annulé */ } } else { await copyText(link); toast('Lien copié'); } });
     on('#mn-scores', () => { closeModal(); showScores(); });
+    on('#mn-journal', () => { closeModal(); showJournal(); });
     on('#mn-rules', () => { closeModal(); showRules(); });
     on('#mn-reload', () => { closeModal(); app.version = 0; refresh(); });
     on('#mn-home', () => { closeModal(); leaveGame(); renderHome(); });
@@ -993,6 +1117,14 @@
         catch (e) { toast('Échec : ' + e.message, true); refresh(); }
       }; });
     });
+  }
+  function showJournal() {
+    const s = view();
+    const log = (s.log || []).slice().reverse();
+    modal('<h2>' + ic('scroll', 'h') + 'Journal</h2><ul class="log">' + (log.length ? log.map(l =>
+      '<li><span class="turnno">T' + l.n + '</span>' + seatDot(l.p) + '<b>' + esc(s.players[l.p].name) + '</b><span class="acts">' + (actionsHTML(l.actions) || '—') + '</span></li>').join('') : '<li>Début de partie.</li>') + '</ul>' +
+      '<div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>', { cls: 'sheet' });
+    $('#m-close').onclick = closeModal;
   }
   function showRules() {
     const tok = c => R.tokenSVG(c);
