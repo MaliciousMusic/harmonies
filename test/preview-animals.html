@@ -1,0 +1,8 @@
+<!doctype html><meta charset="utf-8"><title>Animaux</title>
+<style>body{font-family:sans-serif;background:#f7efe0;padding:12px}div.g{display:flex;flex-wrap:wrap;gap:8px}figure{margin:0;width:88px;text-align:center;font-size:11px}svg.a{width:64px;height:64px;background:#fff;border-radius:16px}</style>
+<div class="g" id="g"></div>
+<script src="../src/cards.js?t=1"></script><script src="../src/animals.js?t=1"></script>
+<script>
+document.body.insertAdjacentHTML('afterbegin', ANIMAL_SPRITE);
+document.getElementById('g').innerHTML = CARDS.map(c => '<figure><svg class="a"><use href="#a-' + c.id + '"/></svg><figcaption>' + c.id + ' ' + c.fr + '</figcaption></figure>').join('');
+</script>

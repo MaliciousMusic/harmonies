@@ -61,13 +61,13 @@
       '<ellipse cx="' + n(x - rx * 0.3) + '" cy="' + n(y - ry * 0.45) + '" rx="' + n(rx * 0.4) + '" ry="' + n(ry * 0.22) + '" fill="#fff" opacity=".18"/>' +
       '</g>';
   }
-  function cubeMark(x, y, emoji, spirit, extraClass) {
-    const s = 0.62;
+  function cubeMark(x, y, cardId, spirit, extraClass) {
+    const s = 0.6;
     return '<g class="cube' + (extraClass ? ' ' + extraClass : '') + '">' +
       '<ellipse cx="' + n(x) + '" cy="' + n(y + 0.3) + '" rx=".42" ry=".16" fill="#000" opacity=".25"/>' +
-      '<rect x="' + n(x - s / 2) + '" y="' + n(y - s / 2 - 0.06) + '" width="' + s + '" height="' + s + '" rx=".1" fill="' + (spirit ? '#d9a441' : '#2b2118') + '"/>' +
-      '<rect x="' + n(x - s / 2) + '" y="' + n(y - s / 2 - 0.16) + '" width="' + s + '" height="' + n(s * 0.35) + '" rx=".08" fill="' + (spirit ? '#f0c975' : '#4a3a2c') + '"/>' +
-      '<text x="' + n(x) + '" y="' + n(y + 0.12) + '" text-anchor="middle" font-size=".5" style="pointer-events:none">' + esc(emoji) + '</text></g>';
+      '<rect x="' + n(x - s / 2) + '" y="' + n(y - s / 2 + 0.02) + '" width="' + s + '" height="' + s + '" rx=".1" fill="' + (spirit ? '#d9a441' : '#2b2118') + '"/>' +
+      '<rect x="' + n(x - s / 2) + '" y="' + n(y - s / 2 - 0.1) + '" width="' + s + '" height="' + n(s * 0.35) + '" rx=".08" fill="' + (spirit ? '#f0c975' : '#4a3a2c') + '"/>' +
+      '<use href="#a-' + cardId + '" x="' + n(x - 0.42) + '" y="' + n(y - 0.98) + '" width=".84" height=".84"/></g>';
   }
   // Pile complète à (x, y) ; opts.newTop marque le dernier disque (animation), opts.newCube le cube.
   function stack(x, y, s, cube, opts) {
@@ -76,10 +76,7 @@
     let out = '<g class="stack" data-cell="' + (opts.cellIdx === undefined ? '' : opts.cellIdx) + '">' +
       '<ellipse cx="' + n(x + 0.08) + '" cy="' + n(y + thick + 0.12) + '" rx="' + n(rx + 0.08) + '" ry="' + n(ry + 0.02) + '" fill="#000" opacity=".22"/>';
     s.forEach((color, k) => { out += disc(x, y - k * lift, color, rx, ry, thick, opts.newTop && k === s.length - 1 ? 'arriving' : ''); });
-    if (cube) {
-      const card = E.CARD_BY_ID.get(cube.id);
-      out += cubeMark(x, y - (s.length - 1) * lift - 0.05, card ? card.emoji : '●', !!cube.sp, opts.newCube ? 'arriving' : '');
-    }
+    if (cube) out += cubeMark(x, y - (s.length - 1) * lift - 0.05, cube.id, !!cube.sp, opts.newCube ? 'arriving' : '');
     return out + '</g>';
   }
   // Petit jeton isolé (barre de main, plateau central, vol d'animation)
@@ -102,7 +99,8 @@
   // Pioche de cartes Animaux (dos)
   function deckSVG(count) {
     return '<svg class="deck" viewBox="0 0 60 84"><rect x="6" y="6" width="50" height="72" rx="6" fill="#3a2a1c"/><rect x="3" y="3" width="50" height="72" rx="6" fill="#4e351d" stroke="#7a5d33" stroke-width="1.5"/>' +
-      '<rect x="3" y="3" width="50" height="72" rx="6" fill="url(#card-back)"/><circle cx="28" cy="34" r="11" fill="#2b2118" opacity=".5"/><text x="28" y="40" text-anchor="middle" font-size="16">🐾</text>' +
+      '<rect x="3" y="3" width="50" height="72" rx="6" fill="url(#card-back)"/><circle cx="28" cy="34" r="12" fill="#2b2118" opacity=".45"/>' +
+      '<g fill="#f3d9a6"><ellipse cx="28" cy="37" rx="5" ry="4"/><circle cx="22" cy="31" r="2.2"/><circle cx="26.5" cy="28.5" r="2.2"/><circle cx="31.5" cy="29" r="2.2"/><circle cx="35" cy="32.5" r="2"/></g>' +
       '<text x="28" y="66" text-anchor="middle" font-size="13" font-weight="700" fill="#f3d9a6">' + count + '</text></svg>';
   }
 
@@ -185,28 +183,68 @@
       });
       if (step.cube) {
         const topY = p.y + 0.12 - (s.length - 1) * 0.3;
-        g += '<rect x="' + n(p.x - 0.31) + '" y="' + n(topY - 0.86) + '" width=".62" height=".62" rx=".1" fill="' + (card.spirit ? '#d9a441' : '#2b2118') + '"/>' +
-          '<text x="' + n(p.x) + '" y="' + n(topY - 0.38) + '" text-anchor="middle" font-size=".46">' + esc(card.emoji) + '</text>';
+        g += '<rect x="' + n(p.x - 0.3) + '" y="' + n(topY - 0.78) + '" width=".6" height=".6" rx=".1" fill="' + (card.spirit ? '#d9a441' : '#2b2118') + '"/>' +
+          '<use href="#a-' + card.id + '" x="' + n(p.x - 0.5) + '" y="' + n(topY - 1.5) + '" width="1" height="1"/>';
       }
       out += g + '</g>';
     }
     return out + '</svg>';
   }
 
-  // Illustration d'ambiance d'une carte : ciel + reliefs colorés selon l'habitat.
-  const SKY = { 1: ['#bfe3f5', '#7fc1e6'], 2: ['#dfe6ec', '#a9b8c6'], 3: ['#f2dfc2', '#d9b78c'], 4: ['#dff0c8', '#a5d07e'], 5: ['#fdebb0', '#f3c65a'], 6: ['#fbd9c2', '#f0a27a'] };
-  function sceneSVG(card, uid) {
+  // Collines striées (esthétique de la boîte du jeu). bands = couleurs de l'arrière vers l'avant.
+  let hillUid = 0;
+  function hillsSVG(w, h, bands, opts) {
+    opts = opts || {};
+    const uid = ++hillUid;
+    const seed = opts.seed || 1;
+    const rnd = k => { const v = Math.sin(seed * 12.9898 + k * 78.233) * 43758.5453; return v - Math.floor(v); };
+    const sky = opts.sky || ['#fdf1c4', '#f9d977'];
+    let out = '<svg class="' + (opts.cls || 'hills') + '" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="' + (opts.par || 'none') + '">' +
+      '<defs><pattern id="st' + uid + '" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-28)"><rect width="2.6" height="7" fill="#fff" opacity=".16"/></pattern>' +
+      '<linearGradient id="sk' + uid + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + sky[0] + '"/><stop offset="1" stop-color="' + sky[1] + '"/></linearGradient></defs>' +
+      '<rect width="' + w + '" height="' + h + '" fill="url(#sk' + uid + ')"/>';
+    if (opts.sun !== false) {
+      const sx = w * (opts.sunX || 0.78);
+      out += '<circle cx="' + n(sx) + '" cy="' + n(h * 0.28) + '" r="' + n(h * 0.24) + '" fill="#fff3b8" opacity=".35"/><circle cx="' + n(sx) + '" cy="' + n(h * 0.28) + '" r="' + n(h * 0.16) + '" fill="#fff7d6" opacity=".95"/>';
+    }
+    const nb = bands.length;
+    bands.forEach((color, i) => {
+      const base = h * (0.42 + 0.5 * i / nb);
+      const a = h * 0.12 * (0.6 + rnd(i));
+      const y0 = base + (rnd(i + 10) - 0.5) * a, y1 = base - a * rnd(i + 20), y2 = base + a * (rnd(i + 30) - 0.3), y3 = base - a * rnd(i + 40) * 0.6;
+      const d = 'M0,' + n(y0) + ' C' + n(w * 0.22) + ',' + n(y1 - a) + ' ' + n(w * 0.3) + ',' + n(y2 + a * 0.8) + ' ' + n(w * 0.5) + ',' + n(y2) +
+        ' S' + n(w * 0.8) + ',' + n(y3 - a * 0.5) + ' ' + w + ',' + n(y3) + ' L' + w + ',' + h + ' L0,' + h + ' Z';
+      out += '<path d="' + d + '" fill="' + color + '"/><path d="' + d + '" fill="url(#st' + uid + ')"/>';
+    });
+    if (opts.reeds) {
+      const tips = ['#f2c94c', '#e8873a', '#5cc2b7', '#d96a8e'];
+      let stems = '', heads = '';
+      for (let k = 0; k < opts.reeds; k++) {
+        const x = w * (0.04 + 0.92 * rnd(k + 50)), hh = h * (0.12 + 0.16 * rnd(k + 60)), tilt = (rnd(k + 70) - 0.5) * 8;
+        stems += '<path d="M' + n(x) + ',' + h + ' q' + n(tilt) + ',' + n(-hh / 2) + ' ' + n(tilt * 1.6) + ',' + n(-hh) + '"/>';
+        heads += '<ellipse cx="' + n(x + tilt * 1.6) + '" cy="' + n(h - hh) + '" rx="1.6" ry="3.2" fill="' + tips[k % 4] + '"/>';
+      }
+      out += '<g fill="none" stroke="#1e2a5a" stroke-width="1.2" stroke-linecap="round" opacity=".75">' + stems + '</g><g>' + heads + '</g>';
+    }
+    return out + '</svg>';
+  }
+  // Illustration d'une carte : collines aux couleurs de l'habitat.
+  const SKY = { 1: ['#e6f4fb', '#9fd3ef'], 2: ['#eef1f5', '#b9c5d3'], 3: ['#f8ecd8', '#e2c59a'], 4: ['#eaf6dc', '#b6dc95'], 5: ['#fff3c8', '#f7d268'], 6: ['#fde4d3', '#f4b08a'] };
+  const HILL = { 1: ['#7fc3e6', '#3d8fc4', '#2c4a8a'], 2: ['#b3b7bb', '#8f9498', '#5f6468'], 3: ['#b98a5e', '#7d4b2a', '#52301a'], 4: ['#9ad160', '#6aa83c', '#467527'], 5: ['#f2cb55', '#e8b526', '#c98f14'], 6: ['#e0655f', '#cf4540', '#922c29'] };
+  function sceneSVG(card) {
     const colors = [];
     card.pat.forEach(step => step.s.forEach(c => { if (c !== 7 && !colors.includes(c)) colors.push(c); }));
     const cubeStep = card.pat.find(p => p.cube);
     const main = cubeStep.s[0] === 7 ? 6 : cubeStep.s[0];
     const second = colors.find(c => c !== main) || main;
-    const sky = SKY[main];
-    const gid = 'sky-' + uid;
-    return '<svg class="scene" viewBox="0 0 100 60" preserveAspectRatio="none"><defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + sky[0] + '"/><stop offset="1" stop-color="' + sky[1] + '"/></linearGradient></defs>' +
-      '<rect width="100" height="60" fill="url(#' + gid + ')"/><circle cx="78" cy="16" r="8" fill="#fff6d5" opacity=".9"/>' +
-      '<path d="M0,44 C20,30 40,52 60,38 C75,28 90,42 100,36 L100,60 L0,60 Z" fill="' + LIGHT[second] + '" opacity=".9"/>' +
-      '<path d="M0,52 C25,42 45,58 70,48 C85,42 95,54 100,50 L100,60 L0,60 Z" fill="' + FILL[main] + '"/></svg>';
+    const bands = [HILL[second][0], HILL[main][1], HILL[second][1], HILL[main][2]];
+    return hillsSVG(120, 70, bands, { sky: SKY[main], seed: card.id, cls: 'scene', sunX: 0.8 });
+  }
+  function animalSVG(id, cls) {
+    return '<svg class="animal' + (cls ? ' ' + cls : '') + '" viewBox="0 0 72 72" aria-hidden="true"><use href="#a-' + id + '"/></svg>';
+  }
+  function logoSVG(cls) {
+    return '<svg class="' + (cls || 'logo-svg') + '" viewBox="0 0 340 70"><text x="170" y="54" text-anchor="middle" textLength="322" lengthAdjust="spacingAndGlyphs" font-family="Fredoka, Nunito, Arial, sans-serif" font-weight="700" font-size="54" fill="#fff" stroke="#1e2a5a" stroke-width="6" stroke-linejoin="round" paint-order="stroke">HARMONIES</text></svg>';
   }
 
   // Couleur (CSS) de la case cube d'une carte, pour la bande de rappel.
@@ -216,5 +254,5 @@
     return FILL[c];
   }
 
-  root.Render = { defsSVG, tokenSVG, slotSVG, pouchSVG, deckSVG, boardSVG, patternSVG, sceneSVG, cubeColorOf, esc, FILL, DARK, LIGHT };
+  root.Render = { defsSVG, tokenSVG, slotSVG, pouchSVG, deckSVG, boardSVG, patternSVG, sceneSVG, hillsSVG, animalSVG, logoSVG, cubeColorOf, esc, FILL, DARK, LIGHT };
 })(typeof self !== 'undefined' ? self : this);

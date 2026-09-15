@@ -12,232 +12,265 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap">
 <style>
 :root {
-  --sand: #f4ead6;
-  --sand-2: #eadcbd;
-  --earth: #6b4a2b;
-  --earth-2: #4e351d;
-  --ink: #2f2418;
-  --muted: #7a6650;
-  --teal: #1f8a80;
-  --teal-2: #17706a;
-  --orange: #e0743d;
-  --orange-2: #c45d2a;
-  --red: #c9433f;
-  --card: #fffaf0;
-  --line: #d9c9a8;
-  --shadow: 0 2px 6px rgba(60, 40, 20, .18);
+  --navy: #1e2a5a; --blue: #2c4a8a; --teal: #2a8f8a; --teal-l: #5cc2b7; --teal-d: #1f6f6b;
+  --orange: #e8873a; --orange-d: #c96a22; --yellow: #f2c94c; --coral: #d9635a; --purple: #6b4fa0; --pink: #d96a8e; --sky: #7fc3e6;
+  --cream: #f7efe0; --paper: #fffdf8; --line: #e6dcc6; --ink: #23305e; --muted: #6b7699;
+  --shadow: 0 3px 10px rgba(30, 42, 90, .10), 0 1px 2px rgba(30, 42, 90, .08);
+  --shadow-lg: 0 10px 30px rgba(30, 42, 90, .18);
   --hex: #efdcb6; --hex-line: #b9976a;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --display: "Fredoka", "Nunito", system-ui, sans-serif;
+  --body: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; }
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background: var(--sand) radial-gradient(ellipse at 50% 0%, #fbf3e3 0%, var(--sand) 60%);
+  font-family: var(--body);
+  background: var(--cream);
+  background-image: repeating-linear-gradient(-28deg, rgba(255,255,255,.35) 0 3px, transparent 3px 9px);
   color: var(--ink);
   font-size: 15px;
-  line-height: 1.35;
+  line-height: 1.4;
   overscroll-behavior-y: contain;
   -webkit-user-select: none; user-select: none;
 }
 button { font: inherit; }
-h1, h2, h3 { margin: 0; font-weight: 700; }
+h1, h2, h3 { margin: 0; font-family: var(--display); font-weight: 600; letter-spacing: .2px; }
 .hidden { display: none !important; }
 .spacer { flex: 1; }
+.ic { width: 1.15em; height: 1.15em; vertical-align: -.2em; flex: none; }
+.ic.inl { width: 1.05em; height: 1.05em; margin-right: .3em; }
+.ic.h { width: 1.2em; height: 1.2em; margin-right: .4em; color: var(--teal); }
+.ic.big { width: 40px; height: 40px; display: block; margin: 0 auto 6px; }
+.animal { width: 1.4em; height: 1.4em; vertical-align: middle; }
+.animal.h { width: 34px; height: 34px; margin-right: 8px; vertical-align: -10px; }
+.mtok { display: inline-block; width: 1.25em; height: 1.25em; vertical-align: -.3em; margin-right: .15em; }
+.mtok svg { width: 100%; height: 100%; display: block; }
+.manimal { display: inline-block; width: 1.5em; height: 1.5em; vertical-align: -.4em; }
+.manimal svg { width: 100%; height: 100%; display: block; }
+.mcube { display: inline-block; width: .85em; height: .85em; border-radius: 3px; background: linear-gradient(180deg, #4a3a2c 0 35%, #2b2118 35%); vertical-align: -.05em; margin-right: .25em; }
+.sep { color: var(--muted); margin: 0 .35em; }
 
 /* ---------- Boutons ---------- */
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 10px 16px; border-radius: 12px; border: 0; cursor: pointer;
-  background: var(--teal); color: #fff; font-weight: 700; box-shadow: var(--shadow);
-  min-height: 42px; transition: transform .08s, box-shadow .2s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 10px 18px; border-radius: 999px; border: 0; cursor: pointer;
+  background: #fff; color: var(--ink); font-family: var(--display); font-weight: 600; font-size: 15.5px; letter-spacing: .2px;
+  box-shadow: var(--shadow); min-height: 44px; transition: transform .08s, box-shadow .2s, filter .2s;
 }
 .btn:active { transform: translateY(1px) scale(.98); }
-.btn:disabled { opacity: .45; cursor: default; box-shadow: none; }
-.btn.secondary { background: #fff; color: var(--earth); border: 1.5px solid var(--line); box-shadow: none; }
-.btn.warn { background: var(--orange); }
-.btn.ghost { background: transparent; color: var(--teal); box-shadow: none; padding: 6px 10px; min-height: 0; }
-.btn.small { padding: 6px 10px; min-height: 34px; border-radius: 10px; font-size: 14px; }
+.btn:disabled { opacity: .45; cursor: default; box-shadow: none; filter: saturate(.6); }
+.btn.primary { background: linear-gradient(135deg, var(--teal-l), var(--teal) 55%, var(--blue)); color: #fff; box-shadow: 0 4px 12px rgba(42,143,138,.35), inset 0 1px 0 rgba(255,255,255,.35); }
+.btn.secondary { background: #fff; color: var(--navy); border: 2px solid var(--line); box-shadow: none; }
+.btn.warn { background: linear-gradient(135deg, #f7a35a, var(--orange) 60%, var(--orange-d)); color: #fff; box-shadow: 0 4px 12px rgba(232,135,58,.35), inset 0 1px 0 rgba(255,255,255,.35); }
+.btn.ghost { background: transparent; color: var(--teal-d); box-shadow: none; padding: 6px 10px; min-height: 0; }
+.btn.small { padding: 6px 12px; min-height: 34px; font-size: 14px; }
 .btn.block { width: 100%; }
+.btn.big { min-height: 52px; font-size: 17px; }
+.btn.icon { padding: 10px 12px; }
 .btn.ready { animation: glow 1.6s ease-in-out infinite; }
-@keyframes glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(31,138,128,.45); } 50% { box-shadow: 0 0 0 7px rgba(31,138,128,0); } }
+@keyframes glow { 0%, 100% { box-shadow: 0 4px 12px rgba(42,143,138,.35), 0 0 0 0 rgba(92,194,183,.55); } 50% { box-shadow: 0 4px 12px rgba(42,143,138,.35), 0 0 0 8px rgba(92,194,183,0); } }
+.icon-btn { background: rgba(255,255,255,.14); border: 0; color: inherit; border-radius: 12px; width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer; }
+.icon-btn .ic { width: 22px; height: 22px; }
 
-/* ---------- Écrans ---------- */
+/* ---------- Accueil / héros ---------- */
 .screen { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
-.home { padding: 24px 18px 40px; max-width: 480px; margin: 0 auto; width: 100%; gap: 18px; }
-.home .logo { text-align: center; padding: 8px 0 4px; }
-.home .logo-art { display: flex; justify-content: center; gap: 4px; margin-bottom: 4px; }
-.home .logo-art svg { width: 44px; height: 44px; }
-.home .logo-art svg:nth-child(2) { transform: translateY(6px); }
-.home .logo h1 { font-size: 34px; letter-spacing: 3px; color: var(--earth-2); font-family: Georgia, "Times New Roman", serif; }
-.home .logo p { margin: 4px 0 0; color: var(--muted); }
-.panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); }
-.panel h2 { font-size: 17px; margin-bottom: 10px; color: var(--earth-2); }
+.hero { position: relative; height: 200px; overflow: hidden; border-radius: 0 0 34px 34px; box-shadow: var(--shadow-lg); }
+.hero-hills { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 0 18px; }
+.logo-svg { width: min(86vw, 360px); height: auto; filter: drop-shadow(0 4px 0 rgba(30,42,90,.35)) drop-shadow(0 8px 14px rgba(30,42,90,.35)); }
+.tagline { font-family: var(--display); font-weight: 500; color: var(--navy); background: rgba(255,253,248,.85); padding: 5px 14px; border-radius: 999px; font-size: 14px; }
+.home-body { padding: 18px 16px 40px; max-width: 480px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 16px; }
+.panel { background: var(--paper); border: 1px solid var(--line); border-radius: 22px; padding: 16px; box-shadow: var(--shadow); }
+.panel h2 { font-size: 18px; margin-bottom: 10px; color: var(--navy); display: flex; align-items: center; }
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
-.field label { font-size: 13px; color: var(--muted); font-weight: 600; }
+.field label { font-size: 13px; color: var(--muted); font-weight: 700; }
 input[type=text] {
-  font: inherit; padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--line); background: #fff; width: 100%;
+  font: inherit; padding: 11px 14px; border-radius: 14px; border: 2px solid var(--line); background: #fff; width: 100%; color: var(--ink);
   -webkit-user-select: text; user-select: text;
 }
-input[type=text]:focus { outline: 2px solid var(--teal); border-color: transparent; }
-.seg { display: flex; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
-.seg button { flex: 1; border: 0; background: transparent; padding: 9px 6px; color: var(--muted); font-weight: 600; cursor: pointer; }
-.seg button.on { background: var(--teal); color: #fff; }
+input[type=text]:focus { outline: none; border-color: var(--teal-l); box-shadow: 0 0 0 3px rgba(92,194,183,.25); }
+.code-input { text-transform: uppercase; letter-spacing: 5px; font-family: var(--display); font-weight: 600; font-size: 18px; }
+.seg { display: flex; border: 2px solid var(--line); border-radius: 999px; overflow: hidden; background: #fff; padding: 3px; gap: 3px; }
+.seg button { flex: 1; border: 0; background: transparent; padding: 8px 6px; color: var(--muted); font-family: var(--display); font-weight: 500; cursor: pointer; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+.seg button.on { background: var(--navy); color: #fff; }
 .row { display: flex; gap: 10px; align-items: center; }
 .row > * { flex: 1; }
 .check { display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; }
-.check input { width: 20px; height: 20px; }
+.check input { width: 20px; height: 20px; accent-color: var(--teal); }
+.check em { color: var(--muted); font-style: normal; font-size: 13px; }
 .recent { list-style: none; padding: 0; margin: 0; }
 .recent li { display: flex; align-items: center; gap: 10px; padding: 10px 4px; border-top: 1px solid var(--line); }
 .recent li:first-child { border-top: 0; }
-.recent .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 700; letter-spacing: 2px; color: var(--earth-2); }
+.recent .code { font-family: var(--display); font-weight: 600; letter-spacing: 2px; color: var(--navy); min-width: 60px; }
 .recent .meta { flex: 1; font-size: 13px; color: var(--muted); }
 .note { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
-.code-big { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 36px; letter-spacing: 8px; text-align: center; color: var(--earth-2); padding: 8px 0; }
+.note.center { text-align: center; }
+.code-big { font-family: var(--display); font-weight: 600; font-size: 40px; letter-spacing: 10px; text-align: center; color: var(--navy); padding: 6px 0; }
 .players-list { list-style: none; margin: 0; padding: 0; }
-.players-list li { padding: 8px 0; border-top: 1px solid var(--line); display: flex; gap: 8px; align-items: center; }
+.players-list li { padding: 9px 0; border-top: 1px solid var(--line); display: flex; gap: 8px; align-items: center; }
 .players-list li:first-child { border-top: 0; }
-.dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex: none; }
+.dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex: none; box-shadow: inset 0 0 0 2px rgba(255,255,255,.5); }
+.credits { font-size: 11.5px; color: var(--muted); text-align: center; margin: 4px 0 0; }
 
 /* ---------- Partie ---------- */
 .game { padding-bottom: calc(96px + var(--safe-bottom)); }
 .topbar {
-  position: sticky; top: 0; z-index: 20; background: var(--earth-2); color: #f6e9cf;
-  display: flex; align-items: center; gap: 8px; padding: 8px 12px; box-shadow: 0 2px 6px rgba(0,0,0,.25);
+  position: sticky; top: 0; z-index: 20; background: linear-gradient(135deg, var(--navy), var(--blue) 70%, #3b5aa0); color: #f6e9cf;
+  display: flex; align-items: center; gap: 10px; padding: 8px 12px; box-shadow: 0 2px 8px rgba(30,42,90,.35);
 }
-.topbar .title { font-family: Georgia, serif; letter-spacing: 2px; font-weight: 700; }
-.topbar .code { font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: 2px; font-size: 13px; opacity: .85; }
-.topbar .icon-btn { background: rgba(255,255,255,.12); border: 0; color: inherit; border-radius: 10px; padding: 6px 10px; font-size: 18px; line-height: 1; cursor: pointer; }
+.logo-small { width: 150px; height: auto; }
+.topbar .code { font-family: var(--display); letter-spacing: 3px; font-size: 13px; background: rgba(255,255,255,.14); padding: 3px 9px; border-radius: 999px; }
 .status {
-  display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--sand-2); border-bottom: 1px solid var(--line);
-  font-weight: 600; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--paper); border-bottom: 1px solid var(--line);
+  font-weight: 700; flex-wrap: wrap;
 }
-.status .msg { flex: 1; min-width: 160px; }
-.status.mine .msg { color: var(--teal-2); }
-.scores { display: flex; gap: 6px; flex-wrap: wrap; }
+.status .msg { flex: 1; min-width: 160px; display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.status.mine .msg { color: var(--teal-d); }
+.status .msg .ic { width: 20px; height: 20px; flex: none; }
+.score-chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .score-chip {
-  display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 999px; background: #fff; border: 1.5px solid var(--line);
-  font-size: 13px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 6px; border-radius: 999px; background: #fff; border: 2px solid var(--line);
+  font-family: var(--display); font-weight: 500; font-size: 13.5px; cursor: pointer; color: var(--ink);
 }
-.score-chip.active { border-color: var(--teal); box-shadow: 0 0 0 2px rgba(31,138,128,.2); }
-.score-chip b { font-size: 14px; }
+.score-chip.active { border-color: var(--seat); box-shadow: 0 0 0 3px color-mix(in srgb, var(--seat) 22%, transparent); }
+.score-chip b { font-weight: 600; font-size: 15px; }
+.score-chip .ic { width: 16px; height: 16px; color: var(--orange-d); margin: 0; }
 
-.section { padding: 10px 12px 4px; }
-.section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; min-height: 30px; }
-.section h3 .hint { text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--orange-2); }
+.section { padding: 12px 12px 4px; }
+.sec { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; min-height: 34px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px 5px 10px; border-radius: 999px; color: #fff; font-family: var(--display); font-weight: 500; font-size: 13.5px; letter-spacing: .3px; box-shadow: var(--shadow); }
+.pill .ic { width: 16px; height: 16px; }
+.pill.blue { background: linear-gradient(135deg, var(--blue), var(--navy)); }
+.pill.orange { background: linear-gradient(135deg, #f4a55c, var(--orange)); }
+.pill.teal { background: linear-gradient(135deg, var(--teal-l), var(--teal)); }
+.pill.purple { background: linear-gradient(135deg, #8c6fc0, var(--purple)); }
+.hint { font-size: 13px; font-weight: 700; color: var(--orange-d); }
+.hint.muted { color: var(--muted); font-weight: 600; }
 .pouch-wrap { display: inline-flex; }
 .pouch-wrap .pouch { width: 40px; height: 44px; display: block; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
 
 /* Plateau central */
-.market { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.market { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
 .slot {
-  background: radial-gradient(ellipse at 50% 30%, #7c5836, #5a3d22); border-radius: 14px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px;
-  border: 2px solid transparent; min-height: 84px; justify-content: center; position: relative; box-shadow: inset 0 0 0 2px rgba(255,230,190,.12);
+  background: radial-gradient(ellipse at 50% 30%, #35508f, #1e2a5a); border-radius: 18px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  border: 2px solid transparent; min-height: 84px; justify-content: center; position: relative; box-shadow: inset 0 0 0 2px rgba(255,255,255,.08), var(--shadow);
   transition: transform .12s, box-shadow .2s;
 }
-.slot.takeable { cursor: pointer; border-color: #f3c86b; box-shadow: 0 0 0 3px rgba(243,200,107,.35); }
+.slot.takeable { cursor: pointer; border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(242,201,76,.35), var(--shadow); }
 .slot.takeable:active { transform: scale(.96); }
-.slot.empty { background: rgba(107,74,43,.3); box-shadow: none; }
+.slot.empty { background: rgba(30,42,90,.14); box-shadow: none; }
 .slot svg { width: 100%; height: auto; display: block; }
-.slot-empty { color: #f6e9cf; font-size: 12px; opacity: .8; }
+.slot-empty { color: var(--muted); font-size: 12px; font-family: var(--display); }
 
 /* Plateau perso */
 .board-wrap { padding: 4px 8px 0; }
-.board-tabs { display: flex; gap: 6px; padding: 0 12px 6px; overflow-x: auto; }
+.board-tabs { display: flex; gap: 6px; padding: 0 12px 8px; overflow-x: auto; }
 .board-tabs button {
-  border: 1.5px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; font-weight: 600; color: var(--muted); cursor: pointer; white-space: nowrap;
+  border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px 6px 8px; font-family: var(--display); font-weight: 500; color: var(--ink); cursor: pointer; white-space: nowrap;
   display: inline-flex; align-items: center; gap: 6px;
 }
-.board-tabs button.on { background: var(--earth-2); color: #fff; border-color: var(--earth-2); }
-.board { width: 100%; max-width: 440px; margin: 0 auto; display: block; border-radius: 22px; box-shadow: 0 6px 18px rgba(60,40,20,.3), inset 0 0 0 3px rgba(255,235,200,.12); }
+.board-tabs button em { font-style: normal; font-size: 12px; color: var(--muted); font-family: var(--body); font-weight: 700; }
+.board-tabs button.on { background: var(--seat); color: #fff; border-color: var(--seat); }
+.board-tabs button.on em { color: rgba(255,255,255,.85); }
+.board-tabs button.on .dot { box-shadow: 0 0 0 2px #fff; }
+.board { width: 100%; max-width: 440px; margin: 0 auto; display: block; border-radius: 26px; box-shadow: 0 0 0 5px #efe3cc, 0 8px 22px rgba(30,42,90,.28); }
 .board .hex { fill: var(--hex); stroke: var(--hex-line); stroke-width: .07; cursor: pointer; transition: fill .15s; }
 .board .hex-inner { fill: #f6e8ca; opacity: .55; pointer-events: none; }
 .board .hex.legal { stroke: var(--teal); stroke-width: .13; fill: #dff2ec; }
 .board .hex.target { stroke: var(--orange); stroke-width: .15; fill: #ffe7d2; }
 .board .hex.last { stroke: #fff7e6; stroke-width: .12; }
 .board .legal-dot { fill: var(--teal); opacity: .55; pointer-events: none; }
-.board .target-dot { fill: var(--orange); opacity: .85; pointer-events: none; animation: bob 1s ease-in-out infinite; }
+.board .target-dot { fill: var(--orange); opacity: .85; pointer-events: none; }
 .board g.stack { pointer-events: none; }
 .board.readonly .hex { cursor: default; }
 @keyframes pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
-@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-.15px); } }
 .board .hex.legal, .board .hex.target { animation: pulse 1.4s ease-in-out infinite; }
 
 /* Barre de jeu (bas) */
 .handbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
-  background: var(--card); border-top: 1px solid var(--line); padding: 8px 12px calc(8px + var(--safe-bottom));
-  display: flex; align-items: center; gap: 10px; box-shadow: 0 -4px 12px rgba(60,40,20,.12);
+  background: var(--paper); border-top: 1px solid var(--line); padding: 8px 12px calc(8px + var(--safe-bottom));
+  display: flex; align-items: center; gap: 10px; box-shadow: 0 -6px 18px rgba(30,42,90,.12); border-radius: 22px 22px 0 0;
 }
 .handbar .tokens { display: flex; gap: 8px; flex: 1; align-items: center; min-height: 48px; }
-.handbar .tokens .placeholder { color: var(--muted); font-size: 14px; }
+.handbar .tokens .placeholder { color: var(--muted); font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; }
 .tok {
   width: 48px; height: 48px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; padding: 0; background: transparent;
   display: grid; place-items: center; transition: transform .12s;
 }
 .tok svg { width: 42px; height: 42px; display: block; }
-.tok.sel { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(31,138,128,.25); transform: translateY(-3px); }
+.tok.sel { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(42,143,138,.25); transform: translateY(-3px); }
 .tok.dead { opacity: .5; }
 .handbar .actions { display: flex; gap: 8px; }
 .handbar .actions .btn { white-space: nowrap; padding: 10px 14px; }
+@media (max-width: 380px) { .handbar .actions .lbl { display: none; } }
 
 /* Cartes */
 .cards-strip { display: flex; gap: 10px; overflow-x: auto; padding: 6px 12px 12px; scroll-snap-type: x proximity; align-items: stretch; }
 .deck-wrap { flex: 0 0 auto; width: 60px; display: flex; align-items: center; scroll-snap-align: start; }
 .deck-wrap .deck { width: 60px; height: 84px; display: block; filter: drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
 .card {
-  flex: 0 0 auto; width: 136px; background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 6px 30px 6px 10px;
+  flex: 0 0 auto; width: 138px; background: var(--paper); border: 2px solid var(--line); border-radius: 18px; padding: 6px 30px 6px 10px;
   box-shadow: var(--shadow); position: relative; scroll-snap-align: start; cursor: pointer; display: flex; flex-direction: column; gap: 4px;
   transition: transform .12s, box-shadow .2s;
 }
 .card:active { transform: scale(.98); }
-.card.spirit { background: linear-gradient(180deg, #fff6e0, #fbe9c2); border-color: #e0b95c; }
-.card.takeable { border-color: var(--teal); }
-.card.placeable { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(224,116,61,.28), var(--shadow); animation: placeable 1.6s ease-in-out infinite; }
-@keyframes placeable { 0%, 100% { box-shadow: 0 0 0 3px rgba(224,116,61,.28), var(--shadow); } 50% { box-shadow: 0 0 0 6px rgba(224,116,61,.08), var(--shadow); } }
+.card.spirit { background: linear-gradient(180deg, #fff8e6, #fbebc4); border-color: #e2b95a; }
+.card.takeable { border-color: var(--teal-l); }
+.card.placeable { border-color: var(--orange); animation: placeable 1.6s ease-in-out infinite; }
+@keyframes placeable { 0%, 100% { box-shadow: 0 0 0 3px rgba(232,135,58,.28), var(--shadow); } 50% { box-shadow: 0 0 0 7px rgba(232,135,58,.06), var(--shadow); } }
 .card.done { opacity: .78; }
-.card .art { position: relative; height: 58px; border-radius: 9px; overflow: hidden; }
+.card .art { position: relative; height: 64px; border-radius: 12px; overflow: hidden; }
 .card .art .scene { position: absolute; inset: 0; width: 100%; height: 100%; }
-.card .art .emoji { position: absolute; left: 4px; bottom: 0; font-size: 30px; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,.3)); }
-.card .art .name { position: absolute; right: 5px; top: 4px; font-size: 11.5px; font-weight: 800; color: #3a2a1c; background: rgba(255,250,240,.82); padding: 1px 6px; border-radius: 8px; max-width: 78px; text-align: right; line-height: 1.15; }
+.card .art .animal { position: absolute; left: 3px; bottom: 1px; width: 48px; height: 48px; filter: drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
+.card .art .name { position: absolute; right: 5px; top: 5px; font-family: var(--display); font-size: 12px; font-weight: 600; color: var(--navy); background: rgba(255,253,248,.9); padding: 2px 8px; border-radius: 999px; max-width: 80px; text-align: right; line-height: 1.15; }
 .card .pattern { width: 100%; height: 62px; display: block; }
 .card .track { position: absolute; right: 5px; top: 8px; bottom: 8px; display: flex; flex-direction: column; justify-content: flex-end; gap: 3px; }
 .card .track .step {
-  width: 21px; height: 21px; border-radius: 5px; display: grid; place-items: center; font-size: 11px; font-weight: 800;
-  background: #efe5cf; color: var(--muted);
+  width: 21px; height: 21px; border-radius: 6px; display: grid; place-items: center; font-family: var(--display); font-size: 11.5px; font-weight: 600;
+  background: #eee6d4; color: var(--muted);
 }
 .card .track .step.cube { background: linear-gradient(180deg, #4a3a2c 0 35%, #2b2118 35%); box-shadow: 0 1px 2px rgba(0,0,0,.4); }
 .card.spirit .track .step.cube { background: linear-gradient(180deg, #f0c975 0 35%, #d9a441 35%); }
-.card .track .step.got { background: #e6f2ef; color: var(--teal-2); }
-.card .track .step.cur { background: var(--teal); color: #fff; box-shadow: 0 0 0 2px rgba(31,138,128,.3); }
-.card .stripe { position: absolute; left: 0; top: 10px; bottom: 10px; width: 5px; border-radius: 0 4px 4px 0; }
+.card .track .step.got { background: #e3f1ef; color: var(--teal-d); }
+.card .track .step.cur { background: var(--teal); color: #fff; box-shadow: 0 0 0 2px rgba(42,143,138,.3); }
+.card .stripe { position: absolute; left: 0; top: 12px; bottom: 12px; width: 5px; border-radius: 0 4px 4px 0; }
 .card .badge {
-  position: absolute; right: -4px; top: -7px; background: var(--orange); color: #fff; border-radius: 999px; font-size: 12px; font-weight: 700; padding: 3px 9px;
-  box-shadow: var(--shadow); z-index: 2;
+  position: absolute; right: -4px; top: -8px; background: linear-gradient(135deg, #f4a55c, var(--orange)); color: #fff; border-radius: 999px; font-family: var(--display); font-size: 12.5px; font-weight: 600; padding: 4px 10px;
+  box-shadow: var(--shadow); z-index: 2; display: inline-flex; align-items: center; gap: 4px;
 }
-.card .badge.teal { background: var(--teal); }
-.card .rule { font-size: 11px; color: var(--muted); line-height: 1.2; }
-.card .foot { font-size: 11px; color: var(--muted); text-align: center; }
-.card.empty { border-style: dashed; background: transparent; box-shadow: none; cursor: default; min-height: 160px; padding: 0; }
-.card .empty-text { display: grid; place-items: center; height: 100%; color: var(--muted); font-size: 13px; }
+.card .badge .ic { width: 14px; height: 14px; }
+.card .badge.teal { background: linear-gradient(135deg, var(--teal-l), var(--teal)); }
+.card .rule { font-size: 11px; color: var(--muted); line-height: 1.2; font-weight: 700; }
+.card .foot { font-size: 11px; color: var(--muted); text-align: center; font-weight: 700; }
+.card.empty { border-style: dashed; background: transparent; box-shadow: none; cursor: default; min-height: 170px; padding: 0; }
+.card .empty-text { display: grid; place-items: center; height: 100%; color: var(--muted); font-size: 13px; font-weight: 700; }
 .card.choose { padding-right: 10px; }
-.card .choose-body { font-size: 13px; font-weight: 700; color: var(--earth-2); text-align: center; padding: 10px 4px; }
+.card .choose-body { font-family: var(--display); font-size: 13.5px; font-weight: 500; color: var(--navy); text-align: center; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.card .choose-body .ic { width: 26px; height: 26px; color: var(--orange); }
 .card.big { width: 100%; cursor: default; }
-.card.big .art { height: 84px; }
+.card.big .art { height: 96px; }
+.card.big .art .animal { width: 64px; height: 64px; }
 .card.big .pattern { height: 120px; }
 
 /* Journal */
 .log { list-style: none; padding: 0 12px 12px; margin: 0; font-size: 13px; color: var(--muted); }
-.log li { padding: 4px 0; border-top: 1px dashed var(--line); }
+.log li { padding: 5px 0; border-top: 1px dashed var(--line); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .log li b { color: var(--ink); }
+.log .turnno { font-family: var(--display); font-size: 11px; color: var(--muted); background: #eee6d4; border-radius: 999px; padding: 1px 7px; }
+.log .acts { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 2px; }
 
 /* ---------- Animations ---------- */
 .arriving { visibility: hidden; }
 .fly { position: fixed; z-index: 100; pointer-events: none; transform-origin: top left; will-change: transform; }
 .fly svg { width: 100%; height: 100%; display: block; }
-.ghost-card { width: 100%; height: 100%; border-radius: 12px; background: var(--card); border: 3px solid var(--line); display: grid; place-items: center; font-size: 34px; box-shadow: 0 6px 14px rgba(0,0,0,.3); }
+.ghost-card { width: 100%; height: 100%; border-radius: 16px; background: var(--paper); border: 3px solid var(--line); display: grid; place-items: center; box-shadow: 0 6px 14px rgba(0,0,0,.3); }
+.ghost-card .animal { width: 60%; height: 60%; }
 .ghost-card.back { background: #4e351d url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Ccircle cx='7' cy='8' r='2.6' fill='%23f3d9a6' opacity='.35'/%3E%3Ccircle cx='4' cy='4' r='1.1' fill='%23f3d9a6' opacity='.35'/%3E%3Ccircle cx='7' cy='2.6' r='1.1' fill='%23f3d9a6' opacity='.35'/%3E%3Ccircle cx='10' cy='4' r='1.1' fill='%23f3d9a6' opacity='.35'/%3E%3C/svg%3E"); border-color: #7a5d33; }
 .ghost-cube { width: 100%; height: 100%; border-radius: 15%; background: linear-gradient(180deg, #4a3a2c 0 35%, #2b2118 35%); box-shadow: 0 4px 10px rgba(0,0,0,.35); }
 .ghost-cube.spirit { background: linear-gradient(180deg, #f0c975 0 35%, #d9a441 35%); }
@@ -251,62 +284,66 @@ input[type=text]:focus { outline: 2px solid var(--teal); border-color: transpare
 @keyframes pop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.08); opacity: 1; } 100% { transform: none; } }
 .flip { animation: flip .5s ease-out; transform-origin: center; }
 @keyframes flip { 0% { transform: rotateY(90deg); opacity: 0; } 60% { transform: rotateY(-12deg); opacity: 1; } 100% { transform: none; } }
-.float-text { position: fixed; z-index: 90; pointer-events: none; font-weight: 900; font-size: 18px; transform: translate(-50%, -10px); animation: floatup 1.1s ease-out forwards; text-shadow: 0 1px 2px #fff; }
-.float-text.up { color: var(--teal-2); }
-.float-text.down { color: var(--red); }
+.float-text { position: fixed; z-index: 90; pointer-events: none; font-family: var(--display); font-weight: 600; font-size: 20px; transform: translate(-50%, -10px); animation: floatup 1.1s ease-out forwards; text-shadow: 0 1px 2px #fff; }
+.float-text.up { color: var(--teal-d); }
+.float-text.down { color: var(--coral); }
 @keyframes floatup { 0% { opacity: 0; transform: translate(-50%, 0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -46px); } }
 .confetti { position: fixed; top: -12px; width: 9px; height: 14px; z-index: 95; pointer-events: none; border-radius: 2px; animation: confetti 3s linear forwards; opacity: .95; }
 @keyframes confetti { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(105vh) rotate(720deg); } }
 .turn-overlay {
   position: fixed; left: 50%; top: 42%; transform: translate(-50%, -50%) scale(.9); z-index: 80; pointer-events: none;
-  background: var(--earth-2); color: #f6e9cf; font-size: 22px; font-weight: 800; padding: 16px 26px; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.35);
-  border: 2px solid #f3c86b; animation: overlay-in .35s cubic-bezier(.2,.9,.3,1.3) forwards; text-align: center; max-width: 88vw;
+  background: linear-gradient(135deg, var(--navy), var(--blue)); color: #fff; font-family: var(--display); font-size: 22px; font-weight: 600; padding: 18px 28px; border-radius: 24px; box-shadow: var(--shadow-lg);
+  border: 3px solid var(--yellow); animation: overlay-in .35s cubic-bezier(.2,.9,.3,1.3) forwards; text-align: center; max-width: 88vw;
 }
+.turn-overlay .ic { color: var(--yellow); }
 .turn-overlay.out { animation: overlay-out .35s ease-in forwards; }
 @keyframes overlay-in { from { opacity: 0; transform: translate(-50%, -50%) scale(.7); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 @keyframes overlay-out { to { opacity: 0; transform: translate(-50%, -60%) scale(.9); } }
 
 /* ---------- Modales & toasts ---------- */
-.modal-bg { position: fixed; inset: 0; background: rgba(30,20,10,.55); z-index: 50; display: flex; align-items: flex-end; justify-content: center; animation: fade .15s; }
+.modal-bg { position: fixed; inset: 0; background: rgba(30,42,90,.5); z-index: 50; display: flex; align-items: flex-end; justify-content: center; animation: fade .15s; backdrop-filter: blur(2px); }
 @keyframes fade { from { opacity: 0; } }
-.modal { background: var(--card); border-radius: 20px 20px 0 0; width: 100%; max-width: 520px; max-height: 88vh; overflow-y: auto; padding: 18px 16px calc(18px + var(--safe-bottom)); box-shadow: 0 -6px 30px rgba(0,0,0,.3); animation: slideup .22s cubic-bezier(.2,.9,.3,1); }
+.modal { background: var(--paper); border-radius: 26px 26px 0 0; width: 100%; max-width: 520px; max-height: 88vh; overflow-y: auto; padding: 20px 18px calc(18px + var(--safe-bottom)); box-shadow: 0 -6px 30px rgba(0,0,0,.3); animation: slideup .22s cubic-bezier(.2,.9,.3,1); }
 @keyframes slideup { from { transform: translateY(30px); opacity: .5; } }
-@media (min-width: 600px) { .modal-bg { align-items: center; } .modal { border-radius: 20px; } }
-.modal h2 { font-size: 20px; margin-bottom: 8px; color: var(--earth-2); }
+@media (min-width: 600px) { .modal-bg { align-items: center; } .modal { border-radius: 26px; } }
+.modal h2 { font-size: 21px; margin-bottom: 8px; color: var(--navy); display: flex; align-items: center; }
 .modal .actions { display: flex; gap: 10px; margin-top: 14px; }
 .modal .actions .btn { flex: 1; }
 .modal p { margin: 6px 0; }
 .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .choice-grid .card { width: auto; }
 table.scores { width: 100%; border-collapse: collapse; font-size: 14px; }
-table.scores th, table.scores td { padding: 5px 6px; text-align: right; border-bottom: 1px solid var(--line); }
+table.scores th, table.scores td { padding: 6px 6px; text-align: right; border-bottom: 1px solid var(--line); }
+table.scores th { font-family: var(--display); font-weight: 600; }
 table.scores th:first-child, table.scores td:first-child { text-align: left; }
-table.scores tr.total td { font-weight: 800; font-size: 16px; border-bottom: 0; }
-.winner { text-align: center; font-size: 20px; font-weight: 800; color: var(--orange-2); margin: 6px 0 10px; }
+table.scores tr.total td { font-family: var(--display); font-weight: 600; font-size: 17px; border-bottom: 0; }
+.winner { text-align: center; font-family: var(--display); font-size: 21px; font-weight: 600; color: var(--orange-d); margin: 6px 0 10px; }
+.winner .ic { color: var(--yellow); filter: drop-shadow(0 2px 2px rgba(0,0,0,.2)); }
 .toast {
   position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(104px + var(--safe-bottom)); z-index: 60;
-  background: var(--earth-2); color: #fff; padding: 10px 16px; border-radius: 12px; box-shadow: var(--shadow); max-width: 92vw; font-weight: 600;
-  animation: toast-in .2s ease-out;
+  background: var(--navy); color: #fff; padding: 10px 16px; border-radius: 999px; box-shadow: var(--shadow-lg); max-width: 92vw; font-weight: 700;
+  animation: toast-in .2s ease-out; display: flex; align-items: center; gap: 8px;
 }
-.toast.err { background: var(--red); }
+.toast .ic { width: 18px; height: 18px; color: var(--teal-l); flex: none; }
+.toast.err { background: var(--coral); }
+.toast.err .ic { color: #fff; }
 @keyframes toast-in { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
 .banner {
-  position: fixed; left: 10px; right: 10px; top: 96px; z-index: 40; background: var(--orange); color: #fff; padding: 10px 14px; border-radius: 12px;
-  box-shadow: var(--shadow); font-weight: 700; display: flex; gap: 10px; align-items: center; justify-content: space-between; animation: toast-in .2s ease-out;
+  position: fixed; left: 10px; right: 10px; top: 100px; z-index: 40; background: linear-gradient(135deg, #f4a55c, var(--orange)); color: #fff; padding: 10px 14px; border-radius: 16px;
+  box-shadow: var(--shadow-lg); font-weight: 700; display: flex; gap: 10px; align-items: center; justify-content: space-between; animation: toast-in .2s ease-out;
 }
-.banner span { flex: 1; }
-.banner button { background: rgba(255,255,255,.2); border: 0; color: #fff; border-radius: 8px; padding: 6px 10px; cursor: pointer; font-weight: 700; }
+.banner span { flex: 1; display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.banner button { background: rgba(255,255,255,.22); border: 0; color: #fff; border-radius: 999px; padding: 6px 12px; cursor: pointer; font-family: var(--display); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
 .menu { list-style: none; margin: 0; padding: 0; }
-.menu li { padding: 12px 4px; border-top: 1px solid var(--line); cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+.menu li { padding: 12px 6px; border-top: 1px solid var(--line); cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+.menu li .ic { color: var(--teal); width: 22px; height: 22px; }
 .menu li:first-child { border-top: 0; }
 .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; font-size: 13px; }
 .legend div { display: flex; align-items: center; gap: 8px; }
 .legend svg { width: 26px; height: 26px; flex: none; }
 .rules p { font-size: 14px; }
-.rules ul { padding-left: 18px; font-size: 14px; }
-.rules ul li { margin-bottom: 4px; }
 .conn { width: 9px; height: 9px; border-radius: 50%; background: #9aa; display: inline-block; }
-.conn.on { background: #6fdc8c; }
+.conn.on { background: #6fdc8c; box-shadow: 0 0 0 3px rgba(111,220,140,.25); }
 .conn.off { background: #e06d6d; }
 @media (prefers-reduced-motion: reduce) {
   .fly, .float-text, .confetti, .turn-overlay, .pop, .flip, .board .disc.drop, .board .cube.bounce, .slot .disc.drop { animation: none !important; transition: none !important; }
@@ -369,6 +406,64 @@ const CARDS = [
 ];
 if (typeof module !== 'undefined') module.exports = { CARDS };
 else if (typeof self !== 'undefined') self.CARDS = CARDS;
+
+</script>
+<script>
+// Généré par tools/build-animals.py — icônes animaux (OpenMoji, CC BY-SA 4.0, openmoji.org, + icônes maison).
+const ANIMAL_SPRITE = "<svg width=\"0\" height=\"0\" style=\"position:absolute\" aria-hidden=\"true\"><symbol id=\"a-1\" viewBox=\"0 0 72 72\"><g stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\"><path fill=\"#5c9e31\" stroke=\"#5c9e31\" d=\"M46 52s17 2 19 0v-1s3-3 1-4-5 0-5 0-3-1.3-6.5-4.7c0 0-1.5-1.3-3.5.7 0 0-2-3-8-3s-24 1-24 1-6-1 0-3 11-2 12 0c0 0-2.7-8.4-17.3-5.2C13.7 32.8 1 36 8 48c0 0 2 4 8 4z\"/><path fill=\"#b1cc33\" stroke=\"#b1cc33\" d=\"M23 47s-4.8 4-3.4 5 3.4 3 3.4 3h4l-3-3s2-1 3-3 0-3.2 0-3.2M40 47s-4.8 4-3.4 5 3.4 3 3.4 3h4l-3-3s2-1 3-3 0-3.2 0-3.2\"/></g><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\"><path d=\"M29 52h4m13 0s17 2 19 0v-1s3-3 1-4-5 0-5 0-3-1.3-6.5-4.7c0 0-1.5-1.3-3.5.7 0 0-2-3-8-3s-24 1-24 1-6-1 0-3 11-2 12 0c0 0-2.7-8.4-17.3-5.2C13.7 32.8 1 36 8 48c0 0 2 4 8 4\"/><path d=\"M23 47s-4.8 4-3.4 5 3.4 3 3.4 3h4l-3-3s2-1 3-3 0-3.2 0-3.2M40 47s-4.8 4-3.4 5 3.4 3 3.4 3h4l-3-3s2-1 3-3 0-3.2 0-3.2\"/></g></symbol><symbol id=\"a-2\" viewBox=\"0 0 72 72\"><path fill=\"#7fa8c9\" d=\"M36 13C48 20 60 30 66 40c-8 3-16 3-22 2-3 6-5 12-8 18-3-6-5-12-8-18-6 1-14 1-22-2 6-10 18-20 30-27z\"/><path fill=\"#a9c6dc\" d=\"M36 24c6 5 12 10 16 16-5 1-10 1-16 0-6 1-11 1-16 0 4-6 10-11 16-16z\"/><path fill=\"none\" stroke=\"#000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M36 13C48 20 60 30 66 40c-8 3-16 3-22 2-3 6-5 12-8 18-3-6-5-12-8-18-6 1-14 1-22-2 6-10 18-20 30-27zM36 60c1 4 4 7 8 8\"/><circle cx=\"31\" cy=\"30\" r=\"1.8\"/><circle cx=\"41\" cy=\"30\" r=\"1.8\"/></symbol><symbol id=\"a-3\" viewBox=\"0 0 72 72\"><path fill=\"#f8b9a3\" d=\"M16.1 35.2s-5.1-4.8-4-11 13.5 1 14.6 6.2c0 0 3.1-5.2 8.3-6.3 0 0-1-5.2 0-8.3 0 0 11.5-4.2 15.7 6.3 0 0 11.5 2 12.5 11.4l-3.1 2.1 2.7 2.4s-.1 7-11.8 10c0 0-2.3 7.4-10.7 5.3l1-5.2s-6.2 1-14.5-8.4c0 0-3.2 9.4-15.7 7.3 0 0-.2-8.1 5.1-11.9\"/><path fill=\"#ef8a6d\" d=\"M41.8 28.7s-7.9 4.3-.9 11\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M16.1 35.2s-5.1-4.8-4-11 13.5 1 14.6 6.2c0 0 3.1-5.2 8.3-6.3 0 0-1-5.2 0-8.3 0 0 11.5-4.2 15.7 6.3 0 0 11.5 2 12.5 11.4l-3.1 2.1 2.7 2.4s-.1 7-11.8 10c0 0-2.3 7.4-10.7 5.3l1-5.2s-6.2 1-14.5-8.4c0 0-3.2 9.4-15.7 7.3 0 0-.2-8.1 5.1-11.9\"/><path d=\"M41 28.8s-6 4-1 11\"/></g></symbol><symbol id=\"a-4\" viewBox=\"0 0 72 72\"><path fill=\"#a57939\" d=\"M30.5 30.7c.9.4 1.7 1.1 2.5 3.2\"/><path fill=\"#a57939\" d=\"M38.5 38.4a18 18 0 0 1-5.6.9 3 3 0 0 1-2.1-.8l-.3-.3a10 10 0 0 1-2.3-3.6c-.3-.7-.7-2.7 0-3.5a2 2 0 0 1 2.3-.4c.9.4 1.7.7 2.4 2.8M20.6 47.3a18 18 0 0 0 3.5-4.4 3 3 0 0 0 .4-2.3v-.3a10 10 0 0 0-2.1-3.8c-.5-.7-2-2-3-1.8a2 2 0 0 0-1.5 1.8c-.1 1 0 2 1.5 3.7\"/><g fill=\"#6a462f\"><ellipse cx=\"21.9\" cy=\"29.2\" rx=\"10.3\" ry=\"8.5\" transform=\"rotate(-25.4 21.9 29.2)\"/><path d=\"M23 19.6a2.3 2.3 0 1 1 4.5 1ZM11.3 29.8a2.3 2.3 0 1 1 1.4-4.3Zm51.2 4.8-1.3-.3.2-.4a25 25 0 0 0-1.7-12.6 4 4 0 0 0-3.6-2.2 4 4 0 0 0-3 1 4 4 0 0 0-1.8 4.3l2 7-.5-1-2.4-3a2.4 2.4 0 1 0-3.7 3l2.6 2.3c-4.4 1.8-4.6 4.6-4.3 6.3-2.8.3-6.6 0-8.4-2a16 16 0 0 0-5.7-5l-14 6 2.4 7.7c3.2 5.1 9 10.6 24.8 8.4A18 18 0 0 0 56.4 46l.8-1.2c.2-.3 1-1.1 1.3-1.1a3 3 0 0 0 2.8-1.6l2-3.7a3 3 0 0 0-.8-3.8m.8 3.8-.5 1Zm-.5.9-.4.8zM50.4 27.4l.6.7Zm.6.7.5.6z\"/><path d=\"M54 36.2c0-.3-1-5.5-1.2-5.8l-2.4-3a2.4 2.4 0 1 0-3.7 3l2.6 2.3c-4.4 1.8-4.6 4.6-4.3 6.3m18.3-.6-.5 1Zm-.5.9-.4.8zM50.4 27.4l.6.7Zm.6.7.5.6z\"/></g><path fill=\"#a57939\" d=\"m45 39 4.7-1.1 4.1-1.4\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2.1\" d=\"m50.4 27.4 2.4 3a3 3 0 0 1 .4 2.9c-.2.3.3 1.2.5 1.4l1.5 3m-5.9-5c-4.4 1.7-4.6 4.6-4.3 6.3m5.4-11.6a2.4 2.4 0 1 0-3.7 3l2.6 2.3m2.2-4-1-1.3\"/><path fill=\"none\" stroke=\"#000\" stroke-miterlimit=\"10\" stroke-width=\"2.1\" d=\"m17.9 37.7-.7-.1-1-.5a8 8 0 0 1-3.6-3.5c-2-4.2.5-9.7 5.6-12.1s11-1 13 3.2a8 8 0 0 1 .1 6.2m-3.1 4.2a12 12 0 0 1-2.6 1.8l-2 .7\"/><path fill=\"none\" stroke=\"#000\" stroke-miterlimit=\"10\" stroke-width=\"2.1\" d=\"M23 19.6a2.5 2.5 0 0 1 3-2.1 2.5 2.5 0 0 1 1.5 3.2m-16.2 9.1A2.5 2.5 0 0 1 9.5 27a2.5 2.5 0 0 1 3.2-1.4m35.4 13.1c-2.3.8-8.2-.3-11.5-1.6 0 0-1.5-.6-3.6-3.2m21.4 14.7A18 18 0 0 1 44.1 54c-12.2 1.7-17.6-.7-21.6-4.4L20.2 47a28 28 0 0 1-3.4-10\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2.1\" d=\"m53.3 31.6-2-7.2a4 4 0 0 1 1.7-4.3 4 4 0 0 1 3.1-1 4 4 0 0 1 3.6 2.2 25 25 0 0 1 1.7 12.6m-7 14.7 3.2-4.3m5.7-5.9-2 3.7a3 3 0 0 1-2.8 1.6c-.4 0-1 .8-1.3 1.1l-1.8 2.5m2-7.8c-5.3-5.5-9.3-.8-9.3-.8a5 5 0 0 0-.8 2.8m10.1-2 1.4-3.6a2.6 2.6 0 1 1 4.5 2.5m-.9 1.6 1-1.6M33 33.9c-1.4-1.6-1.6-3-2.5-3.4a2 2 0 0 0-2.5.7c-.6.8-.1 2.7.2 3.4a10 10 0 0 0 2.3 3.6l.3.3a3 3 0 0 0 2.1.8m-13.5.7c-1.4-1.7-1.6-2.8-1.5-3.7a2 2 0 0 1 1.5-1.9c1-.1 2.5 1.2 3 1.8a10 10 0 0 1 2 3.8v.4a3 3 0 0 1-.3 2.2l-1.3 2\"/><path d=\"M24.8 29a1 1 0 0 1 .1 1.2l-.6 1.4a1 1 0 0 1-1 .4l-1.2-.1a1.4 1.4 0 0 1-1.2-1.2 1 1 0 0 1 .4-.8l2.3-1.1a1 1 0 0 1 1.2.3\"/><circle cx=\"17.9\" cy=\"28.7\" r=\"1\"/><circle cx=\"23.9\" cy=\"25.4\" r=\"1\"/><path fill=\"#a57939\" d=\"M44.4 44.6c0 2.5-7.8 5.1-12 3.3-4.4-2-6.3-6.3-5.1-8.1a2 2 0 0 1 3-.4 4 4 0 0 0 3.2.7l2.2.5c4.7 1.2 8.8 1.9 8.7 4\"/></symbol><symbol id=\"a-5\" viewBox=\"0 0 72 72\"><path fill=\"#b1cc33\" d=\"M39.4 22.4a1 1 0 0 0 1-.8c.5-2 2.6-7 7.6-7.6 7.9-1 11 4.2 11 8.4 0 5-2 5.2-3.4 7.6q-.5.7 0 1.4C61 37.1 63.7 61 36 61 11 61 9 41 16.5 31.4q.5-.7 0-1.4c-1.5-1.6-4.6-5.7-3-9.7A10 10 0 0 1 23 14c3 0 7.9 2 9.2 7.6q.2.7 1 .8z\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M39.4 22.4a1 1 0 0 0 1-.8c.5-2 2.6-7 7.6-7.6 7.9-1 11 4.2 11 8.4 0 5-2 5.2-3.4 7.6q-.5.7 0 1.4C61 37.1 63.7 61 36 61 11 61 9 41 16.5 31.4q.5-.7 0-1.4c-1.5-1.6-4.6-5.7-3-9.7A10 10 0 0 1 23 14c3 0 7.9 2 9.2 7.6q.2.7 1 .8z\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M22.4 48.5S36 61 50.6 48.5\"/><circle cx=\"22.4\" cy=\"23.4\" r=\"3.1\"/><circle cx=\"49.6\" cy=\"23.4\" r=\"3.1\"/><circle cx=\"31.8\" cy=\"43.2\" r=\"2.1\"/><circle cx=\"40.2\" cy=\"43.2\" r=\"2.1\"/></symbol><symbol id=\"a-6\" viewBox=\"0 0 72 72\"><path fill=\"#6a462f\" d=\"M34.6 64h8.6s3 .4-.5-3.1c0 0 .5-1 .5-1.5s1-1 .8-2\"/><path fill=\"#6a462f\" stroke=\"#6a462f\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M37.8 61.4q1.7-.1 2.4-1c1-1.5 1-1 .5-2s0-2 0-2l4.3.6\"/><path fill=\"#a57939\" d=\"M33.8 54c9.4 4.7 29.5 3.8 25.6-.2-4.5-4.4-5.1-6.3-5.7-10.1S47.9 32.3 39 30.4c-9-2 0-14-6.4-19.7s-14-.6-14 2.5-3 5.1-3 5.1c-1.4.6-9.6 3.8 1.2 3.8s10.1 2.6 7 4.5c0 0-10.9 4.5-7.9 14.4s18 13.5 18 13.5-.6 1.2 0 2.5-.4 1.6-1.6 3.5c-1.3 2-4.1.3-6.6 1-2 .4-3.2 2.5.6 2.5h10.8s3.8.6-.7-3.8c0 0 .7-1.3.7-2s1.3-1.2 1-2.5\"/><path fill=\"#5c9e31\" d=\"M39 30.4c-8.8-2 0-14-6.3-19.7s-14-.6-14 2.5-3 5.1-3 5.1c-1.4.6-9.6 3.8 1.2 3.8s10.1 2.6 7 4.5\"/><path fill=\"#fcea2b\" d=\"M15.6 18.3c-1.3.6-9.5 3.8 1.3 3.8\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\"><path d=\"M48 46.2c7 5.7 0 6.4 0 6.4C30.7 54.5 26.3 36 26.3 36\"/><path d=\"M34 54.5c10.8 2.9 29.3 3.3 25.4-.7-4.5-4.4-5.1-6.3-5.7-10.1S47.9 32.3 39 30.4c-9-2 0-14-6.4-19.7s-14-.6-14 2.5-3 5.1-3 5.1c-1.4.6-9.6 3.8 1.2 3.8s10.1 2.6 7 4.5c0 0-10.9 4.5-7.9 14.4s18 13.5 18 13.5-.6 1.2 0 2.5-.4 1.6-1.6 3.5c-1.3 2-4.1.3-6.6 1-2 .4-3.2 2.5.6 2.5h10.8s3.8.6-.7-3.8c0 0 .7-1.3.7-2s1.3-1.2 1-2.5\"/><path d=\"M34.6 64h8.6s3 .4-.5-3.1c0 0 .5-1 .5-1.5s1-1 .8-2\"/><path d=\"M40.7 56.4s-.5 1 0 2 .5.5-.5 2q-.7.9-2.4 1\"/></g></symbol><symbol id=\"a-7\" viewBox=\"0 0 72 72\"><path fill=\"#ffa7c0\" d=\"M59.7 41.3c-5.5-1.3-8.8-8.8-13-11.6-4.4-2.9-11.6-3.8-16.1-.3-2.1 1.6-3 3.8-3.5 5.2q-.8.4-1.8-.1c-.5-.3-1.1-1.2-.8-4.2.5-5.1 2.3-5.9 2-9.2-.3-2.4-1.4-4-2-4.8-1-1.3-2.5-3.5-4.7-3.3-1.7.1-2.8 1.5-3.1 2a4 4 0 0 0-3.7 2.5c-.7 2.1 1.2 4.3 1.7 4.2.3-.1.1-1 .6-2.3.4-.9 1.1-.8 1.6-1.2 1 0 1.8.8 2.8.8.6 0 1.9-.7 1.9-.7.6 1.7 1.5 2.3-.9 6-.5 1.1-1.4 6.8-.2 10.1.3 1 1 3.9 5.2 5 .5.8 1.9 1 3.5 1.8a9 9 0 0 0 5.5 1c6.5 4.2 18.5 1.5 25-.9\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\"><path d=\"m36.3 54.7 2.1-2.1L53 48.2l-11-3.8m-2.4.2c1.2 3.2 3 10.6 3 10.6l-.9 7.2\"/><path d=\"M21.6 24.7c-.5 1.2-2.3 6.7-1.1 10 .3 1 1.2 4.2 5.4 5.4q3.6 3 8.6 2.4c1.2 1.2 6.8 2.1 9.3 2 4.5-.2 7.3-2.8 15.6-2.1a72 72 0 0 0-12.6-11.5c-4.4-3-12-5.1-16.4-1.6-2.1 1.6-1.8 4.4-3.5 5.2q-.8.4-1.8-.1c-.5-.3-1.1-1.2-.8-4.2.5-5.1 2.3-5.9 2-9.2-.3-2.4-1.4-4-2-4.8-1-1.3-2.5-3.5-4.7-3.3-1.7.1-2.8 1.5-3.1 2a4 4 0 0 0-3.7 2.5c-.7 2.1 1.2 4.3 1.7 4.2.3 0 1.7-3.2 2.5-3.1 1 0 1.5 1.3 2.5 1.4 1.3.1 1.9-.7 1.9-.7\"/></g></symbol><symbol id=\"a-8\" viewBox=\"0 0 72 72\"><path fill=\"#b1cc33\" d=\"M40 47.4s7.8-2.4 13.9-.9S68 46 68 46s-7.7.7-15.3-3.7-13.7-1.5-20.2-1.9a43 43 0 0 1-17.8-7C11 31 8.6 31.3 8.6 31.3S8 32 6 33s-5 2 1 4 8.8 5.8 8.8 5.8 6 6 24.1 4.6\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M40 46.5s7.8-1.5 13.9 0S68 46 68 46s-7.7.7-15.3-3.7-13.7-1.5-20.2-1.9a43 43 0 0 1-17.8-7C11 31 8.6 31.3 8.6 31.3S8 32 6 33s-5 2 1 4 8.8 4.8 8.8 4.8m5.6 3.2S27 46.8 32 46.4M19 43l-3 7m0-2h-1m2 0 1 1m18.5-2.5-.4 6.9m-.7-1.7-.9.4m1.8-.7 1.3.4\"/></symbol><symbol id=\"a-9\" viewBox=\"0 0 72 72\"><path fill=\"#9b9b9a\" d=\"m30.5 19.7-.6-.6a3 3 0 0 0-2.2-.9h-1.9a3 3 0 0 0-2.2 1.2l-.6.7q-1.3 1.6-1.2 3.7.1 1 1.1 1.3h.5l5.2-.4a3 3 0 0 0 1.9-5m-6.2 22-.2.6-.3.5-1.4 2q-1 1.1-1 2.7v.6q-.1.8.4 1.4.6.8 1.4.8 1.5.2 2.8-.5l2.6-1.8.6-.6 2.3-3.7.3-.9v-.4c.3-1.3-.9-2.5-2.2-2.4l-2.6.3h-.6q-1.6 0-2.1 1.4\"/><path fill=\"#d0cfce\" d=\"M33.5 19.3h-1.3q-2.4.5-4.4 2l-.7.7-.5.6-.7 1.2a2 2 0 0 1-1.6 1L23 25q-1.7.2-3.2.6l-3.6 1-1 .5a17 17 0 0 0-4.4 4.4l-.4.6-1.4 3v.3a2 2 0 0 0 .3 1.8q1.1 1.4 2.8 1.7l3.8.8 1.5.2h7.2q.7 0 1.2.3l1.4 1 .3.2q1.2 1 .6 2.5l-.9 1.9-.1.3-.5 1.7a2 2 0 0 0 2.9 2.3l3.8-2.4c1.6-.9 3.5-.8 5.3-.5l2 .2h.2l.3.1q5.7 1.5 11.3-.6l.3-.2q1.5-.9 2.3-2.3l1.5-2.4.1-.3.6-1.4.1-.5.4-2.3q.6-4.1-1.4-7.8-.7-1.4-1.8-2.6l-1.6-2a7 7 0 0 0-4.1-2.5h-.5q-3.5-.7-7-.1a2 2 0 0 1-1.7-.5q-1.7-1.5-3.7-2.1z\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M53.6 45.4q-1.3 1.2-3.3 2.1-3.4 1.4-7 .8l-9-1.2M40 23.5c2-1 5-2 10 0 3.9 1.5 10 8 7.1 16l-.7 1.6m-19.7.5c-.5 1.9-4.4 6.6-5.8 8.3-1.7 2-6.7.6-4.9-3 .7-1.5 2-2.8 2.1-4.4l.1-1\"/><path d=\"M22.4 49.2q-1.2-1.1.4-3.7c.6-.8 2.1-2.6 2.3-4.7l-4.3-.2C7 40.6 8.8 35.4 9 34.9c.3-.9 4-6.6 6.9-8 4.4-2.2 9.7-1.7 9.7-1.7 1.5-5.7 10.5-9.6 14.2-1C43 31.7 35 34.4 32 34.4M56.4 41c2 0 3.7 3.5 2.7 6.5s-1.8 4-6.2 6.1C44 58 33.2 55.8 23.2 54c-6.3-1.2-9.2.6-10.1 2.5-1.1 2.2 1.7 5.9 7 4.8\"/><path d=\"M22.7 21.7a6 6 0 0 1 .8-2.2c2.2-3.3 6.8-1.8 7.6 0\"/></g></symbol><symbol id=\"a-10\" viewBox=\"0 0 72 72\"><circle cx=\"22.3\" cy=\"37\" r=\"1.5\"/><circle cx=\"49.8\" cy=\"37\" r=\"1.5\"/><circle cx=\"28.8\" cy=\"32\" r=\"1.5\"/><circle cx=\"43.7\" cy=\"31.9\" r=\"1.5\"/><circle cx=\"22.3\" cy=\"47.5\" r=\"1.5\"/><circle cx=\"49.8\" cy=\"47.5\" r=\"1.5\"/><circle cx=\"28.8\" cy=\"42.6\" r=\"1.5\"/><circle cx=\"43.7\" cy=\"42.5\" r=\"1.5\"/><circle cx=\"22.3\" cy=\"27.2\" r=\"1.5\"/><circle cx=\"36\" cy=\"17.5\" r=\"1.5\"/><circle cx=\"49.8\" cy=\"26.7\" r=\"1.5\"/><circle cx=\"28.8\" cy=\"22.3\" r=\"1.5\"/><circle cx=\"43.3\" cy=\"22.3\" r=\"1.5\"/><path fill=\"#5c9e31\" d=\"M41.3 56.6s3.8 1.5 4.6.9 0-3.7 0-3.7 4.3 2.1 5.2 1.2c.8-1-1.5-4.6-1.5-4.6s5-.4 5.5-1.7c.3-1.1-2.8-3.6-2.8-3.6s6.5-1 6.4-2.7c0-1.5-5.8-1.8-5.8-1.8s6.3-1.6 6.3-3.5c0-1.1-4-2.2-4-2.2s4.8-2.2 4.6-3.6c0-1-3.8-1.9-3.8-1.9s3.5-3.7 2.7-5c-.6-1-4.7 0-4.7 0s2.5-4.5 1.5-5.5c-1.3-1.3-6.5.7-6.5.7s1.3-4.3 0-5c-1.3-.9-5.2 3-5.2 3s1.3-3.5-.4-5c-1.6-1.4-4.4 1.5-4.4 1.5s-1.8-3.8-3-3.8-3 4.3-3 4.3-2.2-3-4.1-2.4c-1.5.5-.7 5.4-.7 5.4s-4-3.9-5.2-3c-1.3.7-.6 4.9-.6 4.9s-4.6-1.8-5.9-.6C15 20.4 18 24.4 18 24.4s-4.1-1-4.7 0c-.8 1.3 2.7 5 2.7 5s-3.7.8-3.8 1.9c-.2 1.4 4.6 3.6 4.6 3.6s-4 1-4 2.2C12.8 39 17 40 17 40s-3.8.9-3.8 2.4c-.1 1.7 6.4 2.7 6.4 2.7s-3 2.5-2.8 3.6c.5 1.3 5.5 1.7 5.5 1.7S20 54.1 20.8 55c.9 1 5.2-1.2 5.2-1.2s-.8 3.2 0 3.7 4.5-.8 4.5-.8l1.8-1.4h7.2Z\"/><path fill=\"#1e50a0\" d=\"M34.9 22.6a3 3 0 0 1 3 2.2c1.4 3.1-.1 10.3.4 13.6.4 2.6 4.3 7 4.3 9.7 0 4.8-3.5 7.9-6.6 7.9-4.2-.1-6.5-5.4-6.6-8 0-3.2 3.4-7.1 4.3-9.6.8-2.3 1.6-9.1 0-10.5-.6-.6-4.3-.6-4.3-.6s3.2-4.7 5.5-4.7\"/><circle cx=\"22.2\" cy=\"37\" r=\"1.5\" fill=\"#fcea2b\"/><circle cx=\"22.2\" cy=\"37.5\" r=\"1\" fill=\"#1e50a0\"/><circle cx=\"49.8\" cy=\"37\" r=\"1.5\" fill=\"#fcea2b\"/><circle cx=\"49.8\" cy=\"37.5\" r=\"1\" fill=\"#1e50a0\"/><circle cx=\"28.8\" cy=\"32\" r=\"1.5\" fill=\"#fcea2b\"/><circle cx=\"28.8\" cy=\"32.5\" r=\"1\" fill=\"#1e50a0\"/><circle cx=\"43.7\" cy=\"31.9\" r=\"1.5\" fill=\"#fcea2b\"/><circle cx=\"43.7\" cy=\"32.4\" r=\"1\" fill=\"#1e50a0\"/><circle cx=\"22.2\" cy=\"47.5\" r=\"1.5\" fill=\"#fcea2b\"/><circle cx=\"22.2\" cy=\"48\" r=\"1\" fill=\"#1e50a0\"/><circle cx=\"49.8\" cy=\"47.5\" r=\"1.5\" fill=\"#fcea2b\"/><circle cx=\"49.8\" cy=\"48\" r=\"1\" fill=\"#1e50a0\"/><circle cx=\"28.8\" cy=\"42.6\" r=\"1.5\" fill=\"#fcea2b\"/><circle cx=\"28.8\" cy=\"43.1\" r=\"1\" fill=\"#1e50a0\"/><circle cx=\"43.7\" cy=\"42.5\" r=\"1.5\" fill=\"#fcea2b\"/><circle cx=\"43.7\" cy=\"43\" r=\"1\" fill=\"#1e50a0\"/><circle cx=\"22.2\" cy=\"27.2\" r=\"1.5\" fill=\"#fcea2b\"/><circle cx=\"22.2\" cy=\"27.7\" r=\"1\" fill=\"#1e50a0\"/><circle cx=\"36\" cy=\"17.5\" r=\"1.5\" fill=\"#fcea2b\"/><circle cx=\"36\" cy=\"18\" r=\"1\" fill=\"#1e50a0\"/><circle cx=\"49.8\" cy=\"26.7\" r=\"1.5\" fill=\"#fcea2b\"/><circle cx=\"49.8\" cy=\"27.2\" r=\"1\" fill=\"#1e50a0\"/><circle cx=\"28.8\" cy=\"22.3\" r=\"1.5\" fill=\"#fcea2b\"/><circle cx=\"28.8\" cy=\"22.8\" r=\"1\" fill=\"#1e50a0\"/><circle cx=\"43.3\" cy=\"22.3\" r=\"1.5\" fill=\"#fcea2b\"/><circle cx=\"43.3\" cy=\"22.8\" r=\"1\" fill=\"#1e50a0\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M42 56s3 2 4 1.5c.7-.5 0-3.7 0-3.7s4.2 2.1 5 1.2c.9-1-1.4-4.6-1.4-4.6s5-.4 5.5-1.7c.3-1.1-2.8-3.6-2.8-3.6s6.5-1 6.4-2.7c0-1.5-5.8-1.8-5.8-1.8s6.3-1.6 6.3-3.5c0-1.1-4-2.2-4-2.2s4.8-2.2 4.6-3.6c0-1-3.8-1.9-3.8-1.9s3.5-3.7 2.7-5c-.6-1-4.7 0-4.7 0s2.5-4.5 1.5-5.5c-1.3-1.3-6.5.7-6.5.7s1.3-4.3 0-5c-1.3-.9-5.2 3-5.2 3s1.3-3.5-.4-5c-1.6-1.4-4.4 1.5-4.4 1.5s-1.8-3.8-3-3.8-3 4.3-3 4.3-2.2-3-4.1-2.4c-1.5.5-.7 5.4-.7 5.4s-4-3.9-5.2-3c-1.3.7-.6 4.9-.6 4.9s-4.6-1.8-5.9-.6C15 20.4 18 24.4 18 24.4s-4.1-1-4.7 0c-.8 1.3 2.7 5 2.7 5s-3.7.8-3.8 1.9c-.2 1.4 4.6 3.6 4.6 3.6s-4 1-4 2.2C12.8 39 17 40 17 40s-4.3.7-3.8 2.4c1 3.6 6.4 2.7 6.4 2.7s-3 2.5-2.8 3.6c.5 1.3 5.5 1.7 5.5 1.7S20 54.1 20.8 55c.9 1 5.2-1.2 5.2-1.2s-.8 3.2 0 3.7 3.8-1.5 3.8-1.5\"/><path d=\"M34.9 22.6a3 3 0 0 1 3 2.2c1.4 3.1-.1 10.3.4 13.6.4 2.6 4.3 7 4.3 9.7 0 4.8-3.5 7.9-6.6 7.9-4.2-.1-6.5-5.4-6.6-8 0-3.2 3.4-7.1 4.3-9.6.8-2.3 1.6-9 .8-10-.6-.6-5.1-1-5.1-1s3.2-4.8 5.5-4.8\"/><path d=\"M33 55v5.6l-2.2.7m4.5-.7H33m6-5.5v5.5l-2.3.7m4.5-.7H39\"/></g></symbol><symbol id=\"a-11\" viewBox=\"0 0 72 72\"><path fill=\"#a57939\" d=\"M19.8 19.3q-1.5-.1-3 .7-2.1 1.5-3.7 3.6l-2 2.8-.9 2.8q-.5 1.4 0 2.6l.2.4q.5 1 1.4 1.1l2 .2h1.9l5-.7s1.5.4 2 2.5c.7 2.5-1.5 3.4-1.9 3.5l-6.3.7-1.9.4q-.8.2-1 1l-.3.7v.8q.3 2 2.3 1.9c1 0 2.3-.2 3-.7 1.4-1.1 4.8.4 4.8.4l5 .8s-1.3 6.7.4 9c1.6 1.9-1.7 2-2.4 2.3l-.3.3-1.6 1.2.2 1.8q-.2 1.4 1.3 1.7l2-.1 1.5.5 1.4.4h2.5l4.1-1.4 4.1.7c2 0 4.9-1 6.2-2.5l.6-.6 1.4-2.5c.1-.3 1.5-4.4 2-7.2q.5-1.7.3-3.5l-.2-4.8-1.6-6.5-1.9-3.4-1.9-2.5q-3-2.3-6.7-3l-3.7-.8-6.5-2.2c-.5-.2-2-1.7-2-1.7l-3-4.6z\"/><path fill=\"#a57939\" d=\"M37.5 23.7v-.5q.4-2.6 1.5-5l2.2-5.2 2.1-3.3 3.5-2 2.7-.2q4.1-.1 7.4 2.3l4.3 5 1 .8c.4.7 1 1.8 1 2.7.6 9.2-13.2 7.7-11.1-.8-2.3 5.8.8 10.3 5 13.7a12 12 0 0 1 2.5 2.9l2.5 3.9.2 3.7-2 5L56 51l-6 2.5.5-7.4v-6.3l-1.2-4.5-1.1-3.7-3.2-4-4.3-2.8z\"/><path fill=\"#d0cfce\" d=\"M34 23.2c-.6.4-2 3.8-.3 4.5s4.7 2.5 4.7 2.5l4.5 5 1.8 4.8v7.9l-1 4.6s1.5 5.2 5 1.8.6 0 .6 0l1.7-9.8-1.7-9.2-1.8-4.8-5-5z\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M20.4 32.5c-3 2.2-6.6 2-8.8 1.5a3 3 0 0 1-2.3-3.6q.4-1.7 2-5.1c3.1-6.5 8.4-6.5 8.4-6.5.4-1 1.9-3.7 3-4.2 0 0 7.2 7.4 1 11.3m-12 17.7c-1.8-.8-2.9-6.6 6.7-4.5q1.1.2 2.2 0c1.8-.4 5.6-.6 5.6-4.5m7.9.4c.2.2 4.6 10-3.1 10.5s-13.8-2-13.8-2\"/><path d=\"M30.1 49.4s-1.1 4 2 7l-2.9.8a5 5 0 0 0-3 2.6c-.4 1 0 2.2 1 2.6 1.7.6 4.4.8 8.2-1.2 0 .2 9.5 3 12.4-3.9 0 0 5.5-9.2 1.8-22.2-2.7-9.2-10.7-11.3-15-11.8a15 15 0 0 1-4.7-1.3c-1.9-.9-3.5-1-3.5-1m12.2-.4s.1-13.1 10.1-13.9 14 9.6 14 9.6\"/><path d=\"M55.9 16.6c-2.2-1.3-7.5 1.9-3.6 8.1s13.4 10.6 10.3 18.8C59 53.2 49.5 54.2 49.5 54.2M34 27.8s15.5 4.6 10 23.7m-17.6-5.9s-2.1 4.7.4 9.2c0 0-6.9.8-4.7 5.3\"/></g></symbol><symbol id=\"a-12\" viewBox=\"0 0 72 72\"><path fill=\"#9b9b9a\" d=\"M13.6 35.6s-4.2 5.2-3.7 8.3l-2.8 2.5V48s6.8 2.9 13.3.9v2.5l.2 2.5 3.3 1.3s3.9-.7 4.9-6c0 0 4 1.5 5.6 5.8l4.7-.3s.7-2.5-.2-4.2l20.5-.3 2 1.8v2l1 1.2h2.2l1.7-1.8-1.9-6.5L66 42s-17.3 10.5-41.3-3.2L22.9 35s-3.9.7-3.7 1.7c0 0-.8-2.7-5.5-1.2\"/><path fill=\"#6a462f\" d=\"M18.6 30.5 15 36s4 .2 4 1.6c-.1 1.4 2.5 2.4-.4 6.6l2.1 1 1.5-1.1 1.5-3.5.8-1.7s19 14.4 41.3 3.2l1.6-3-5-5-.6-2.2-.6-2.8-4-.8-3.5-4L46 23l-4.2-1.6-3.9 2.8-3.8-1-4.2 3H28l-3.4-.3-2.2 4.9H20z\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\"><path d=\"M24.5 26.6c-.9 2.3-1.9 3.3-2.7 4.1q-1 1-2 .2l-1.2-1-3.4 5.1q-.8 1-2 1s-2.7 3.3-3.6 6.9q-.5 1.5-1.8 2.4l-.3.3s-2.4 2 .4 2.8c0 0 9.6 3 15-1.2m18.5-24.9s-1.8 1.2-3.2 1.5l-1.7.3-3.2-.6c-1.6 1.8-3.8 2.6-5.3 3.3m32 2c-2 0-2.6-.1-3.7-1a9 9 0 0 1-2.2-2.6l-.4-.6q-4-.1-8-.8m20.6 14.7c-3.1-1.2-3.6-4.4-4.6-5.7M20.8 51.7l-.2.5a2 2 0 0 0 1.8 2.9H24a2 2 0 0 0 1.8-1l2.8-5.3s3.5 1.4 4.8 5a2 2 0 0 0 1.9 1.3h2a2 2 0 0 0 2-2.2q-.1-1.7-.7-2.3s15.2.4 20-.6q1.7-.3 2.3 1.4l.2 1.6q0 1.9 2 2h.3a2 2 0 0 0 2.1-1.8 10 10 0 0 0-1.5-6.4s1.1-1 1-4\"/><path d=\"M19.2 37.2s2.1-3.3 4-.3c1.3 2-.3 5-1.4 6.8q-1 1.2-2.6.7m8.2-9.8 5-4.1m-.9 9.6 6-2m-.6-5.3L43 30m-3.1 13.5 6.9-.8m2-6.1 6.9 1.3m-8.8-5.4 5.5-2.5m.6 13.8 6.3 1.6\"/></g></symbol><symbol id=\"a-13\" viewBox=\"0 0 72 72\"><path fill=\"#92d3f5\" d=\"M38.6 28q-.8.6-1.4 1.3H37l-1.7-.8A82 82 0 0 0 15 22.2q-.7-3.3.1-4.7 1-1.6 3.5-1c5.5.8 15.1 7.8 20 11.6\"/><path fill=\"#fcea2b\" d=\"M57.7 32q0 2.9-2 5.2l-.1.1q-.6.8-1.4 1.2-1.5 1.1-3.3 1.4h-2l-.3.2-1.4 1.1-.4.2q-.9.6-1.9.8h-3.3q-.7.1-1.3.7l-.1.1q0 .2-.2.3-1.2 1.6-3 2.5l-.5.4h-.1L34.2 48l-3 1.7A28 28 0 0 1 21 52.8h-.7a4 4 0 0 1-3.8-4.8 23 23 0 0 1 10-14.3l2.5-1.3q2-1.5 4.7-1.6h.6l1.6-.2q.6-.3 1.1-.9l.4-.4a8 8 0 0 1 5.4-2.7h1.4a8 8 0 0 1 7-2.6 8 8 0 0 1 6.6 8\"/><path fill=\"#3f3f3f\" d=\"M36.5 46.4h-.2L34.2 48l-3 1.8-1.5-1c-3.7-3-6-7.4-6.1-12.1q-.3 0-.5-.2l.5-.4 2.5-2.2 2.7-1.5.7-.2.8.6 1.4 1.3a17 17 0 0 1 4.8 12.3\"/><path fill=\"#92d3f5\" d=\"m37.1 29.3-1.7-.8c-6.4-2.7-17.4-7-24-6.5-3 .3-5.2 1.5-5.6 4.2-.8 5.7 6.1 8.4 13.3 9.5l3.9.6q5.7.5 11.3.5l6.1-5.9-1.8-.9z\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M15 22.2q-.7-3.4.1-4.7 1-1.4 3.5-1.1c5.5.9 15.1 8 20 11.7m19.1 2.6.9-.2q1.5-.3 2.9 0l2.3.3 2.4.4M38.4 42.8l1 3v3.5q0 1.2-.6 2.1L37 53.6m11.2-13.5.6 1.8q.3.9.2 1.8l-.4 2.7m-13.1-3.1.2 5.1-.1.7-.6 3.3q-.2 1.3-1.3 2.1L32 55.7m12.6-15 1 2q.5 1.6-.3 3.2l-.7 1.5m8.2-17.6 1-1.1q2.1-2.1 5-2.8l6.3-1.4M23 36.3a24 24 0 0 0-6.8 11.8v.9a4 4 0 0 0 3.9 4l2.9-.5\"/><path d=\"M54.3 38.5q.8-.4 1.3-1.2h.1V37a8 8 0 0 0 2-6.4A8 8 0 0 0 56 27l-.3-.3a8 8 0 0 0-6-2.7 8 8 0 0 0-5.8 2.6h-1.4q-2.1 0-4 1.5m1.9 2.7-3.2-1.5H37l-1.7-.8A82 82 0 0 0 15 22.2l-3.6-.2c-3 .3-5.2 1.5-5.6 4.2-.8 5.7 6.1 8.4 13.3 9.5l3.9.6q5.7.5 11.3.5\"/></g></symbol><symbol id=\"a-14\" viewBox=\"0 0 72 72\"><path fill=\"#6a462f\" d=\"m24.7 18.7-7.1-5.5-7.2 1.3-2.6 4 .5 5.8L10 28c.8 1.9 2.8 4.1 4.5 5.1l-2.5 8v5.4l1.4 5 2.2 3.2 6 4.4s14 9 29 .2l7-6 2.5-5.4.2-5.2-1.7-7.2-.3-2.7 2-2.4 3.3-4.6.8-6.2-2-4.9-4.2-2.3-5.1 1.4-4 3-2.6 1.7-8.8-2.2-8.2.4z\"/><path fill=\"#a57939\" d=\"m29.6 37.8-2 5-.8 6.6 2 3.2.3 4.3 2.8 2.2 8.7-.3 2.3-1 .2-5.2 2-3.2-1.2-6.6-2.5-5.5s-7-4.9-11.8.5\"/><path fill=\"#3f3f3f\" d=\"M30.8 47.8s4.3-4.7 9.8-.4l-1.8 2.9-6-.2z\"/><path fill=\"#a57939\" d=\"M47.8 18.4s12.8-4 15.1 8l1.3-5.1-1-5.3-3.8-3-3.7-.3-5.4 2.7zm-23.5 0s-12.9-4-15.2 8l-.9-1.7a8 8 0 0 1-.7-3.6v-.8q0-2.8 2-5 1.6-1.6 3.8-2.2h.2q3-.7 5.8.8l2.5 1.5z\"/><circle cx=\"28.6\" cy=\"37\" r=\"2\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M26 19.9S18.3 8.3 11 13c-6.5 4.4-3.8 14 .7 16.9\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 58.6c-15.9-6.3-7.8-24-7.8-24S17 25.2 22.6 23m28.5 35.6c16-6.3 7.8-24 7.8-24s-3.6-9.4-9.3-11.6\"/><circle cx=\"43.4\" cy=\"37\" r=\"2\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m43.5 43.3 1.6 4.8a3 3 0 0 1-.4 2.4c-1.2 2-4 5.1-8.3 2.3h-.8c-4.2 2.8-7-.3-8.3-2.3a3 3 0 0 1-.4-2.4l1.6-4.8\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M40.2 48c-.1 3-2.8 1.6-2.8 1.6l-1.4-.7-1.4.7s-2.7 1.3-2.8-1.7m14.2-28S53.7 8.3 61 13c6.5 4.4 3.8 14-.7 16.9M30 57.1s5.1 6.6 12 .6M24.7 18s8.7-5 22.3 0M36 52.8v-3.2\"/></symbol><symbol id=\"a-15\" viewBox=\"0 0 72 72\"><path fill=\"#fff\" d=\"m26.6 29-.5 1.8a8 8 0 0 1-6.5 5.7l-3.2.5q-1.3.3-1.4 1.6 0 1.7.2 2.3l2 3.2q.7 1 1.9 1.8l2.5 1.6q.8.5 1.4 1.2.9 1 .3 2l-.1.2q-.6.8-1.4 1.3-1.2.4-2.1 2.2c-.1.2.6 1.2.8 1.6q0 .3.3.3l2.5.3q1.4 0 2.6-.3c1-.4 1.7-1.3 1.7-1.3s1.7-1.7 2.6-3.2a3 3 0 0 1 2.5-1.3q1.7-.1 3.1 1.1.5.6 1.1.1h.1q3.5-3.1 4.4-7.6l1-5q.3-2.1-.6-4l-1-1.9-3.5-3.4q-1.7-1.5-4-1l-2 .7q-1.6.4-2.7-.8c-.6-.7-1.8-.5-2 .4\"/><path fill=\"#fff\" d=\"m14.4 25.6-.3.2q-1 .6-1.7 1.6l-2.2 3.5q-1.1 1.6-.7 3.6c.3 1 1 1.6 1 1.5.1 0 3.8 1.5 6 2q1.6.1 2.8-.3l.7-.3a5 5 0 0 0 2.7-6.3L21.4 28a4.8 4.8 0 0 0-7-2.3\"/><path fill=\"#3f3f3f\" d=\"m28 20.8 1-3a5 5 0 0 0 .3-2.4l-.4-2.7c-.1-.7-.9-1.1-1.5-.9l-1.6.7-1 .6a1.6 1.6 0 0 1-2.3-.5 2 2 0 0 0-3.2 0L18 14q-.9 1-1.2 2.6l-.5 3-.4 4.2c.2 1 1 .1 1.5 0l-2 1.2q-1.5.8-1.7 2.4c-.2 2.6 0 7.4 4.9 10.3q.6.4 1.3.4c1.5.2 2.4.3 3.8-.7q1.2-.8 1.7-2c.9-1.7 1.9-5-.1-9.3v-.4l1.6-2.6q.8-1 1.2-2.3m3.7 8.2s12.8 8.6 4.8 20.7c-.5.7-.3.6-.6 1.3l-.5.8q-.3 1 .5 1.8l.7 1.3 1.1.7 4 .8q1 .3 2.3.2l5-.4a4 4 0 0 0 2-.8l3.3-1.7q1-.8 1.1-2l.2-1.8v-1.6l-.6-3.7q-.3-1.5-1-2.5l-2-3.5-1.3-1.9-3-3.5a8 8 0 0 0-2-1.7l-2.2-1.4a6 6 0 0 0-3-.8z\"/><path fill=\"#fff\" d=\"M56.1 48.2q.6-.3 1.2-.2l.9.3c.5.3 1.4.2 1.7.4l1.2.5q1 .4 1.1 1.3c0 1-.6 1.7-.5 1.8L60 54s-1 .8-1.5 1l-1.2.5h-1.8c-1.4-.3-2-1-.8-2.2q.5-.4.6-1.2v-2.5q.2-.9.8-1.4\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M23.9 35.5c-2.4 5.1-13.3 1-13.3 1a2 2 0 0 1-1-1.4L9 33q0-.8.3-1.4l2-3.2q1.4-2.4 3.8-3.6L19 23s3.6-10.8 9.4-11.7c0 0 4.6 4.7-3.5 15 0 0 2 1.4 3.6 4 0 0 15.3-8.8 25 10.4 8.9 17.9-8.4 16.7-14.3 16a5 5 0 0 1-3.5-2.6c-.6-1.4-.5-3 3.4-3.6\"/><path d=\"M15 41.2c.3 2.9 2 6.1 6.7 6.8 0 0 1.4 1.8 0 3.3l-2.5 2.3a2 2 0 0 0 1.4 3.4h4a2 2 0 0 0 1.6-1l3.7-5.8 1.3-4M59 48s5-.1 3.4 3.8-5 3.7-5 3.7M16.3 20.2c-.1-3 .8-7.2 4-9 0 0 2-.1 3.2 3.3\"/></g></symbol><symbol id=\"a-16\" viewBox=\"0 0 72 72\"><path fill=\"#fcea2b\" d=\"M31.7 20.8a7 7 0 0 1-3-6c0-4 3.5-7.4 7.6-7.3 4 0 7.4 3 7.7 7 .2 3.2-.7 6.4-.6 9.5v1.7c1.5 1.8 4.7 5.4 6.6 16 .4 2.3 4.1 19.2 4.4 23-.7.4-1.5 1.9-2.2 2.3-1.7-3.7-5-14.1-7.8-15.7-2.8-1.4-5.2-3.3-9-5.2-4.6 0-7.9-8.4-7.9-15 0-5.2 1-8.6 4.2-10.3\"/><path fill=\"#9b9b9a\" d=\"m27.8 16.9 1.8 2.2a3.5 3.5 0 0 1-5.4-.8z\"/><path fill=\"#92d3f5\" d=\"M32 31c-.1-3.6-.6-5.5 3-7q2.7-1 5.5 0c3 1.3 4.6 4.5 5.7 7.5q1.7 4.6 2.6 9.4l.7 3.8c.1 1 1 3.7.7 4.6-.5 1.4-3.7-2-4.9-2.5q-3.7-1.5-6.9-4.2a19 19 0 0 1-5.6-7Q32 33.4 32 31\"/><path fill=\"#9b9b9a\" d=\"M28.7 11a7 7 0 0 0-.9 5.9l-4.7 1.9v-1.4c0-3.4 2.2-6 5.6-6.5\"/><path fill=\"#fff\" d=\"M31 10h-.4a7.2 7.2 0 0 0 1.1 10.8l-.3.1A8 8 0 0 0 37 18c.4-.6 1.4-3.3 1.6-4-.4-.8-3.3-3.4-7.6-4\"/><path fill=\"#92d3f5\" d=\"M31 10c2.6 1.2 6 2 6.5 4.1l15.6 44.5.6-5.3-5.6-17.6c-4.9-7.3-4.8-14-5-22.5C40.4 7.8 36.4 4.8 31 10\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path stroke-miterlimit=\"10\" d=\"M35 24q2.7-1 5.5 0c5.2 2.1 11 20.6 9.8 26.1-3.3-.2-8.9-4.9-11.4-7a19 19 0 0 1-5.6-7c-1.5-4.6-1.5-10.7 1.7-12\"/><path d=\"M27.9 16.9 23 18.8l-.1-1a6.6 6.6 0 0 1 5.7-6.9m24.2 42.5c.4 1.4 1.5 9.8 1.6 11.3.1 1.7-.7 3-2.2 2.3-1.3-4-3.8-14.6-7-16.3\"/><path d=\"M29.6 19a3.5 3.5 0 0 1-5.4-.7m10.6 27.3-.1 6.4m22.4 0H61m-48 .2h30\"/><path d=\"M34.8 45.6c-4-3-6.2-5.8-7-11.9-.7-5 .7-11.2 3.7-13A7.4 7.4 0 0 1 36 7.6c4 0 7.2 3.1 7.4 7v11.2\"/><path d=\"m31.7 20.8-.3.1c4.4-.8 6-3 7.2-6.9-.4-.8-3.3-3.4-7.6-4h-.4m10.1 38v4\"/></g></symbol><symbol id=\"a-17\" viewBox=\"0 0 72 72\"><path fill=\"#6a462f\" d=\"m17.9 21-.2.5q-1 1.6-2.5 2.6l-5.3 3.1S5.8 30.6 6.1 32l.6 2 .5 1.6c0 .9.4 2.2 1 2.7q1 .6 2.3.1 2-.5 4-.6h1.1q1.5-.2 3 .4c6 2.3 5.6 2.2 5.9 2.2.8.2 2.2 1.5 2.2 1.5s-.4 2.8 0 3.8 1.2 5.2 1.2 5.2l-.8 4 1.7 2.1s3.1 0 3.3-1.6l1 2 2.4-.4.7-1.5.4-7.2 2-4.7 2.2 1c.5.2 2.1.2 3.6.1q2 0 4-1l2.3-1 3.6 3.6-.1 4.8-.4 3.6.5 1.3 1.4.7L58 56l1-10.8-.7-3.3s4.3-9.7 3.2-12.7c-.8-2.2-5.3-5-7.8-6.4q-1.4-.8-3.2-1.5L44 19l-1.8-.6c-2.5-.6-8.8-2.2-11.8-2.4S21 19 19 20q-.8.4-1.1 1\"/><path fill=\"#3f3f3f\" d=\"M22 38.2s8.8 6.3 16.8 4.2L37 47.7l-.5 2.3-.2 4.4A3 3 0 0 1 34 57q-1 .3-1.6-.5l-.6-.7s-1.3 1.3-3 1q-1.2-.2-1.6-1.4-.7-1.3-.2-2.7l.4-1.2q.6-2 0-4.1a12 12 0 0 0-1.8-4 43 43 0 0 1-3.6-5.3m37 .8s-6.6-.1-7.6 2.6c-.6 1.6.6 3 1.6 3.8a3 3 0 0 1 1.1 2.7l-.3 2.6v.3l-.1 3.4q0 .9.6 1.6t1.8.6a3 3 0 0 0 2.5-2.3l.4-1.7.1-.5.5-7.1v-.6l-.6-4.4zM23.3 21.7s-5.5 5.5 1.6 8.7l3-2.2 1.1-4-.2-3.3-1.1-.4z\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M9 37.7s2 1.4 4.3-.2l3 .2q2 .1 3.3-1.2l3.3-3.2m-9.3 0c-.9-.7-1.4-2.6-.5-4.2\"/><path d=\"M15.2 32.2c-2.7 2.4-8.1 2.5-8.1 2.5l-1-2.4c1.3-5 10.7-9.2 10.7-9.2l.8-2.2q7-5.6 16-4.1s22.8 3 27.6 12.2c0 0 1.6 2.3-3 12.8l.9 3.3-.7 9.8q-.2 1.6-1.9 1.7h-.8c-1.1 0-2-1-1.9-2l.8-8.1-3.7-4.3s-2 4-9.5 1.6\"/><path d=\"m23.8 22.6 3.8-1.7q.9-.1 1 .7c0 2 .2 7.4-4 7.8m-2.4 9c5.8 2 6.6 2.5 8.6 4.4l1.7 7.7-.4 4.8q0 1.8 1.8 2h.5c1 0 1.9-.8 1.8-1.9-.1-3.5 0-10.8 3.6-14.8\"/><path d=\"M27.6 45.6c.4 1.9.7 4.7-.4 8.2-.3 1 .4 2.1 1.6 2.1M64.6 31c.5 1.1 1.5 6.3-.5 7.5s.6 3.3.6 3.3\"/></g></symbol><symbol id=\"a-18\" viewBox=\"0 0 72 72\"><path fill=\"#9b9b9a\" d=\"m33.7 13.2-5.3 1c-2 .6-5 .2-6.6-.1q-1-.2-1.8.3l-.8.5a5 5 0 0 0-2.1 3.8q0 .8.3 1.4l.3.4a8 8 0 0 0 4.1 3.4l.7.3.5 1.2a9 9 0 0 0 2.6 3.3l.8.7-.6 2.4-1.3 6.7 1.3 6.3.4 1.4s1.6 1.7 2.3 2l.4 3.4.1 2q.1 1.8 1 3.5v.3q1.1 2.2 3.6 2.8l3-.1s3.4.3 4.3.1c.7-.1 6.3-2.6 6.3-2.6s4.7-4.4 5.2-8.3.7-9-1-12.3a58 58 0 0 0-4.4-7l-2.1-3.5-2.8-2.5s-2.2-.7-2.7 0-.5-2.4-.5-2.4l.4-.1q2.7-.9 3.5-3.5l.4-2.1c0-2-1.4-3.8-3.3-4.3q-1.2-.3-2.3.1c-2 1-3.8 1.6-3.8 1.6\"/><path fill=\"#3f3f3f\" d=\"m30 19.5-1.8 1.7v2.4l1.5 1.8h1.9l.7-1.4-.1-3z\"/><path fill=\"#d0cfce\" d=\"M33.3 29.1s3.2 1.2.7 3.4-3.3 4.8-3.3 4.8l.5 5-1.5 4.7-.4 1.6s-3.2-1.4-4-4.2-.8-6.7-.8-6.7l2.3-7.8z\"/><g fill=\"none\" stroke=\"#000\" stroke-width=\"2\"><ellipse cx=\"30.3\" cy=\"22.6\" stroke-miterlimit=\"10\" rx=\"2.2\" ry=\"3.1\" transform=\"rotate(-10.2 30.3 22.6)\"/><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M29.7 29.9c3-.2 7.2-1.8 8.4-3.6s.7-4.8.7-4.8c4.1 0 3.9-3.1 4-6.7 0-3.6-4.3-3.3-4.3-3.3-1.9-.1-4.9 2.3-4.9 2.3-5.4-.7-9 1.5-9.2 1.7 0 0-2-2-4.2-1.5 0 0-5.2 1-2.9 6 2.6 5.7 5 3.8 5 3.8s1 6.5 7.4 6m3.4 2.4c0 .2-4.1 2.4-1.8 10.2l-2 6a13 13 0 0 0-.8 5.1l.1 1.4q.2 3.2 2.5 5c4.2 3 6.3-1.7 6.8-2.7.7-1.4-.4-3.1-2.2-2.7m4.6-21.3.7 3.6q.3 1.7-.4 3.2l-2.1 3.7\"/><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M46.9 50s-9.1-5.7-12.5-.2q-1 1.8-1.2 3.2M27 29.9s-5.5 8.1 0 15.6M40 61q-2 .1-4.3-.5\"/><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M42 24.8c2.5.8 3.6 2 4.9 5 7.8 8.7 8 20.2 1.3 26.8 0 0-3.2 3.8-8.2 4.3\"/></g></symbol><symbol id=\"a-19\" viewBox=\"0 0 72 72\"><path fill=\"#9b9b9a\" d=\"m53.2 6.2-6.2 6s-6-3.1-12-3.1-10.8 3-10.8 3L17 8.2l-2.7-.6-1.4 2-1.6 7s-.8 7.7 1.8 9.6-2.4 15.6-2.4 15.6l3.6 5.8 5.1 4.6q2.2 2 4.6 3.7l.3.2s3.4 7.6 11 5.6c0 0 5.8 3.5 10.4-5.5l1.4-.8 2.2-1.5 4.7-3.5 6-8s-3.3-10.5-2.5-14S60.3 19 60 17.3l-1.4-8.5s-1.9-4.7-5.5-2.6\"/><path fill=\"#3f3f3f\" d=\"M10.9 43.2c.7 1 2.1 1 2.7 0 1.6-3.1 4.8-7.9 9-7.7l6.7-.4q.8 0 1.4.7l1.5 2.1.3.7c.1 1.1.5 4.4-.2 7.3-.3 1.6.8 3.1 2.4 3.1q1.1 0 2.2.3a1 1 0 0 0 1.2-1.3c-.7-2-1.4-5.2-.7-9.4q0-.4.4-.8l2-2q.5-.5 1.2-.5l3 .1h.1l3.1.6h.5a8 8 0 0 1 9.2 6.4c.3 1.3 2 1.6 2.8.5q.3-.6.2-1.2l-2.6-11.3v-.7l.7-2.6 2-8.1v-.6l-1.3-7.1V11l-1.3-3q0-.3-.2-.4A4 4 0 0 0 54.6 6h-1.1q-.8 0-1.3.5l-3.7 4.3-.6.4-.8.3q-.5.3-1 0L41.5 10l-.4-.1-8.7-.6h-.6L24.5 12q-.8.3-1.5-.4l-5.5-5q-.4-.4-1-.4L15.3 6q-1 0-1.4.7l-1.6 2.5-.2.5-1.5 6.3v.5l.7 6.5.1.4 1.7 4.2v.8L12 35.1v.2L10 41q-.3.6.2 1.3zM29.5 53s4.4-2.5 11.2.2v.8l-2.2 1.5-1 1.6s-1.3 1.2-2 1l-3-1.1-.7-1.6-2.6-1.4v-1\"/><path fill=\"#9b9b9a\" d=\"M55.3 8.7s5.2 8.6.7 17.5c0 0-4.4-6.5-8-6.4 0 0 7.2-4.2 7.3-11m-40.6-.1s-5.2 8.6-.7 17.5c0 0 4.4-6.5 8-6.4 0 0-7.2-4.2-7.3-11M29.2 62q0 2.8 1.5 3.6a4 4 0 0 0 2 .6l4 .2q1.5 0 2.9-.9t1.1-3.2z\"/><circle cx=\"26.2\" cy=\"40.3\" r=\"2\"/><circle cx=\"44.3\" cy=\"40.5\" r=\"2\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m29.3 54 2.4 1.4s.5 3 3.3 2.7v3.6s-3.5 1.7-6.4-.5c-2.2-1.8-3.6-4.7-3.6-4.7m-3.3-3.2a13 13 0 0 1-7.8-5.5l-4-5.5c2.7-7 2.5-14.1 2.5-14.1-4.7-8.7-1.6-17.5-1.6-17.5 2-6.6 5.2-5.8 6.3-5.3l.7.6c3.2 5 9.7 8.6 9.7 8.6\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M15.6 9.2s.4 7.5 7.3 10.4c0 0-6.7 1.7-7.8 6.3M54.9 9.2s-.4 7.5-7.4 10.4c0 0 6.7 1.7 7.8 6.3M31 40.5s2.7-4.4-1.3-5.7c-2.8-.9-6.2 1.1-6.2 1.1m11.8 25.8s3.5 1.7 6.4-.5c2.2-1.8 3.6-4.7 3.6-4.7M40.7 54l-2.8 1.4s-.2 3-3 2.7\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M42.8 15s6.8-3.8 9.9-9c0 0 4.2-3.2 6.8 5 0 0 3 8.9-1.7 17.5 0 0 0 7.4 2.7 13.8l-4.7 6.8q-2.3 3-7.2 4.6\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M39.3 40.9s-2.7-4.4 1.3-5.7c2.8-1 6.2 1 6.2 1M24.7 11.5s8-5.6 21.3 0M31.4 65.9a8 8 0 0 0 7.7 0\"/></symbol><symbol id=\"a-20\" viewBox=\"0 0 72 72\"><path fill=\"#e8873a\" d=\"M40.2 22s3.1-9 11.4-4c0 0 8.6.8 9 3.4 0 0-8 1.6-10 5.6s3.1 7-5.3 15.6c0 0-4 4.4-10.3 4.4 0 0-22 3-25 0\"/><path fill=\"#2f9fd6\" d=\"M10.1 46.9S35 24 43 25s2 13.3-5.5 17.6S10.1 47 10.1 47\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M32.6 55.6 37 54\"/><path d=\"M42.9 29.5c-.8-.2-1 .5-1 .5-.7 2.1-3 7.1-10.5 10 0 0-.7.3-.4 1.1.3.7 1 .6 1.2.5a18 18 0 0 0 11.4-11.3q.2-.5-.7-.8\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M31.6 40.9S40 39 43 29\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M41 22s3-9 11-4c0 0 8.3.8 8.6 3.4 0 0-7.6 1.6-9.6 5.6s3 7-5.1 15.6c0 0-3.9 4.4-9.9 4.4l-1 2 2 5 6 1\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M10.1 46.9S35 24 43 25s2 13.3-5.5 17.6S10.1 47 10.1 47\"/></symbol><symbol id=\"a-21\" viewBox=\"0 0 72 72\"><path fill=\"#3f3f3f\" d=\"M45 12c1-1 4-2.3 4.4-3 .1-.3-.7-.8-1-1-1-.3-3.2 0-4.2 0q-5-2.7-8.3-1.2c-3.6 1.6-4.2 5.8-4.2 7.4 0 1.4 0 4.3-.3 5.8a19 19 0 0 1-4.2 8.4c-1 1-8.7 9.9-10 12.5-1.1 2.2-4.1 7.3-2.9 9.3 1.4.2 1.6-4.2 8-9.3 1.6-1.4 4.2-4 4.7-4.9.2-.4 0 1.5 0 2-.1 7.9 1 12 1 16.7.5 2.5.5 3.5 0 4.5-1.5 2.9-4 2.9-4.7 4 0 0 3 2 9.9-2m12.2-22.4c1 1.2 4.2 3.3 5 4 1.9 1.8 6.5 8.3 7.6 7.4.3-.3.9-2 .7-2.6-.8-2.6-4.3-8-7.2-13s-5-9.3-5-9.3l-3.2-3.6m-6.5 39.7c5.3 4.5 12 1 12 1 0-.6-4-2.7-8-4.8\"/><path fill=\"#fff\" d=\"M32 14c0 1.3 7.3 6.8 11 1 0 0-1 11 1 15 2.4 4.6-.5 22.9-5 29-1.5 2-7.2 5.2-10-5s-2-9.9-2-16 7.5-19 5-24\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\"><path d=\"M32 14c0 1.3 7.3 6.8 11 1 0 0-1 11 1 15 2.4 4.6-.5 22.9-5 29-1.5 2-7.2 5.2-10-5s-2-9.9-2-16 7.5-19 5-24\"/><path d=\"M45 12c1-1 4-2.3 4.4-3 .1-.3-.7-.8-1-1-1-.3-3.2 0-4.2 0q-5-2.7-8.3-1.2c-3.6 1.6-4.2 5.8-4.2 7.4 0 1.4 0 4.3-.3 5.8a19 19 0 0 1-4.2 8.4c-1 1-8.7 9.9-10 12.5-1.1 2.2-4.1 7.3-2.9 9.3 1.4.2 1.6-4.2 8-9.3 1.6-1.4 4.2-4 4.7-4.9.2-.4 0 1.5 0 2-.1 7.9 1 12 1 16.7.5 2.5.5 3.5 0 4.5-1.5 2.9-4 2.9-4.7 4 0 0 3 2 9.9-2M48 39.8l3 2.9c1.8 1.8 6 8.3 7 7.4.4-.3.9-2 .7-2.6-2-6.7-9-15-12.8-21.5m-6 36.2c4.7 1.8 8.5.4 8.5.4a28 28 0 0 0-4.5-2.4\"/></g></symbol><symbol id=\"a-22\" viewBox=\"0 0 72 72\"><g fill=\"#3f3f3f\"><path d=\"M25.5 30.9c-2.4-1.7-3.9-4.1-4-9-6.2-12.4-15.7-7.7-19-2.3 8 1 4 14.7 4 14.7 10-.5 7.5 10.1 7.5 10.1 10-3.1 16.8 6.2 16.8 6.2-1.7 2.3-1.9 6.6-.4 7.4s6.7 4.3 6.7 4.3l4.6-4.8s2.1-2-2.2-7c2.6-5.1 6-7.8 11.6-7.8 1.7-12.3 10.2-11.3 10.2-11.3 1-10.6 8.8-13 8.8-13a15.6 15.6 0 0 0-25.3 2.3c-.3.5-.4 6.9-3.4 9.5-5 2.7-10.3 3.3-15.9.6\"/><path d=\"M30.4 35.5c-3.2-2.5-2.7-6.3-2.7-6.3l.7-6.4 3.5 3.9 2.5.2 3.1-4.4s2.8 10.1-.6 13.2\"/></g><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\"><path d=\"M24.7 31.5c-2.3-1.7-3-4.7-3.1-9.6-6.3-12.4-15.8-7.7-19-2.3 7.8 1 4 14.7 4 14.7 10-.5 7.4 10.1 7.4 10.1 10-3.1 16.8 6.2 16.8 6.2-1.7 2.3-1.9 6.6-.4 7.4s6.7 4.3 6.7 4.3l4.6-4.8s2.1-2-2.2-7c2.6-5.1 6-7.8 11.6-7.8 1.7-12.3 10.2-11.3 10.2-11.3 1-10.6 8.8-13 8.8-13a15.6 15.6 0 0 0-25.3 2.3c-.3.5.5 7.3-2.5 10\"/><path d=\"M30.4 35.1c-3.2-2.5-2.7-6.3-2.7-6.3l.7-6.3 3.5 3.9 2.5.2 3.1-4.4s2.8 10-.6 13.2\"/></g></symbol><symbol id=\"a-23\" viewBox=\"0 0 72 72\"><path fill=\"#e27022\" d=\"m17.1 5.3-3.3 4-2.1 13 2.5 11.9-2.5 5 .5 11.4 2.2 4.5s7-3.3 8.8 3.9L36 62.8l13.2-4.2.7-2.5 3.6-2.2 3.5.5 2.6-6.1.6-6.3-1.7-6.6-.8-1.2 1.5-4.8.2-9-1-9.8-1.7-3.8-2.6-2.1-5.2 6.5-5.5 6.8h-1.3L37 16.5l-9.2.6-4.7-5-3.3-5.2z\"/><path fill=\"#fff\" d=\"M11.3 45c6-.6 12 4.6 16 10l6 2.3 2.7.8 3-.9 5.8-2s5-11.3 15.9-10.2l-2.1 8.3-1.7 1.7-3.2-.8-3 1.3-1.6 3.1s-3.5 4.5-12.8 4.5c-5.9 0-12.3-1.4-13.5-4.5a20 20 0 0 0-3.8-5l-4.5.3z\"/><path fill=\"#d0cfce\" d=\"M28.8 61s-.4 3.5 1.4 5 6.4 1.7 6.4 1.7l6-1.8s1.7-1.7.8-5l-2.7.8-6.5.2z\"/><path fill=\"#fff\" d=\"m57.7 7.4-3 2-4.5 6-1.6 7.1.2 2s5 8.3 11.3.3l-.6-8.6-1-7.3zm-43.4 0 3 2 4.5 6 1.5 7.1-.2 2s-5 8.3-11.2.3l.5-8.6 1-7.3z\"/><path d=\"M29 41.7s-3 1.6-4.5 1c-1.4-.6-2.2-2.1-1.7-3.5s2.2-2 3.7-1.3c1.4.5 2.5 3.8 2.5 3.8\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M36 57q-2.3-.4-3.6-2.1v-.7M17 10.3s7.7 5.9 5.2 13.7\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M23.6 58c-1.5-3.2-4.5-4.3-5.2-4.1l-3.5.5c-2.7-2.6-3.1-10.2-3.1-10.2-.5-4.7 1-8 2.4-10l-.4-.8c-2.5-6.2-1-15.6-.5-21.7.4-4.3 2.6-5.9 3.8-6.4q.8-.2 1.2.3c1.3 1.6 5.3 6.6 9.1 10.4a10 10 0 0 1 2.8 4.5\"/><path d=\"M43 41.7s3 1.6 4.5 1c1.4-.6 2.2-2.1 1.7-3.5s-2.2-2-3.7-1.3c-1.4.5-2.5 3.8-2.5 3.8\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M36 61.7V57q2.4-.3 3.7-2v-.7\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M43.7 50.2 45 56s0 6.6-7.4 6.1h-3c-7.4.5-7.4-6.1-7.4-6.1l1.2-5.8M55 10.3s-7.7 5.9-5.2 13.7\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M48.4 58c1.5-3.2 4.5-4.3 5.2-4.1l3.5.5c2.7-2.6 3.1-10.2 3.1-10.2.5-4.7-1-8-2.4-10l.4-.8c2.5-6.2 1-15.6.5-21.7-.4-4.3-2.6-5.9-3.8-6.4a1 1 0 0 0-1.2.3c-1.3 1.6-5.3 6.6-9.1 10.4a10 10 0 0 0-2.8 4.6m-.1 44.8q-5.8 3.1-10.8 0M29 18s6-3.2 13.8-.2\"/></symbol><symbol id=\"a-24\" viewBox=\"0 0 72 72\"><path fill=\"#a57939\" d=\"M58.9 25.4v-.2a12 12 0 0 0-7.7-5.4Q48 19.1 45 17a3 3 0 0 1-1.3-2.2q-.1-2.7 4.1-2.1a7 7 0 0 1 4.7 3.2 5 5 0 0 0 2 1.9c1.3.6 1.9-.3 2.1-1q.3-1-.5-1.6l-.8-.6-.1-.2-3-2.9q-.7-.6-1.5-1l-1.5-.4q-1.6-.6-3.3-.1l-1.2.3q-.8.3-1.5.9l-1 .7-.4.7-.2 1a4 4 0 0 0 .6 3.2l.6 1a8 8 0 0 0 3.4 2.7l2.5 1.1 3.4 1.3q1.6.6 2.9 1.8l.5.5q.9.9 1.3 2.1.4 1.6-.7 2.8-.6.5-1.3.5h-1.7l-.5-.1-3.4-1.4-2.3-.6-1.3-.3a8 8 0 0 0-5.3.6l-.2.1-.5.1q-1.5-.2-1.4-1.7v-.5q.1-.4-.2-.9l-.3-.4q-.3-.4-.9-.4h-1.5q-.5 0-.8.3-1.2.8-2.4-.2l-.6-.7-.6-.3a6 6 0 0 0-5.1.8l-.8.6a6 6 0 0 0-2 2.8l-.2.6a9 9 0 0 0-.4 3.9l.1.8.1.4 1.3 3.4.1.2 1.1 1.7q.9 1.5.3 3.1-.2.8-.8 1.4L23 45.8q-2.7 3-6.2 4.8l-1.5.7q-1.2.8-2.6 1.2l-2.2.9q-1.5.5-2.8 2-.6.7 0 1.4.5.5 1 .4l5.9-1 .1-.1 6.8-1.8 2.7-.6a9 9 0 0 0 5.5-3.6l1-1.4q1.1-1.6 2-3.4c.4-.8 1.4-1 2.1-.5l1.4 1 .3.3 1 1.4q.8 1.1.4 2.5l-1.2 3.4-.1.2-1 1.8q-.4.5-1 .6l-2.7.6q-1.2.3-2.1 1l-.4.2q-.9.8-.3 2l.1.1q.3.4.7.5l.7.2q3 .7 5.9.2h.9l3.1.6q1.8.3 3.4-.2l.8-.3q2.9-.9 3.6-3.6L49 55q.5-1.7.5-3.5V50q.2-1.9 1.8-2.9l1.4-.9q2.4-1.5 3.8-3.7l1-1.8q1.2-2 1.6-4.3v-1.2l-1-1.8q-.6-.9 0-1.7c2.5-2.4 1-5.8.8-6.4M41.4 56l1-2.1c.4-1.1 2-1 2.2.2l.1.7q.2 1.2-1 1.6l-1.6.4a.6.6 0 0 1-.7-.8\"/><path fill=\"#6a462f\" d=\"M55.5 46.3q0 .4.2.7l.5 1q1.6 2.5 4.3 3.4l2.6.8a2 2 0 0 1 1.5 1.6v.5q.4 2 .4 4v2a2 2 0 0 1-3 1.8q-1.7-1-2-2.8v-.1q-.1-1.6-1.6-2.4l-7.1-3.7q-.8-.9-1.1-2a4 4 0 0 1 1.8-4.7l2-1.2a1 1 0 0 1 1.5 1.1\"/><path fill=\"#f4aa41\" d=\"m26.4 31.3 2.6.3q1.3.1 1.9 1.3l.2.6q.3.9-.1 1.8l-.7 1.3-.2.6v.1q-.4 1.6-2.2 1.8h-1.3q-1.6 0-2.2-1.4l-.3-1v-.2l-1-1.9q-.4-1.1.2-2.1.6-.8 1.5-1l1-.1z\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M55.9 16c-6.2-10.1-14-5.7-14.6-2.5-.6 2.8.5 6.2 9.3 8.6q4 1 6.2 4.6a3 3 0 0 1-1 3.9q-1.1.6-2.4.2c-4.7-1.6-9.4-5-15-.9\"/><path d=\"M35.3 35.7C40.3 36 38 26 38 26c-.6-.8-2.4-1.8-4.7 1.2q-.3-1.2-1.2-2A5 5 0 0 0 26 25a7 7 0 0 0-3 7.6\"/><path d=\"M24 36.6s-3-3.8.9-4.6 5.3 0 5.3 0 3 .8 0 4.6c0 0 1 3.4-2.7 3.4a3 3 0 0 1-3.4-2.7zm7.2 10.2-3.4 6-10.3 2.4-7 2.2q-1.1.4-2.2-.2c-1-.6-1.9-2.8 5.8-5.2 7-2.2 11.9-7.6 12.1-12m13-2.1s7.8 7.9 5.3 11.5c-1.8 2.7-4.5 7.6-5.9 10.1Q38 61 36.2 61h-5c-2.7 0-3-4-.4-4.2h.5c1.1 0 4.1-.6 4.6-1.6l3.1-6.9s-3-4.3-6-4.9m25.6-7.3s3 6.7-9.2 12.1q0 5.6-1.3 11-.5 1.6-2.2 1.4h-3.3\"/><path d=\"M52.3 53c1 3 6 4.2 8 4v2.8q.2 2.1 2.3 2.3h.1c1 0 2-.7 2.1-1.7q.3-3.8-.7-7.4c-9.7-1.8-9.3-7.2-9.3-7.2M42 57.1q1.5 0 3-1l-1-5\"/></g></symbol><symbol id=\"a-25\" viewBox=\"0 0 72 72\"><path fill=\"#a57939\" d=\"M16.8 49.5s-5.6-13.4 14.6-12.3c0 0 4.4-20.2 32.5-27 0 0 5.6 27-23.6 38.2 0 0 0 9 9 11.2 1.2.3 3-.3 3.4 0C54.9 62 40.3 64.1 37 63v-6.7s-7.9 0-11.3-9c0 0-2.2-4.5-9 2.2\"/><path fill=\"#6a462f\" d=\"M33.6 30.3s0-20 6.7-23.4c0 0 5.6 4.5 4.5 11.2z\"/><path fill=\"#fff\" d=\"M26.2 46.3S22.1 44 17 49.5c0 0-6.5-13.1 15.6-12.7z\"/><path fill=\"#fcea2b\" d=\"m16.2 43.3 3.9 2.4-3.3 2.7z\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\"><path d=\"M43.7 14.8c0-4.5-3.4-6.8-3.4-6.8-6.7 4.5-6.7 18-7.8 24.7-.4 2.5-.7 3.6-1.3 4.1-1.1.8-3.2 0-8.8 1.1-9 2-5.6 11.6-5.6 11.6 6.7-6.7 9-2.2 9-2.2 3.3 10 10 9 10 9 1.2 4.4 0 6.7 0 6.7 3.4 3.4 27-3.4 15.3-4.1-11.7-.8-10.8-10.5-10.8-10.5a69 69 0 0 0 10.5-7s.7-2-1.5-7.6\"/><path d=\"M31.4 37.2c1-7.9 13.4-18 13.4-18s12.3-9 20.2-9c0 0 0 16.9-10 28.1 0 0 0-6.7-2.3-9M30 54.2l-.9 5.4s-3.4-1.1-4.5 0m4.5 0s2.3 0 2.3 1.1\"/></g></symbol><symbol id=\"a-26\" viewBox=\"0 0 72 72\"><path d=\"M46 52c6-2 10 2 9 9\" fill=\"none\" stroke=\"#b8925a\" stroke-width=\"5\" stroke-linecap=\"round\"/><ellipse cx=\"36\" cy=\"48\" rx=\"10\" ry=\"15\" fill=\"#d9b273\"/><ellipse cx=\"36\" cy=\"51\" rx=\"5\" ry=\"10\" fill=\"#efd9a8\"/><circle cx=\"28\" cy=\"21\" r=\"3.5\" fill=\"#b8925a\"/><circle cx=\"44\" cy=\"21\" r=\"3.5\" fill=\"#b8925a\"/><circle cx=\"36\" cy=\"26\" r=\"9\" fill=\"#d9b273\"/><ellipse cx=\"32\" cy=\"26\" rx=\"2.6\" ry=\"3\" fill=\"#3b2a1c\"/><ellipse cx=\"40\" cy=\"26\" rx=\"2.6\" ry=\"3\" fill=\"#3b2a1c\"/><circle cx=\"32.7\" cy=\"25.3\" r=\".9\" fill=\"#fff\"/><circle cx=\"40.7\" cy=\"25.3\" r=\".9\" fill=\"#fff\"/><ellipse cx=\"36\" cy=\"31\" rx=\"1.6\" ry=\"1.2\" fill=\"#3b2a1c\"/><path fill=\"none\" stroke=\"#000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M36 35a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM26 48c0-8 4-13 10-13s10 5 10 13-4 15-10 15-10-7-10-15zM46 52c6-2 10 2 9 9M30 43l-4 8M42 43l4 8M25.5 19.5a3.5 3.5 0 1 1 5 4M46.5 19.5a3.5 3.5 0 1 0-5 4\"/></symbol><symbol id=\"a-27\" viewBox=\"0 0 72 72\"><path fill=\"#3f3f3f\" d=\"M40.2 22s3.1-9 11.4-4c0 0 8.6.8 9 3.4 0 0-8 1.6-10 5.6s3.1 7-5.3 15.6c0 0-4 4.4-10.3 4.4 0 0-22 3-25 0\"/><path fill=\"#9b9b9a\" d=\"M10.1 46.9S35 24 43 25s2 13.3-5.5 17.6S10.1 47 10.1 47\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M32.6 55.6 37 54\"/><path d=\"M42.9 29.5c-.8-.2-1 .5-1 .5-.7 2.1-3 7.1-10.5 10s-.7.3-.4 1.1c.3.7 1 .6 1.2.5a18 18 0 0 0 11.4-11.3q.2-.5-.7-.8\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M31.6 40.9S40 39 43 29\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M41 22s3-9 11-4c0 0 8.3.8 8.6 3.4 0 0-7.6 1.6-9.6 5.6s3 7-5.1 15.6c0 0-3.9 4.4-9.9 4.4l-1 2 2 5 6 1\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M10.1 46.9S35 24 43 25s2 13.3-5.5 17.6S10.1 47 10.1 47\"/></symbol><symbol id=\"a-28\" viewBox=\"0 0 72 72\"><path fill=\"#a57939\" d=\"M61.5 37q-.7-1-2.7-2c-1.5-1.9-.3-2.8-2-4.9-4.3-4.8-26.4-1-26.4-1-4.6-5.7-5.2-8.3-11-17.5 0 0-.2 1.5-1.4 2.2s-3.4.8-3.7 1.1c-.7.8-1.6 2.2-3 3-.7.6.4 2.3.5 3 .2 1.7 2.6-.6 3.8.4 3.6 3.2 4 15.2 6.7 19.1q2 2.4 5 3.4c1.9 7 3.8 7.3 2.7 15.9.5.1 1.3.9 1.7.7s1.2-.1 1.5-1l.8-1.7c.2-.6.1-1.7.1-1.7l.7-6.2-.2-3.8a55 55 0 0 0 14.9-2c1.3-.7 1-.9 1.5.7 1.1 3.1 3.6 5.7 4.1 7 1.8 4.5.6 4.6.4 6.8 0 0 0 2.3 1.6 2a10 10 0 0 0 2.3-4.4c.3-1.5.4-4.2-.3-6.4-.8-1 0-6.3-.4-9.5l-.3-2.4c1.8 2.2 3.5 1.4 3.1-.8\"/><path fill=\"#6a462f\" d=\"M24.8 42.7c2 .2 3.8 1.7 3.8 4.8 0 0-4.1 2.1-4.5 2.9s1 6 1 6l-1.2 2c-.8 1.7-2.6 1.2-2.6 1.2L20.5 48c1.3-2 4.3-5.3 4.3-5.3m23.6 1.8s2.6-1.7 3.1-1 1 6 1.4 8.6-3.7 6.3-4.5 7.2q-.7.9-1.8.8c-.5 0-1.3 1-1.8.3-.4-.5-.4-2.3-.7-2.4l4.9-5z\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"m60.7 37.4-2-2.3c-.8-8.9-18.4-7.8-28.3-6-2.3.4-6.4-9.3-8.2-13.7-.3-.7-1.3-3.8-2.6-3.8-1.2 0-1 1.7-1.6 2.2-.4.5-2.7.7-3.7 1-.4.1 0 1.6-.3 1.7-1.3.4-2.7.8-2.7 1.7 0 .7.1 2.7.8 2.9 1.6.3 2.7-.5 3.5.3 3.6 3.2 4 15.1 6.7 19q2 2.4 5 3.5l2.4 5.1c1 2.7 1 5.6 1 8.4l-.5 1c-.4 1 .4 2 1.5 2q1.1 0 1.5-1l.7-1.7a3 3 0 0 0 .2-1.7l-.2-6\"/><path d=\"M33 45.2c3.6 1.8 13.7 0 18.2-1.4.5 5.8 2 5.8 4 7.8l.8 5.8-.4 1c-.5 1 .3 2 1.5 2q1 0 1.5-1l.7-1.7a3 3 0 0 0 .2-1.8l-1.3-6\"/><path d=\"M49 44.7c-1 3.3-1 3.4-1 4.3s.3 1.3.7 2.7C49 53 46 56 45 57.1l-.8.8c-.7.7-.4 2 .7 2.3q1 .4 1.8-.3l1.2-1.3M24.8 42.7c-1.4 2.2-3.5 4.5-4.3 6.3-.3.8.7 9 .7 9l.1 1.2c.1 1 1.3 1.5 2.3 1q1-.6.8-1.7l-.2-1.8\"/></g></symbol><symbol id=\"a-29\" viewBox=\"0 0 72 72\"><path fill=\"#eef3f7\" d=\"m17.1 5.3-3.3 4-2.1 13 2.5 11.9-2.5 5 .5 11.4 2.2 4.5s7-3.3 8.8 3.9L36 62.8l13.2-4.2.7-2.5 3.6-2.2 3.5.5 2.6-6.1.6-6.3-1.7-6.6-.8-1.2 1.5-4.8.2-9-1-9.8-1.7-3.8-2.6-2.1-5.2 6.5-5.5 6.8h-1.3L37 16.5l-9.2.6-4.7-5-3.3-5.2z\"/><path fill=\"#fff\" d=\"M11.3 45c6-.6 12 4.6 16 10l6 2.3 2.7.8 3-.9 5.8-2s5-11.3 15.9-10.2l-2.1 8.3-1.7 1.7-3.2-.8-3 1.3-1.6 3.1s-3.5 4.5-12.8 4.5c-5.9 0-12.3-1.4-13.5-4.5a20 20 0 0 0-3.8-5l-4.5.3z\"/><path fill=\"#c9d3dc\" d=\"M28.8 61s-.4 3.5 1.4 5 6.4 1.7 6.4 1.7l6-1.8s1.7-1.7.8-5l-2.7.8-6.5.2z\"/><path fill=\"#fff\" d=\"m57.7 7.4-3 2-4.5 6-1.6 7.1.2 2s5 8.3 11.3.3l-.6-8.6-1-7.3zm-43.4 0 3 2 4.5 6 1.5 7.1-.2 2s-5 8.3-11.2.3l.5-8.6 1-7.3z\"/><path d=\"M29 41.7s-3 1.6-4.5 1c-1.4-.6-2.2-2.1-1.7-3.5s2.2-2 3.7-1.3c1.4.5 2.5 3.8 2.5 3.8\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M36 57q-2.3-.4-3.6-2.1v-.7M17 10.3s7.7 5.9 5.2 13.7\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M23.6 58c-1.5-3.2-4.5-4.3-5.2-4.1l-3.5.5c-2.7-2.6-3.1-10.2-3.1-10.2-.5-4.7 1-8 2.4-10l-.4-.8c-2.5-6.2-1-15.6-.5-21.7.4-4.3 2.6-5.9 3.8-6.4q.8-.2 1.2.3c1.3 1.6 5.3 6.6 9.1 10.4a10 10 0 0 1 2.8 4.5\"/><path d=\"M43 41.7s3 1.6 4.5 1c1.4-.6 2.2-2.1 1.7-3.5s-2.2-2-3.7-1.3c-1.4.5-2.5 3.8-2.5 3.8\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M36 61.7V57q2.4-.3 3.7-2v-.7\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M43.7 50.2 45 56s0 6.6-7.4 6.1h-3c-7.4.5-7.4-6.1-7.4-6.1l1.2-5.8M55 10.3s-7.7 5.9-5.2 13.7\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M48.4 58c1.5-3.2 4.5-4.3 5.2-4.1l3.5.5c2.7-2.6 3.1-10.2 3.1-10.2.5-4.7-1-8-2.4-10l.4-.8c2.5-6.2 1-15.6.5-21.7-.4-4.3-2.6-5.9-3.8-6.4a1 1 0 0 0-1.2.3c-1.3 1.6-5.3 6.6-9.1 10.4a10 10 0 0 0-2.8 4.6m-.1 44.8q-5.8 3.1-10.8 0M29 18s6-3.2 13.8-.2\"/></symbol><symbol id=\"a-30\" viewBox=\"0 0 72 72\"><path fill=\"#9b9b9a\" d=\"M51.9 28.7a13 13 0 0 1-3.3-1.8l-.8-.6a18 18 0 0 0-5.4-3.5l-.6-.5c-3-3.7-11.2-5.5-16.2-5l-1.8.3c-.5 0-9.4 1.2-14.5 11.5l-1.4 3.3-.2.7-.1.4a31 31 0 0 0 2 16c1.1 3 2.6 5.1 4 5.2q1.2.1 2.3-2.3V52a1 1 0 0 0-.1-1l-.6-1-.2-.6a7 7 0 0 1 0-3.5v-.2l.5-3a14 14 0 0 0-.3-3.6l-.2-.7.3.5.5-.8a5 5 0 0 1 .4 2 14 14 0 0 0 7.2 4.7 1 1 0 0 1 .9 1l.2.9 1.6 5.9a1 1 0 0 0 1.1 1l8.1.7a1.3 1.3 0 0 0 1.4-1.3v-.4a1 1 0 0 0-1-.9l-2.6-.3a1.3 1.3 0 0 1-1-1.5l1-8.3 1.3 1.5.1.1 1.1 1.9 4.7 7.9a2 2 0 0 0 1.7.9h4a2 2 0 0 0 1.7-1l.1-.2h.1v-.8l-.1-.1-.5-.3-3.4-.4h-.2l-.1-.1-.3-.3-.1-.3v-.1l.2-5 .1-1.7v-.1l.3-.4.1-.1.4-.1h1.6l.8-.1h.6l.7-.2h.7l.4-.2h.4v-.1h.2l.2-.2.5-.2a11 11 0 0 1 3.1-.7h.6q3-.2 6-.1h3.7l.3-.1h.3l.2-.1.5-.3V40l-.2-.1-.2-.3-.4-.3-.3-.3-.5-.7-.4-.5-.5-.7-.3-.6v-.2l-.3-.5-.2-.5-.4-1-.1-.4v-.1l-.2-.6-.1-.3-.1-.3-.1-.2-.1-.2-.2-.2v-.2l-.4-.4-.3-.2c1.1.7 2.1-1.5 1-2.3-.9-.7-2.2 1.3-1.5 1.8l-.3-.1-.4-.2-.5-.2-.6-.2h-.8l-.3-.1H56l-1-.3-.5-.1-.5-.1-1.4-3.3Z\"/><path fill=\"#fff\" d=\"m50.4 41.9-.7.3h-.1l-.1.1a17 17 0 0 1-4.3.5 9 9 0 0 1 6.4-5 41 41 0 0 0 9.7-3.9 12 12 0 0 0 3.4 5.7c3.1 2.9-9.5.3-14.3 2.3\"/><path fill=\"#3f3f3f\" d=\"M63.5 38.3a44 44 0 0 1-8.4.7h-2a9 9 0 0 1 3-1.1 33 33 0 0 0 5.9-2z\"/><path fill=\"#fff\" d=\"M16.2 36a4 4 0 0 1-.5 2v.1l-.5.8-.2.2a6 6 0 0 1-4.2 1.7 6 6 0 0 1-3.5-1.2v-3l.4-3.5.2-1a6 6 0 0 1 3-.7c3 0 5.3 2 5.3 4.7\"/><path fill=\"#3f3f3f\" d=\"M15.4 42.6v.1a6 6 0 0 1-4.5 2.1 6 6 0 0 1-3-.8l-.5-1.4V41l-.1-1.5v-3a6 6 0 0 1 3.6-1.1 6 6 0 0 1 4.8 2.6l-.5.8-.1.2a12 12 0 0 1 .3 3.5Z\"/><path fill=\"#fff\" d=\"M15.5 42.7a11 11 0 0 1-.5 3v.2a6 6 0 0 0 0 3.5l-.8.4a6 6 0 0 1-2.6.7H11l-1-.2-1-1.7v-.3L7.7 44l-.3-1.4a6 6 0 0 1 4-1.5 6 6 0 0 1 4 1.5\"/><path fill=\"#3f3f3f\" d=\"M16 51.6v.4a5 5 0 0 1-3.1 2l-2.3-2.8-.6-1-1-1.6-.4-2.6a5 5 0 0 1 6.4-.1 7 7 0 0 0 0 3.5l.2.6.6 1v.3z\"/><path fill=\"#fff\" d=\"M16 51.6v.4a5 5 0 0 1-3.1 2l-2.3-2.8 1-.7a5 5 0 0 1 2.4-.7h.4l.8.2.6 1v.3z\"/><path fill=\"#3f3f3f\" d=\"m24.5 46.7-2.8 3.9c3.8.7 1.5 2.5 1.5 2.5s-6 .6-5.3-2c.6-2.6-1.5-10.5-1.7-11a14 14 0 0 0 8 4.9Zm33.3 4L55.4 52l-12-6.7.1-1.7a1 1 0 0 1 .7-.7 24 24 0 0 0 5.3-.6l3.1 5.3Z\"/><g fill=\"none\" stroke=\"#000\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M13.6 54.8zc.7.1 1.4-1 1.9-1.7m-3.2-28.3z\"/><path stroke-miterlimit=\"10\" d=\"M61.1 33.2V33M57 30h.5a5 5 0 0 1 3.6 3.1l.2.8\"/><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m57.3 30 4.6-2.8-.9 5.6v.1m-10.3 0 1.4-5 .5-1.8 1 2.3 1.1 2.7m-5.1 11.2 1.3 2.3a13 13 0 0 0 4.7 4.8l2.2 1.3-1.2.7M16 34.6c-.7 5.4 4 9.1 7.4 10.2a1 1 0 0 1 .9 1l.2.9 1.6 5.9a1 1 0 0 0 1.1 1l8.1.7a1.3 1.3 0 0 0 1.4-1.7 1 1 0 0 0-1-.9l-2.6-.3a1.3 1.3 0 0 1-1-1.5l1-8.3\"/><path stroke-linecap=\"round\" stroke-miterlimit=\"10\" d=\"m21.8 53.2 1.4-.1s2.3-1.8-1.5-2.5l2.8-4M31 39l2.2 2.6 1.2 1.5.1.1 1.1 1.9 4.7 7.9.3.5.7.4h5.4l.6-.4.4-.5.2-.3V52l-.1-.1-.5-.3-3.4-.4h-.2l-.1-.1-.3-.3-.1-.3v-.1l.3-5v-1.8l.3-.4.1-.1.4-.1h1.6l.8-.1h.6l.7-.2h.7l.4-.2h.4v-.1h.2l.2-.2.3-.1.2-.1a11 11 0 0 1 3.1-.7h.6q3-.2 6-.1h3.7l.3-.1h.3l.2-.1.5-.3V40l-.2-.1-.2-.3-1.2-1.3-.4-.5-.5-.7-.3-.6v-.2l-.3-.5-.6-1.4-.1-.5\"/><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M57.5 30h-.8l-.3-.1H56l-1-.3-.5-.1-.5-.1m-2.1-.7a13 13 0 0 1-3.3-1.8l-.8-.6a14 14 0 0 0-4.3-2.5l-1.7-1.5a21 21 0 0 0-10.2-4.5l-3.3-.2a22 22 0 0 0-16 7.2 21 21 0 0 0-3 4.3l-1.3 3-.1.3-.2.7-.1.4a21 21 0 0 0-.8 5.6l.4 3.8.1.8A21 21 0 0 0 9 48.3l.1.3.5 1 .5.7.6 1 2.3 2.8.7.6\"/></g></symbol><symbol id=\"a-31\" viewBox=\"0 0 72 72\"><ellipse cx=\"36.5\" cy=\"21.9\" fill=\"#3f3f3f\" rx=\"11\" ry=\"11.1\"/><ellipse cx=\"36.5\" cy=\"40.7\" fill=\"#d22f27\" rx=\"16.5\" ry=\"18\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M19 21.7c0 3.3 4.2 6 5.5 6.6m-10.4 10c0 .7 4 2 5.9 2.6m-1 16.8c0-2.9 3.2-4.7 4.8-5.4m25.3-23.8s4.9-3.9 4.9-6.8m-1 18.4a8 8 0 0 0 4.9-1.8m-9.3 14.6c1.3 0 4.6.7 5.4 3.8M29.7 9c.7 3.1 2 3.8 2.6 4m10 0s2.7-2.4 2-4\"/><ellipse cx=\"36.5\" cy=\"40.7\" fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" rx=\"16.5\" ry=\"18\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M36.5 23.7v34\"/><circle cx=\"26.8\" cy=\"35.3\" r=\"2\"/><circle cx=\"46.3\" cy=\"35.3\" r=\"2\"/><circle cx=\"42.4\" cy=\"41.1\" r=\"2\"/><circle cx=\"46.3\" cy=\"46.9\" r=\"2\"/><circle cx=\"30.7\" cy=\"41.1\" r=\"2\"/><circle cx=\"26.8\" cy=\"46.9\" r=\"2\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M26.5 21.7a10 10 0 0 1 20 0\"/></symbol><symbol id=\"a-32\" viewBox=\"0 0 72 72\"><path fill=\"#4a4a58\" d=\"m11.4 25.2-1.4.7-2 1.2q-1.5 1-2 2.7l-.3.9-.9 2.5q-.4 1.5.4 2.6a2 2 0 0 0 2.1.7l2.4-.7q1.7-.4 3.2.8 0 .3.4.3l1.8 1q1.4.8 1.8 2.2l.4 1.2c.2.9.7 2 0 2.6L16 45.1q-1.5 1.4-2 3l-.3 1q-.5 1.5-.3 3v.4l.5.8q2 1.5 3.9 0l.1-.2q.6-.5.5-1.3c0-.9 0-2.5 1-3.3l.3-.3c1-1 2.9-.3 2.9 1.2V53l.3 1.2q.2 1 1.3 1.3 1 0 1.7-.7l.3-.5q.3-.3.3-.8l1.2-10c0-1 1-1.6 1.9-1.5h.4l5.1.6q.6 0 1-.2l1.6-.8c1-.5 2.1 0 2.4 1l.4 2 .5.7 2.5 2.6q.6.5.5 1.4l-.5 3 .1 1.1v.1c.5.9 1.6 1.2 2.4.7l.5-.3.6-.6 1.8-3.1.2-.9v-2.2q0-.7-.5-1.2l-3.4-3.3 7.2 5 .4.2q2.1 1.6 2.5 4.2l.3 2q0 .8.9 1.2 1 .5 1.8-.1l.2-.2q.7-.5.6-1.4l-.5-5.8a4 4 0 0 0-1.5-3q-.3 0-.4-.4L55 41.8a9 9 0 0 1-1.3-5.5v-1.2l-.1-1.3c-.3-2.4-2-4.5-4.3-5.2q-3.4-1.2-7-1l-6.3-.1-3.4.1-2.8.2q-2.4.2-5-.5-2-.6-4.2-.7l-3-.1q-1.3 0-2.2-.8l-1.4-.8q-1.5-.3-2.7.3\"/><path fill=\"#7a7a8a\" d=\"M41 37.8c-2.2-.8-7.7-2.5-10.9-.9q-1.2.7-1.6 2.1l-.3 1.2q-.2 1.5 1.3 2l1 .2q1.5.3 3 0l4.2-.8q1-.1 1.9-1l1.7-1.6q.5-.7-.2-1.2m-20.8 4.4-1.9 1q-1.8 1.1-3.2 2.8l-.8 1q-1.2 1.6-1.2 3.4v.7q.2 2.4 2.3 3.3l.7.2q1 .4 1.7-.7.7-1.4.8-3 0-1.2.7-2.2l2.1-2.7q1-1.2.8-2.8 0-.5-.4-.8-.7-.6-1.6-.2m22.1 1.4c2.2 0 5.8.2 7.3 2.4l.1.5v1q0 2.3-1.2 4.2L47 54q-.7 1-1.8 1-1 .2-1.5-.6a2 2 0 0 1-.3-1.6l.5-2.3a3 3 0 0 0-.2-1.8l-.6-1.3-1-1.7-.5-.6a1 1 0 0 1 .8-1.6\"/><path fill=\"#4a4a58\" d=\"M53.2 35.1c0 .3 2.4 8.8 6 11.2s5.4 2.8 7.4 2.4c1.3-.3 1.5-1.5 1.5-2.1q0-.3-.3-.3-1.7 0-3.1-.8l-2-1a8 8 0 0 1-3.5-3.7l-.4-1.3-.5-2-.4-1.3a9 9 0 0 0-2.6-4.3l-1-1c-.2-.2-1.9 0-2-.2v.3c-.9.3-1.2 1.3-.6 2z\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.9\"><path d=\"M15.9 26.4h5.9a5 5 0 0 1 2 .4l.9.4q2 .9 4.1.7c5.2-.7 17.7-1 22.5 1.2 6.5 3 6 7 6.9 9 .8 2.2 2.7 8.5 9 8.1m-47.7-9.8q.5 3 3.4 7v10.4c0 1 .9 2 1.9 2h.2q1.6-.2 1.9-2a73 73 0 0 1 2.3-15.7s-.6-2.4-1.2-4m-14.1 2.2c.4.6 1.6 1.3 2.3 1.7q.6.4.9 1l1.1 4.4S11.3 47 14 53.7q.5 1.1 2 1.5c1 .1 2.9-.7 2.2-2.5\"/><path d=\"M28.7 41.6s7.1 2.8 13.2-2.8A45 45 0 0 0 55 49l.6 5.4c0 .9 1.1 1.4 2 1.4q1.7-.1 1.7-1.8l-.6-7.5q0-.9-.9-1.1c-1.2-.5-3.2-4-4.5-6.8l-.4-3.1\"/><path d=\"M38.7 41s1.2 4 5.9 8l-.9 3.9c-.2 1 .6 2.1 1.8 2.1q1.1 0 1.6-1c.5-1.3 1.2-3.3 1.9-4.3M15.4 27.9c1.7-2.6-1.5-4.4-3.5-2.8-1.4 1.2-2.2 1.2-2.2 1.2C6 27.3 6.3 30 6.3 30l-1.6 4.3q0 .5.3.9l1.6 1.2q.8.6 1.7.2c1.5-.6 5-2.5 5-5.3M23 45s-2.8 1.4-4.1 3.4m29.7-11.5a1.4 1.4 0 1 1 .9-2.5m-16.9-.7a1.4 1.4 0 1 1 .9-2.6m7 3.2a1.4 1.4 0 1 1 2.2-1.5m-23.8.7a1.4 1.4 0 1 1 2.2-1.4m13.7 4.7a1.4 1.4 0 1 1 1.3 2.3m-13-3.1a1.4 1.4 0 1 1 1.4 2.3\"/></g></symbol><symbol id=\"a-33\" viewBox=\"0 0 72 72\"><path fill=\"#a57939\" d=\"M19 25.5c-.8.3-8.6 9.3-9.3 15s-.4 8.2-.4 8.2 2.9 8.7 11.2 13c0 0 13 13.2 30 .3 0 0 8.4-2.8 12-14.6l-.2-9.6-2.5-6.2s-4.5-4.3-4.6-4.8l-5.4-4-2-.5-23.9.4z\"/><path fill=\"#f4aa41\" d=\"m60 21.2.3-5.7-1-4-5.7-.7-5.3 2.5-3 2.7-3.3-5.4-6-2.8-10 2-1.2.3s-2.3 1.7-2.2 2.5c0 0-6.8-3-9.6-.4 0 0-3.8 6.9.3 11.4l4 3.5s-9.5 8.6 1.3 19.5c0 0-2.6 5.6 1.1 11.9l3.2 6.7c6 5.3 19.4 5 25.4-.3l2.4-4.8c.9-1 4.6-6 3.6-11.8 0 0 8.5-8 1.7-20.7L54.3 26l3-1.6z\"/><path fill=\"#a57939\" d=\"M22.3 12.4s1-2 4-3S32 7.7 32 7.7l7 1c.5 0 6 6.3 6 6.3l.4 2.5s-1.8 1.8-6.6-.6-5.8-2.4-6-2.3c-.1.2-5.6 2.4-5.6 2.4l-2-1.7z\"/><path fill=\"#fff\" d=\"m47.7 42.3 1.5-8.6H49s-2.7 4.8-5.6 5.6l-.5 1.6v1.5q-1 0-1.6.2c-1.2.8-2.4.5-2.4.5l-1.8 1.7-.6 1-1.7-.7s-.6-2-.8-2l-2.1-.8-1.2.5s-1-.3-2-.1l.1-1.8-.5-1.6c-3-.8-5.6-5.6-5.6-5.6h-.2l1.5 8.6 2.5 2.6a8 8 0 0 0 .2 4.6l2.3 2.8 5.2-.7 2-1.6 1.8 1 3.9 1.5 2.5-1.4 1.8-4.6-.6-2c.8-.8 2-2 2-2.2\"/><path fill=\"#f4aa41\" d=\"M27 18s.5 3-2.2 5.8l-4.6 1c-.2.2-2.3 1.4-2.7 1.5-.3.2-1.7-.3-2-.5S12 20.3 12 20.3l.2-3.6 1-4.4 4.7-.6 4 1 3.9 3zm18-.7s-.4 2.8 2.3 5.7l4.6 1 2.6 1.5c.3.2 1.7-.3 2-.5s3.5-5.5 3.5-5.5l-.1-3.7-1-4.3-4.7-.6-4 1-3.9 3z\"/><path fill=\"#fff\" d=\"m27.7 51.3 2 4.5 2.6 1.6 5.7.4 4.4-1.5 2.4-5.3-2.9 1.5-4.4-1.5-1.5-1.3-3 1.6s0 1.4-1.8 1z\"/><circle cx=\"28.8\" cy=\"31.6\" r=\"2\" transform=\"rotate(-59 28.8 31.6)\"/><circle cx=\"43.5\" cy=\"31.6\" r=\"2\" transform=\"rotate(-31 43.5 31.6)\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M40.4 43s-1.9-1.3-3 2.1L36 46.2l-1.4-1c-1-3.5-3-2.1-3-2.1\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"m43 40 2 3.5q.4.5.5 1l.3 2.1q0 .9-.2 1.6l-1.2 2.4q-.6 1.4-2.3 1.7-1 .2-1.9-.1l-1.3-.6q-.5-.1-.9-.5L36.7 50h-1.3L34 51l-.8.5-1.3.6q-1 .4-2 .1-1.6-.3-2.3-1.7l-1.1-2.4q-.3-.7-.2-1.6l.3-2q0-.6.4-1.1l2-3.4m7 6.2V49m-5.5 6.5.8.8q1.3 1.4 3.2 1.4l3 .2q1.8 0 3.2-1.1l.8-.7M17.7 26.8c-10-4-4.8-14.2-4.8-14.2 7.6-4.5 13.9 4.8 13.9 4.8S31.7 12.8 39 16\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M24 23.1s-17.3 6.1-13.7 25m9.2-2.9c-2.6 3.7-3.6 10 4.4 19.4m.1-36.9s-5.6 8.4 2.2 17.8M25.4 11S38 1.3 45.2 16.2m0 .3s6.3-9.3 13.9-4.8c0 0 5.2 10.2-4.8 14.2\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M48 22.2s17.3 6.1 13.7 25m-8.1-1c1.6 3.9 1.3 9.6-5.5 17.5M48 26.8s5.6 8.4-2.2 17.8\"/></symbol><symbol id=\"a-34\" viewBox=\"0 0 72 72\"><path fill=\"#92d3f5\" d=\"m35.9 22.8-4.3-2.5c-1.9-1-4.5-2.3-7.3-3a43 43 0 0 0-9-1c-3.3 0-6.8-.2-8.8.8s-2.7 2.9-.7 6.7 6.8 9.5 11.2 11 8.2-.9 11-2.4c2.8-1.6 4.5-2.2 6.3-2.8\"/><path fill=\"#92d3f5\" stroke=\"#92d3f5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M32.1 44c-.8 3.8-1.5 7.6-3.7 9.5-2.1 2-5.6 2.1-7.9-1-2.2-3-3-9.2-2.4-12.6s2.8-4.3 5.6-5.5l9.3-4.6z\"/><path fill=\"#92d3f5\" d=\"m36.1 22.8 4.3-2.5c1.9-1 4.5-2.3 7.3-3a43 43 0 0 1 9-1c3.3 0 6.8-.2 8.8.8s2.7 2.9.7 6.7-6.8 9.5-11.2 11c-4.3 1.7-8.2-.9-11-2.4a31 31 0 0 0-6.3-2.8\"/><path fill=\"#92d3f5\" stroke=\"#92d3f5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M39.9 44c.8 3.8 1.5 7.6 3.7 9.5 2.1 2 5.6 2.1 7.9-1 2.2-3 3-9.2 2.4-12.6s-2.8-4.3-5.6-5.5L39 29.8z\"/><ellipse cx=\"35.8\" cy=\"17.9\" fill=\"#9b9b9a\" rx=\"3.6\" ry=\"2.7\"/><ellipse cx=\"35.8\" cy=\"23.6\" fill=\"#3f3f3f\" rx=\"3.4\" ry=\"2.7\"/><path fill=\"#9b9b9a\" d=\"M35.4 26.8c-6.3.7.6 20.5.6 20.5s7.9-21.4-.6-20.5\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\"><path d=\"M32.1 44c-.8 3.8-1.5 7.6-3.7 9.5-2.1 2-5.6 2.1-7.9-1-2.2-3-3-9.2-2.4-12.6s2.8-4.3 5-5\"/><path d=\"M32.4 20.6q-4-2.1-8.1-3.3a43 43 0 0 0-9-1c-3.3 0-6.8-.2-8.8.8s-2.7 2.9-.7 6.7 6.8 9.5 11.2 11 8.2-.9 12-3.4m10.6-10.8q4-2.1 8.1-3.3a43 43 0 0 1 9-1c3.3 0 6.8-.2 8.8.8s2.7 2.9.7 6.7-6.8 9.5-11.2 11c-4.3 1.7-8.2-.9-12-3.4\"/><path d=\"M39.9 44c.8 3.8 1.5 7.6 3.7 9.5 2.1 2 5.6 2.1 7.9-1 2.2-3 3-9.2 2.4-12.6s-2.8-4.3-5-5\"/><ellipse cx=\"36\" cy=\"17.9\" rx=\"3.6\" ry=\"2.7\"/><ellipse cx=\"36\" cy=\"23.6\" rx=\"3.4\" ry=\"2.7\"/><path d=\"M35.4 26.8c-6.3.7.6 20.5.6 20.5s7.9-21.4-.6-20.5m2.6-12 1.5-3.2M34 14.8l-1.5-3.2\"/></g></symbol><symbol id=\"a-35\" viewBox=\"0 0 72 72\"><path fill=\"#6a462f\" d=\"M35.9 64.7c-3.5 0-6.3-2.3-7-4.9L27.7 52a18 18 0 0 0-1-4c-2.7-6.5-2.1-7.4-1-10.3.8-2.5 2.2-4.5 4.2-4.5l5.3.9c3.7 1 7 4 7 6.8l.8 19.2c0 2.8-3.6 4.6-7.1 4.6\"/><path fill=\"#6a462f\" d=\"M36.2 64.7c-3.5 0-7.1-1.8-7.1-4.6l.8-19.2c0-2.7 3.2-5.9 6.5-6.6l5.6-1c2 0 3.2 1.7 4.1 4.2 1 2.9 2 4-.7 10.5a18 18 0 0 0-1 4L43 59.8c-.6 2.6-3.5 5-7 5\"/><path fill=\"#6a462f\" d=\"m52.5 15.2-4.4 6.9-3.3 1.8s-3 10.6-2.9 10.9l3.2 7c1.6-1.5 4.8-4.5 7.7-7l6.5-6.7 1.7-5.4zm-33.3.5c1.8 2.6 4.8 8 6 8 0 0 2.8 1.7 3.2 2.7.2.5 1.5 8.2 1.4 8.5L25 39.6c-1.6-1.5-6.7-5.1-9.6-7.6l-4.7-9.2z\"/><path fill=\"#a57939\" d=\"M36 44.3c-2.6 0-2.8 3.2-2.8 2.4l-1.6-6.2c-.5-2.2 1-4.4 3.3-4.6l1.3-.1h1.4c2.2.3 3.7 2.5 3.2 4.7l-1.6 6.2c0 .8-.6-2.4-3.2-2.4\"/><path fill=\"#a57939\" d=\"m40.3 45.6.5 15c0 2.2-2.4 3.7-4.6 3.7-2.3 0-4.6-1.7-4.6-3.9l.5-14.8a4 4 0 0 1 4-4 4 4 0 0 1 4.2 4\"/><circle cx=\"29.7\" cy=\"42.5\" r=\"1.1\"/><circle cx=\"42.5\" cy=\"42.8\" r=\"1.1\"/><path fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M39.4 42.2s-.2 5.5 1.7 11.3q.5 1.5.6 2.9t-.4 2-.6 1.1q-.1 1.1-.6 2.3l-.5.5q-.6.4-1.7-.3M33 42.2s.2 5.5-1.7 11.3q-.5 1.5-.5 2.9-.1 1.3.4 2 .5.5.5 1.1.2 1.1.7 2.3.1.3.5.5.5.4 1.6-.3m25.9-40.3L54 16c-.6-.5-1.4-1.3-2-.3m8.4 6zc1.8 1.5-1.8 9-7.3 13-1.1.7-5 2.1-6.7 6m5.4-25-4.3 7c-.4.7-1.8 1-2.1 1q-.4 0-.6.2c-.6.8-2.3 3.3-2.8 8.9m-30.7-11 6.6-5.7c.5-.5 1.4-1.2 2-.3m-8.6 6zc-1.7 1.5 1.8 9.1 7.3 13 1.2.8 5 2.2 6.7 6m-5.3-25 4.3 7.1c.4.6 1.8 1 2 .9q.4 0 .7.3c.5.7 2.3 3.1 2.8 8.7\"/></symbol><symbol id=\"a-36\" viewBox=\"0 0 72 72\"><path fill=\"#9b9b9a\" stroke=\"#9b9b9a\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"1.8\" d=\"m30 29-3 2c-9.5 4.4-2 30-2 30s8.8-9.2 15.9-10.1S51.8 36.8 50 32l-2-4\"/><path fill=\"#9b9b9a\" d=\"M30 30s-6.5-5.5-.2-14.7c0 0-.8-3.3-2.8-3.3s5-3 6 1c0 0 7-3 11 0 0 0 5.3-3.5 7.1-1.7 0 0-4.1 2.7-2.1 4.7s4 10-1 14\"/><path fill=\"#a57939\" d=\"M40 30s-10 0-10-7.9c0-8.7 8.2-4.7 9-3.1 0 0 7-6 9.1 1.5 2 7.3-8.1 9.5-8.1 9.5M25 59s-.9-7 2-9 13-10 10-15\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\"><path stroke-width=\"1.5\" d=\"M37 22s.5-1.5-3-2m7 2s-.5-1.5 3-2m-6.4 5.4 1.8 1.6 2-1.7\"/><path stroke-width=\"2\" d=\"M38 60s1-4-5-3v-2.4m10 2.8s1-4-5-3V52m-8-22s-6.5-5.5-.2-14.7c0 0-.8-3.3-2.8-3.3s5-3 6 1c0 0 7-3 11 0 0 0 5.3-3.5 7.1-1.7 0 0-4.1 2.7-2.1 4.7s4 10-1 14\"/><path stroke-width=\"2\" d=\"M40 30s-10 0-10-7.9c0-8.7 8.2-4.7 9-3.1 0 0 7-6 9.1 1.5 2 7.3-8.1 9.5-8.1 9.5m-13 1c-9.5 4.4-2 30-2 30s8.8-9.2 15.9-10.1S51.8 36.8 50 32\"/><path stroke-width=\"2\" d=\"M25 59s-.7-7 1.6-9S37 41 36 35\"/></g></symbol><symbol id=\"a-37\" viewBox=\"0 0 72 72\"><path fill=\"#e27022\" d=\"m48.5 45.7.2.2q1.2 1.2 2.9 1.5l1.7.4a2 2 0 0 1 1.5 2.7l-.3 1a3 3 0 0 0-.1 1.7l.3 1.1q.3 1.1 1.5.9 1-.3 1.4-1.2l1.5-2.9q.7-1.2 1.1-2.5l.3-.9q.8-2.8-1.2-5.1-2.5-3.1-3.8-6.8a.7.7 0 0 0-1.1-.2l-6 7.3a2 2 0 0 0 .1 2.8m-18.2-2.1-1.2 3-1.4 6.7q-.1.8-.7 1.5-1.1 1.1-2.5.6T23 53.2l-.2-3.6s.5-4.5 1-6.6c.3-1.2 2.2-1.8 3.6-2.1q1.6-.2 2.5 1.1z\"/><path fill=\"#f4aa41\" d=\"m67.1 16.5-1.8-.6a5 5 0 0 0-2.8.3l-1 .4c-1.1.4-1.7 2-1.9 3.2v2.9q-.5 3.1-2.8 5.3l-.2.1Q55.1 29.6 53 30l-2.3.3q-2.1.3-4.1-.5l-1-.4Q42.8 28 40 27.9l-10-.8q-2.7 0-5.1.3l-.7.2q-3.2.5-6.3-.7L16 26q-1.5-.6-3-1.6l-2.5-.8c-.3-.2-2.2-.1-2.2-.1q-1.5.2-.9 1.5l.5 1q.3.7 0 1.4l-2 2.8q-1 1.6-.5 3.4a3 3 0 0 0 2.9 2.5l3.4.2q1.2.2 2.4-.2c1-.3 2 .2 2 1.2q.3 1.9 1.1 3.8.4 1.1-.6 1.8-3 1.6-4 4-.3.6-.5 1.8c-.3 1.7-1 3 .4 4l1 .5a3 3 0 0 0 1.8.3c1-.3 2.4-1.2 1.8-3.7q-.1-.8.4-1.4l1.1-1q1.2-1 2.5-1.8l3.4-1.4 13.5.7q.6 0 1 .5l2 2.2q.3.5.3 1.2l-.9 4.8c-.2 1 .6 1.8 1.6 1.7q.6 0 1-.6l4.2-5.6q.3-.3.3-.8v-2.5q0-.5.3-1c1.2-1.3 4.8-5.6 5.7-8.4s5.8-3 8-7.5c3.7-5-.6-10 4.5-8.4 1.3.5 2.9-2.1 1.3-3.8z\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M12.5 35.7c-2.4 1-5 .9-5 .9-1.6.1-3-4-2.4-4.8l3.3-5-1.8-3.5s5-1.4 8 2.1l1.3 1a13 13 0 0 0 8.4 1c7.2-1.4 14-1.3 21.7 2.3s14.5-2.3 13.6-7.5c-.8-4.7 3.6-7.6 6.8-5M16 48.8c.7-2.2 8.5-3.6 8.5-3.6s3.3-1.2 1.5-4.5\"/><path d=\"M18.3 33.2c-1.5 1.9-3.9 4.8-.4 9.2 0 0-6.8 2.9-6 8 0 0 .3 2.5 2.4 2.4m9.2-2.8c-1.2 7.3 2.4 6 3 5.7 1.2-.7 1.9-9.9 4-11.3 1.6-1.1 8.1-.3 8.1-.3m-.2-2.8q.2 2.7 1.8 4.9c.6 1 1.8 2.3 1.4 3-4.5 8.5.6 7 1.1 6.1 3.2-5.9 6.1-4 4.7-10.5 0 0 5.2-1.8 5.5-8\"/><path d=\"M48.2 45.6s2.3 3.2 7.7 2.7c0 0-3.3 6.7 0 7.6 2 .5 4.7-11.2 4.7-11.2s-1.8-.8-4-4.1\"/></g></symbol><symbol id=\"a-38\" viewBox=\"0 0 72 72\"><path fill=\"#fff\" d=\"M22 40c-4-10 4-20 16-18 8 1 14 6 16 14 1 5-2 12-9 14H28c-4 0-6-6-6-10z\"/><path fill=\"#3f3f3f\" d=\"M44 45c6-1 12-6 16-12-1 8-6 14-14 17z\"/><circle cx=\"52\" cy=\"22\" r=\"6\" fill=\"#fff\"/><path fill=\"#e35d4f\" d=\"M57 22l12 3-12 3z\"/><path fill=\"none\" stroke=\"#e35d4f\" stroke-width=\"2.5\" stroke-linecap=\"round\" d=\"M32 50v14M38 50v14\"/><circle cx=\"53\" cy=\"20\" r=\"1.4\"/><path fill=\"none\" stroke=\"#000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M22 40c-4-10 4-20 16-18 8 1 14 6 16 14 1 5-2 12-9 14H28c-4 0-6-6-6-10zM44 45c6-1 12-6 16-12-1 8-6 14-14 17M46 22a6 6 0 1 0 12 0 6 6 0 0 0-12 0zM57 22l12 3-12 3M48 27c-2 3-3 6-3 9\"/></symbol><symbol id=\"a-39\" viewBox=\"0 0 72 72\"><path fill=\"#d0cfce\" d=\"M27.1 20.1q0 1.8 1.2 3.2.9 1.1 2.4 2.2a18 18 0 0 0 5.5 1.7q4.5 1 8.8-.2l1.2-.2q5-1.3 9.7.8 1.3.6 1.8 1.2C59.1 30.4 65 35 59 42.6a6 6 0 0 0-1.2 3.9l.1 4v.3l-.4 10q0 .8-.6 1.4t-.9.6l-1.6-.6a2 2 0 0 1-1.1-2l.2-3.4-.1-2-.1-.9q-.2-1.4-.8-2.6l-1.3-2.5q-.7-1.5-2.1-2.6a2 2 0 0 0-2-.3l-3.3 1-7.9.4h-.1c-.3 0-1.4 0-2.4-.3a2 2 0 0 0-2.3 1.7L29 59.5a2 2 0 0 1-2.8 1.5l-.2-.2a2 2 0 0 1-1.3-2l.6-9.4q0-1.3-.3-2.5a2 2 0 0 0-1.6-1.5q-3.2-.7-4.7-4.3L17 37.7a34 34 0 0 1-2.6-7.6 2 2 0 0 0-1.4-1.6l-3.5-1Q8 27 7.4 25.7L7 25q-.5-1.6.7-2.6l2.8-1.7.4-.4.6-.6 1.8-1.8 2.1-1.8.3-.3c.5-.7 3.2-3.8 6-2.1L25 16q1.9 1.6 2 4.1\"/><path fill=\"#a57939\" d=\"M16.7 19q.9.3 2.4.2l.4-.1 1.2-.7q.5-.3 1 0 .6.4.7 1v.8q0 .4-.3.7l-.6.8q-.4.6-1.2.4l-1.5-.4h-1l-1.7-.1-.2.7v1l.4.7.6.9a4 4 0 0 0 3 1.4l1.8-.2 1.3-.3q1.4-.3 2.3-1.4l.8-.9q.9-1 1.2-2.4v-.5l.1-1.9-.1-1a4 4 0 0 0-1-2l-.2-.2a6 6 0 0 0-2.6-1.6l-.9-.3q-1-.4-2-.3h-.5q-1.6.3-2.8 1.5L16 16c-1 1-.6 2.6.7 3\"/><path fill=\"#fff\" d=\"M23.2 27c-.5 1.2-2 3.8-6.3 5q-1.1.4-.9 1.6l2 5.2c.2.7 1.3 4.2 2.2 4.3.5.1 2 1.4 3.2 2q1.5.4 2.9 0a8 8 0 0 1 4.3-.7q1.4 0 1.4-1.4 0-1.6 1.3-2c2.6-.8 8-1.9 12.6.7q2.2 1.1 4.5 1c1.7-.2 3.9 0 5.6 1.8.8.7 2.2.3 2.2-.8q0-.5.3-.8l1.8-2q1.3-1.6 1.3-3.8 0-2.4-1.1-4.7l-.5-1a7 7 0 0 0-1.7-2.1l-.6-.6q-1.6-1.2-3-2a5 5 0 0 0-2-.6h-3l-2.2.2q-2 .5-4 .7h-.7q-2.4.3-4.7 0h-.3a11 11 0 0 1-3.8-1l-2.6-1.3-1.6-1-1.1-.7q-1-.5-1.8.3c-.7 1.1-2 2.6-3 3q-.4.1-.7.7\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"m30.6 25.2.5.3s8.4 3.5 17 .7c0 0 8-2.5 12.2 5.5 2.7 5.2.7 8.5-1 10.3q-1.8 1.6-1.5 4l.4 3.6-.4 11c0 1-.9 2-2 2h-.5a2 2 0 0 1-2-2.3l.2-5.4q0-2.6-1.3-4.8l-3.5-5.4s-2.8-5.2-.5-8.8\"/><path d=\"M36 46.1c3.6.5 9.3 1 11.7-.4M63 29s3.2.1 3.4 4.8M19.6 18.2s2.7-1.4 3 1.4c.2 1.4-.7 2-1.3 2.6-1 .8-3.4 0-4.8-.6q-.9-.1-.9.8a5 5 0 0 0 4.2 4.1c6.5 1 11-7.8 4.9-12-6.7-4.4-9.8 2.8-9.8 2.8l-2.7 1.4-1.1 1.5S5 22 7 25.2l1.8 2.2 4.1.4q1.9.3 2 2.2l1.1 4.5 3.7 7.8q.8 1.7 2.5 2.3l2.8 1 .7 2.2-1.1 11a2 2 0 0 0 2 2.3h.7a2 2 0 0 0 2-1.7L32 45v-1.1l-.5-5.5\"/></g></symbol><symbol id=\"a-40\" viewBox=\"0 0 72 72\"><path fill=\"#a57939\" d=\"M31.7 26.7a2 2 0 0 1-1.5-.8L29 24.6a5 5 0 0 0 .2-4 2 2 0 0 0-2-1.3 2 2 0 0 0-2 1l-1.3 2.2-3-.2a8 8 0 0 0-7 4.4q-.7 1.3-1 1.3a2 2 0 0 0-1 2.1 7 7 0 0 0 6.7 6.4c.3.1 1.8.7 1.8 3.1 0 4.5 2.4 13 11 13.3l.8.8a9 9 0 0 0 5.6 2.3h3.3v-.1h.3c8.4-2.4 8.5-14.2 8.5-14.7C50 29 36 27 31.7 26.7\"/><path fill=\"#6a462f\" d=\"M61.8 23.5a5 5 0 0 0-4-1.8c-8.1 0-11 13.4-11 14v.6a11 11 0 0 1 1.1 5S48 52 41 54h-.1l-.2.2-.4.5v.6l.2.3.3.3.4.1c20.4 0 22.7-17 22.7-17 0-.5 1.6-11.2-2-15.5M35.2 56H24.9a1 1 0 0 1-1-.9 5 5 0 0 1 1-3.5 4 4 0 0 1 3.2-1.3l.5.1a8 8 0 0 0 3.3.6 1 1 0 0 1 1 .7c.4 1.2 2 2.1 2.7 2.4a1 1 0 0 1-.4 1.9\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M21.8 42.8c.8 4 3.4 9.2 10.2 9.2\"/><path d=\"M41.1 55C49 52.8 49 41.3 49 41.3 49 30 36.1 28 31.6 27.8a3 3 0 0 1-2.2-1.3c-1-1.2-3.3-3.1-8.5-3.1a7 7 0 0 0-6 3.9c-1.3 2.5-2.3 1.1-2 2.8a6 6 0 0 0 5.9 5.5s2.6.6 2.6 4.1v.4H20a1.6 1.6 0 0 0-1.6 1.6m-5.6-12.4v6.2\"/><path d=\"M38.7 40.6s-7.6.7-7.6 7.6 6.7 6.8 6.7 6.8h-9.7m-3.6-31.4L26 21a1.3 1.3 0 0 1 2.3.1 4 4 0 0 1-.5 3.7M49 31.7c1.4-3.8 4.2-9 8.8-9 7.4 0 5 16 5 16S60.8 55 41.1 55m-16.2 0s-.6-3.7 3.2-3.7\"/></g></symbol><symbol id=\"a-41\" viewBox=\"0 0 72 72\"><g fill=\"#a9dcf0\" opacity=\".92\" stroke=\"#000\" stroke-width=\"2\" stroke-linejoin=\"round\"><ellipse cx=\"22\" cy=\"28\" rx=\"14\" ry=\"6\" transform=\"rotate(-20 22 28)\"/><ellipse cx=\"50\" cy=\"28\" rx=\"14\" ry=\"6\" transform=\"rotate(20 50 28)\"/><ellipse cx=\"24\" cy=\"40\" rx=\"12\" ry=\"5\" transform=\"rotate(15 24 40)\"/><ellipse cx=\"48\" cy=\"40\" rx=\"12\" ry=\"5\" transform=\"rotate(-15 48 40)\"/></g><path fill=\"#3aa89b\" stroke=\"#000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M36 22c3 0 4 3 4 6l-2 32c0 2-4 2-4 0l-2-32c0-3 1-6 4-6z\"/><circle cx=\"32\" cy=\"19\" r=\"4\" fill=\"#2f6f8f\" stroke=\"#000\" stroke-width=\"2\"/><circle cx=\"40\" cy=\"19\" r=\"4\" fill=\"#2f6f8f\" stroke=\"#000\" stroke-width=\"2\"/></symbol><symbol id=\"a-42\" viewBox=\"0 0 72 72\"><path fill=\"#b1cc33\" stroke=\"#b1cc33\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"m20.7 54.3-7.6.7c-1.6 0-3.1 0-2.8-.7.2-.8 2.4-2.3 3.2-4s.5-3.9 1.1-5.4 2.1-2.6 3.6-3.6l4.3-3.5M49 46.2l1 4q.2 1.1 0 2.3c-.4.8-1 1.7-.8 2.1s1.5.4 2.7.4l5.4-.5-2.6-11.6\"/><path fill=\"#5c9e31\" stroke=\"#5c9e31\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"m54.4 39.6-24.8-2.8-2.8 7.2 4.7 1.8c3.7 1 7.4 2.1 10.5 2.4q4.6.3 8.4-.7c2.2-.6 5.4-4.7 5.4-4.7z\"/><path fill=\"#b1cc33\" stroke=\"#b1cc33\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"m32.3 35.1-3 8.5c-1 3.2-2 6.5-2.3 8.5s0 2.8-2.3 3.2-7.4.5-8.4-.3c-1.1-.7 1.8-2.2 3-4.3 1-2 .5-4.8 1-6.4s2.4-2.3 2.5-3.2-1.2-2.2-3-3-3.8-1.3-5-3.2-1.1-5.1-2.6-7-4.4-2.6-5.6-4.4-.9-4.7 1.2-6 6-1 7.7.2 1.2 3.2 1.2 5.2q.3 2.8 1.3 5.6c.5 2 2.1 2 3.2 2l5.6-.4m30.5 7.4L52.5 40s-.3 5.6.5 7.1q.9 1.8 1.2 3.9c.1 1.4-.2 3 .8 3.7 1 .9 3.4.9 4.8.6s1.9-.7 1.5-2.4-1.6-4.5-2.8-7.4l3-1.2 4.8-1-3.3-1.8z\"/><path fill=\"#5c9e31\" d=\"M58.7 42.5c2.7-2.4 2.6-8.3 1-12.7s-4.8-7.5-9.5-9.2a29 29 0 0 0-15.9-.9c-5 1.3-8.8 4.2-10.7 6-2 1.8-2 2.5-1.5 4.8s1.5 5.8 5.6 8.2S38.3 42 44.4 43s11.6 2 14.3-.4\"/><g fill=\"none\" stroke=\"#000\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-miterlimit=\"10\" stroke-width=\"2\"><path d=\"M18 28.5q-1-2.7-1.3-5.6c0-2 .5-4-1.2-5.2s-5.6-1.5-7.7-.2c-2 1.3-2.4 4.2-1.2 6s4.1 2.4 5.6 4.3c1.5 2 1.6 5.2 2.7 7.1s3.2 2.3 5 3.2 3.1 2 3 3-2 1.5-2.6 3.2c-.5 1.6 0 4.3-1 6.4-1.2 2-4.1 3.6-3 4.3 1 .8 6.1.7 8.4.3s2-1.1 2.3-3.2 1.3-5.2 2.3-8.5\"/><path d=\"M18.2 41.3c-1.5 1-3 2-3.6 3.6-.6 1.5-.2 3.6-1 5.3s-3 3.3-3.3 4 1.2.8 2.8.8M53 47.2q.9 1.8 1.2 3.9c.1 1.4-.2 3 .8 3.7 1 .9 3.4.9 4.8.6s1.9-.7 1.5-2.4-1.6-4.5-2.8-7.4M51.9 55c-1.2 0-2.5 0-2.7-.4s.4-1.3.7-2.1q.4-1.1.1-2.3m-18.5-4.4c3.7 1 7.4 2.1 10.5 2.4q4.6.2 8.4-.7m8.3-5c2.7-2.4 2.6-8.3 1-12.7s-4.8-7.5-9.5-9.2a29 29 0 0 0-15.9-.9c-5 1.3-8.8 4.2-10.7 6-2 1.8-2 2.5-1.5 4.8s1.5 5.8 5.6 8.2S38.3 42 44.4 43s11.6 2 14.3-.4m4.3-1 3.3 1.8-4.8 1\"/><path d=\"m42.1 42.2 1.7-11.8 8.8-1 4.4-3.6m-13.4 4.3-9.7-6m0-.1-1.3-3.3m1.2 3.6-6.9 13m26-7.3 4.4 13.1\"/></g></symbol></svg>";
+if (typeof module !== 'undefined') module.exports = { ANIMAL_SPRITE };
+else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
+
+</script>
+<script>
+// Icônes d'interface (traits, 24x24, couleur courante). Usage : Icons.svg('menu', 'cls').
+(function (root) {
+  'use strict';
+  const P = {
+    menu: '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>',
+    sound: '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>',
+    mute: '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>',
+    hourglass: '<path d="M6 2h12v4l-4 6 4 6v4H6v-4l4-6-4-6z"/>',
+    flag: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',
+    check: '<polyline points="20 6 9 17 4 12"/>',
+    undo: '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>',
+    refresh: '<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>',
+    share: '<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>',
+    copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+    home: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+    chart: '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+    book: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+    trophy: '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/>',
+    film: '<rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/>',
+    skip: '<polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/>',
+    x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+    back: '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+    phone: '<rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
+    globe: '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+    dice: '<rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/>',
+    hand: '<path d="M8 13V5a2 2 0 0 1 4 0v6"/><path d="M12 11V7a2 2 0 0 1 4 0v4"/><path d="M16 11V9a2 2 0 0 1 4 0v6a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3.3L3.6 14a2 2 0 0 1 3.3-2.3L8 13"/>',
+    sparkles: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z"/>',
+    users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    play: '<polygon points="5 3 19 12 5 21 5 3"/>',
+    plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+    minus: '<line x1="5" y1="12" x2="19" y2="12"/>',
+    cube: '<path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/>',
+    info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+    star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+    send: '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+    login: '<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>',
+    layers: '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+    scroll: '<path d="M4 4h12a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2z"/><path d="M18 8h2v10a2 2 0 0 1-2 2M8 9h6M8 13h6"/>',
+    bag: '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+    grid: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
+  };
+  function svg(name, cls, size) {
+    const body = P[name] || P.info;
+    return '<svg class="ic' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' +
+      (size ? ' width="' + size + '" height="' + size + '"' : '') + '>' + body + '</svg>';
+  }
+  root.Icons = { svg, paths: P };
+})(typeof self !== 'undefined' ? self : this);
 
 </script>
 <script>
@@ -854,13 +949,13 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
       '<ellipse cx="' + n(x - rx * 0.3) + '" cy="' + n(y - ry * 0.45) + '" rx="' + n(rx * 0.4) + '" ry="' + n(ry * 0.22) + '" fill="#fff" opacity=".18"/>' +
       '</g>';
   }
-  function cubeMark(x, y, emoji, spirit, extraClass) {
-    const s = 0.62;
+  function cubeMark(x, y, cardId, spirit, extraClass) {
+    const s = 0.6;
     return '<g class="cube' + (extraClass ? ' ' + extraClass : '') + '">' +
       '<ellipse cx="' + n(x) + '" cy="' + n(y + 0.3) + '" rx=".42" ry=".16" fill="#000" opacity=".25"/>' +
-      '<rect x="' + n(x - s / 2) + '" y="' + n(y - s / 2 - 0.06) + '" width="' + s + '" height="' + s + '" rx=".1" fill="' + (spirit ? '#d9a441' : '#2b2118') + '"/>' +
-      '<rect x="' + n(x - s / 2) + '" y="' + n(y - s / 2 - 0.16) + '" width="' + s + '" height="' + n(s * 0.35) + '" rx=".08" fill="' + (spirit ? '#f0c975' : '#4a3a2c') + '"/>' +
-      '<text x="' + n(x) + '" y="' + n(y + 0.12) + '" text-anchor="middle" font-size=".5" style="pointer-events:none">' + esc(emoji) + '</text></g>';
+      '<rect x="' + n(x - s / 2) + '" y="' + n(y - s / 2 + 0.02) + '" width="' + s + '" height="' + s + '" rx=".1" fill="' + (spirit ? '#d9a441' : '#2b2118') + '"/>' +
+      '<rect x="' + n(x - s / 2) + '" y="' + n(y - s / 2 - 0.1) + '" width="' + s + '" height="' + n(s * 0.35) + '" rx=".08" fill="' + (spirit ? '#f0c975' : '#4a3a2c') + '"/>' +
+      '<use href="#a-' + cardId + '" x="' + n(x - 0.42) + '" y="' + n(y - 0.98) + '" width=".84" height=".84"/></g>';
   }
   // Pile complète à (x, y) ; opts.newTop marque le dernier disque (animation), opts.newCube le cube.
   function stack(x, y, s, cube, opts) {
@@ -869,10 +964,7 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     let out = '<g class="stack" data-cell="' + (opts.cellIdx === undefined ? '' : opts.cellIdx) + '">' +
       '<ellipse cx="' + n(x + 0.08) + '" cy="' + n(y + thick + 0.12) + '" rx="' + n(rx + 0.08) + '" ry="' + n(ry + 0.02) + '" fill="#000" opacity=".22"/>';
     s.forEach((color, k) => { out += disc(x, y - k * lift, color, rx, ry, thick, opts.newTop && k === s.length - 1 ? 'arriving' : ''); });
-    if (cube) {
-      const card = E.CARD_BY_ID.get(cube.id);
-      out += cubeMark(x, y - (s.length - 1) * lift - 0.05, card ? card.emoji : '●', !!cube.sp, opts.newCube ? 'arriving' : '');
-    }
+    if (cube) out += cubeMark(x, y - (s.length - 1) * lift - 0.05, cube.id, !!cube.sp, opts.newCube ? 'arriving' : '');
     return out + '</g>';
   }
   // Petit jeton isolé (barre de main, plateau central, vol d'animation)
@@ -895,7 +987,8 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
   // Pioche de cartes Animaux (dos)
   function deckSVG(count) {
     return '<svg class="deck" viewBox="0 0 60 84"><rect x="6" y="6" width="50" height="72" rx="6" fill="#3a2a1c"/><rect x="3" y="3" width="50" height="72" rx="6" fill="#4e351d" stroke="#7a5d33" stroke-width="1.5"/>' +
-      '<rect x="3" y="3" width="50" height="72" rx="6" fill="url(#card-back)"/><circle cx="28" cy="34" r="11" fill="#2b2118" opacity=".5"/><text x="28" y="40" text-anchor="middle" font-size="16">🐾</text>' +
+      '<rect x="3" y="3" width="50" height="72" rx="6" fill="url(#card-back)"/><circle cx="28" cy="34" r="12" fill="#2b2118" opacity=".45"/>' +
+      '<g fill="#f3d9a6"><ellipse cx="28" cy="37" rx="5" ry="4"/><circle cx="22" cy="31" r="2.2"/><circle cx="26.5" cy="28.5" r="2.2"/><circle cx="31.5" cy="29" r="2.2"/><circle cx="35" cy="32.5" r="2"/></g>' +
       '<text x="28" y="66" text-anchor="middle" font-size="13" font-weight="700" fill="#f3d9a6">' + count + '</text></svg>';
   }
 
@@ -978,28 +1071,68 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
       });
       if (step.cube) {
         const topY = p.y + 0.12 - (s.length - 1) * 0.3;
-        g += '<rect x="' + n(p.x - 0.31) + '" y="' + n(topY - 0.86) + '" width=".62" height=".62" rx=".1" fill="' + (card.spirit ? '#d9a441' : '#2b2118') + '"/>' +
-          '<text x="' + n(p.x) + '" y="' + n(topY - 0.38) + '" text-anchor="middle" font-size=".46">' + esc(card.emoji) + '</text>';
+        g += '<rect x="' + n(p.x - 0.3) + '" y="' + n(topY - 0.78) + '" width=".6" height=".6" rx=".1" fill="' + (card.spirit ? '#d9a441' : '#2b2118') + '"/>' +
+          '<use href="#a-' + card.id + '" x="' + n(p.x - 0.5) + '" y="' + n(topY - 1.5) + '" width="1" height="1"/>';
       }
       out += g + '</g>';
     }
     return out + '</svg>';
   }
 
-  // Illustration d'ambiance d'une carte : ciel + reliefs colorés selon l'habitat.
-  const SKY = { 1: ['#bfe3f5', '#7fc1e6'], 2: ['#dfe6ec', '#a9b8c6'], 3: ['#f2dfc2', '#d9b78c'], 4: ['#dff0c8', '#a5d07e'], 5: ['#fdebb0', '#f3c65a'], 6: ['#fbd9c2', '#f0a27a'] };
-  function sceneSVG(card, uid) {
+  // Collines striées (esthétique de la boîte du jeu). bands = couleurs de l'arrière vers l'avant.
+  let hillUid = 0;
+  function hillsSVG(w, h, bands, opts) {
+    opts = opts || {};
+    const uid = ++hillUid;
+    const seed = opts.seed || 1;
+    const rnd = k => { const v = Math.sin(seed * 12.9898 + k * 78.233) * 43758.5453; return v - Math.floor(v); };
+    const sky = opts.sky || ['#fdf1c4', '#f9d977'];
+    let out = '<svg class="' + (opts.cls || 'hills') + '" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="' + (opts.par || 'none') + '">' +
+      '<defs><pattern id="st' + uid + '" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-28)"><rect width="2.6" height="7" fill="#fff" opacity=".16"/></pattern>' +
+      '<linearGradient id="sk' + uid + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + sky[0] + '"/><stop offset="1" stop-color="' + sky[1] + '"/></linearGradient></defs>' +
+      '<rect width="' + w + '" height="' + h + '" fill="url(#sk' + uid + ')"/>';
+    if (opts.sun !== false) {
+      const sx = w * (opts.sunX || 0.78);
+      out += '<circle cx="' + n(sx) + '" cy="' + n(h * 0.28) + '" r="' + n(h * 0.24) + '" fill="#fff3b8" opacity=".35"/><circle cx="' + n(sx) + '" cy="' + n(h * 0.28) + '" r="' + n(h * 0.16) + '" fill="#fff7d6" opacity=".95"/>';
+    }
+    const nb = bands.length;
+    bands.forEach((color, i) => {
+      const base = h * (0.42 + 0.5 * i / nb);
+      const a = h * 0.12 * (0.6 + rnd(i));
+      const y0 = base + (rnd(i + 10) - 0.5) * a, y1 = base - a * rnd(i + 20), y2 = base + a * (rnd(i + 30) - 0.3), y3 = base - a * rnd(i + 40) * 0.6;
+      const d = 'M0,' + n(y0) + ' C' + n(w * 0.22) + ',' + n(y1 - a) + ' ' + n(w * 0.3) + ',' + n(y2 + a * 0.8) + ' ' + n(w * 0.5) + ',' + n(y2) +
+        ' S' + n(w * 0.8) + ',' + n(y3 - a * 0.5) + ' ' + w + ',' + n(y3) + ' L' + w + ',' + h + ' L0,' + h + ' Z';
+      out += '<path d="' + d + '" fill="' + color + '"/><path d="' + d + '" fill="url(#st' + uid + ')"/>';
+    });
+    if (opts.reeds) {
+      const tips = ['#f2c94c', '#e8873a', '#5cc2b7', '#d96a8e'];
+      let stems = '', heads = '';
+      for (let k = 0; k < opts.reeds; k++) {
+        const x = w * (0.04 + 0.92 * rnd(k + 50)), hh = h * (0.12 + 0.16 * rnd(k + 60)), tilt = (rnd(k + 70) - 0.5) * 8;
+        stems += '<path d="M' + n(x) + ',' + h + ' q' + n(tilt) + ',' + n(-hh / 2) + ' ' + n(tilt * 1.6) + ',' + n(-hh) + '"/>';
+        heads += '<ellipse cx="' + n(x + tilt * 1.6) + '" cy="' + n(h - hh) + '" rx="1.6" ry="3.2" fill="' + tips[k % 4] + '"/>';
+      }
+      out += '<g fill="none" stroke="#1e2a5a" stroke-width="1.2" stroke-linecap="round" opacity=".75">' + stems + '</g><g>' + heads + '</g>';
+    }
+    return out + '</svg>';
+  }
+  // Illustration d'une carte : collines aux couleurs de l'habitat.
+  const SKY = { 1: ['#e6f4fb', '#9fd3ef'], 2: ['#eef1f5', '#b9c5d3'], 3: ['#f8ecd8', '#e2c59a'], 4: ['#eaf6dc', '#b6dc95'], 5: ['#fff3c8', '#f7d268'], 6: ['#fde4d3', '#f4b08a'] };
+  const HILL = { 1: ['#7fc3e6', '#3d8fc4', '#2c4a8a'], 2: ['#b3b7bb', '#8f9498', '#5f6468'], 3: ['#b98a5e', '#7d4b2a', '#52301a'], 4: ['#9ad160', '#6aa83c', '#467527'], 5: ['#f2cb55', '#e8b526', '#c98f14'], 6: ['#e0655f', '#cf4540', '#922c29'] };
+  function sceneSVG(card) {
     const colors = [];
     card.pat.forEach(step => step.s.forEach(c => { if (c !== 7 && !colors.includes(c)) colors.push(c); }));
     const cubeStep = card.pat.find(p => p.cube);
     const main = cubeStep.s[0] === 7 ? 6 : cubeStep.s[0];
     const second = colors.find(c => c !== main) || main;
-    const sky = SKY[main];
-    const gid = 'sky-' + uid;
-    return '<svg class="scene" viewBox="0 0 100 60" preserveAspectRatio="none"><defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + sky[0] + '"/><stop offset="1" stop-color="' + sky[1] + '"/></linearGradient></defs>' +
-      '<rect width="100" height="60" fill="url(#' + gid + ')"/><circle cx="78" cy="16" r="8" fill="#fff6d5" opacity=".9"/>' +
-      '<path d="M0,44 C20,30 40,52 60,38 C75,28 90,42 100,36 L100,60 L0,60 Z" fill="' + LIGHT[second] + '" opacity=".9"/>' +
-      '<path d="M0,52 C25,42 45,58 70,48 C85,42 95,54 100,50 L100,60 L0,60 Z" fill="' + FILL[main] + '"/></svg>';
+    const bands = [HILL[second][0], HILL[main][1], HILL[second][1], HILL[main][2]];
+    return hillsSVG(120, 70, bands, { sky: SKY[main], seed: card.id, cls: 'scene', sunX: 0.8 });
+  }
+  function animalSVG(id, cls) {
+    return '<svg class="animal' + (cls ? ' ' + cls : '') + '" viewBox="0 0 72 72" aria-hidden="true"><use href="#a-' + id + '"/></svg>';
+  }
+  function logoSVG(cls) {
+    return '<svg class="' + (cls || 'logo-svg') + '" viewBox="0 0 340 70"><text x="170" y="54" text-anchor="middle" textLength="322" lengthAdjust="spacingAndGlyphs" font-family="Fredoka, Nunito, Arial, sans-serif" font-weight="700" font-size="54" fill="#fff" stroke="#1e2a5a" stroke-width="6" stroke-linejoin="round" paint-order="stroke">HARMONIES</text></svg>';
   }
 
   // Couleur (CSS) de la case cube d'une carte, pour la bande de rappel.
@@ -1009,7 +1142,7 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     return FILL[c];
   }
 
-  root.Render = { defsSVG, tokenSVG, slotSVG, pouchSVG, deckSVG, boardSVG, patternSVG, sceneSVG, cubeColorOf, esc, FILL, DARK, LIGHT };
+  root.Render = { defsSVG, tokenSVG, slotSVG, pouchSVG, deckSVG, boardSVG, patternSVG, sceneSVG, hillsSVG, animalSVG, logoSVG, cubeColorOf, esc, FILL, DARK, LIGHT };
 })(typeof self !== 'undefined' ? self : this);
 
 </script>
@@ -1092,13 +1225,15 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
 // Application Harmonies : écrans, interactions, animations, sons, synchronisation.
 (function (root) {
   'use strict';
-  const E = root.Engine, R = root.Render, esc = R.esc;
+  const E = root.Engine, R = root.Render, esc = R.esc, I = root.Icons;
+  const ic = (name, cls) => I.svg(name, cls);
   const $ = sel => document.querySelector(sel);
   const $$ = sel => [...document.querySelectorAll(sel)];
   const CFG = root.HARMONIES_CONFIG || {};
   const ONLINE_OK = !!(CFG.url && CFG.key && !CFG.url.startsWith('__') && root.supabase);
-  const SEAT_COLORS = ['#1f8a80', '#e0743d', '#7c4dff', '#c9a227'];
-  const SIDE_LABEL = { A: 'Face A (rivière)', B: 'Face B (îles)' };
+  const SEAT_COLORS = ['#2a8f8a', '#e8873a', '#6b4fa0', '#d96a8e'];
+  const SIDE_LABEL = { A: 'Face A · rivière', B: 'Face B · îles' };
+  const BANNER = ['#f2c94c', '#e8873a', '#5cc2b7', '#2a8f8a', '#2c4a8a', '#1e2a5a'];
   const wait = ms => new Promise(r => setTimeout(r, ms));
 
   // ---------- Stockage local (appareil) ----------
@@ -1187,10 +1322,11 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
 
   // ---------- Animations (vols d'éléments par-dessus la page) ----------
   const rectOf = el => (el ? el.getBoundingClientRect() : null);
+  const canAnimate = () => typeof Element !== 'undefined' && !!Element.prototype.animate;
   function fly(from, to, html, opts) {
     opts = opts || {};
     return new Promise(resolve => {
-      if (!from || !to || !from.width || !to.width || !el_supported()) { resolve(); return; }
+      if (!from || !to || !from.width || !to.width || !canAnimate()) { resolve(); return; }
       const el = document.createElement('div');
       el.className = 'fly' + (opts.cls ? ' ' + opts.cls : '');
       el.style.cssText = 'left:' + from.left + 'px;top:' + from.top + 'px;width:' + from.width + 'px;height:' + from.height + 'px;';
@@ -1205,12 +1341,12 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
         { transform: 'translate(' + dx / 2 + 'px,' + (dy / 2 + arc) + 'px) scale(' + ((1 + sx) / 2) + ',' + ((1 + sy) / 2) + ')', offset: 0.5 },
         { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sx + ',' + sy + ')' },
       ], { duration: dur, easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'forwards' });
-      const done = () => { el.remove(); resolve(); };
-      a.onfinish = done; a.oncancel = done;
-      setTimeout(done, dur + 200); // filet de sécurité
+      let done = false;
+      const finish = () => { if (done) return; done = true; el.remove(); resolve(); };
+      a.onfinish = finish; a.oncancel = finish;
+      setTimeout(finish, dur + 200);
     });
   }
-  const el_supported = () => typeof Element !== 'undefined' && !!Element.prototype.animate;
   function reveal(el, cls) {
     if (!el) return;
     el.classList.remove('arriving');
@@ -1226,7 +1362,7 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     setTimeout(() => el.remove(), 1200);
   }
   function confetti() {
-    const colors = ['#3d8fc4', '#6aa83c', '#e8b526', '#cf4540', '#8f9498', '#7d4b2a'];
+    const colors = ['#3d8fc4', '#6aa83c', '#e8b526', '#cf4540', '#5cc2b7', '#6b4fa0'];
     for (let i = 0; i < 46; i++) {
       const p = document.createElement('div');
       p.className = 'confetti';
@@ -1238,10 +1374,10 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
       setTimeout(() => p.remove(), 4400);
     }
   }
-  function turnOverlay(text) {
+  function turnOverlay(html) {
     const el = document.createElement('div');
     el.className = 'turn-overlay';
-    el.innerHTML = text;
+    el.innerHTML = html;
     document.body.appendChild(el);
     setTimeout(() => el.classList.add('out'), 1500);
     setTimeout(() => el.remove(), 1900);
@@ -1274,7 +1410,7 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     let t = $('#toast');
     if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
     t.className = 'toast' + (err ? ' err' : '');
-    t.textContent = msg;
+    t.innerHTML = (err ? ic('x') : ic('check')) + '<span>' + msg + '</span>';
     t.classList.remove('hidden');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.add('hidden'), err ? 3200 : 2400);
@@ -1290,23 +1426,38 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     return bg;
   }
   function closeModal() { const m = $('#modal'); if (m) m.remove(); }
-  function vibrate(ms) { if (navigator.vibrate) try { navigator.vibrate(ms); } catch (e) { /* ignore */ } }
-  function showBanner(text, onClick, label) {
+  let interacted = false;
+  function vibrate(ms) { if (interacted && navigator.vibrate) try { navigator.vibrate(ms); } catch (e) { /* ignore */ } }
+  function showBanner(html, onClick, label) {
     let b = $('#banner');
     if (!b) { b = document.createElement('div'); b.id = 'banner'; b.className = 'banner'; document.body.appendChild(b); }
-    b.innerHTML = '<span>' + text + '</span>' + (onClick ? '<button>' + esc(label || 'Annuler') + '</button>' : '');
+    b.innerHTML = '<span>' + html + '</span>' + (onClick ? '<button>' + label + '</button>' : '');
     if (onClick) b.querySelector('button').onclick = onClick;
   }
   function hideBanner() { const b = $('#banner'); if (b) b.remove(); }
+  const seatDot = i => '<span class="dot" style="background:' + SEAT_COLORS[i] + '"></span>';
+  const miniTok = c => '<span class="mtok">' + R.tokenSVG(c) + '</span>';
+  const miniAnimal = id => '<span class="manimal">' + R.animalSVG(id) + '</span>';
+  // Résumé HTML des actions d'un tour (journal, toasts)
+  function actionsHTML(actions) {
+    const parts = [];
+    for (const a of actions) {
+      if (a.a === 'take') parts.push(a.tokens.map(miniTok).join(''));
+      else if (a.a === 'card') parts.push(miniAnimal(a.id) + ' ' + esc(E.CARD_BY_ID.get(a.id).fr));
+      else if (a.a === 'cube') parts.push('<span class="mcube"></span>' + miniAnimal(a.id) + ' ' + esc(E.CARD_BY_ID.get(a.id).fr));
+      else if (a.a === 'spirit') parts.push(ic('sparkles', 'inl') + ' ' + esc(E.CARD_BY_ID.get(a.id).fr));
+      else if (a.a === 'discard') parts.push('défausse ' + miniTok(a.color));
+    }
+    return parts.join('<span class="sep">·</span>');
+  }
 
   // ---------- Cartes ----------
-  let sceneUid = 0;
   function cardHTML(card, opts) {
     opts = opts || {};
     const left = opts.left === undefined ? card.pts.length : opts.left;
     const placed = card.pts.length - left;
     const cls = 'card' + (card.spirit ? ' spirit' : '') + (opts.cls ? ' ' + opts.cls : '');
-    const badge = opts.badge ? '<div class="badge' + (opts.badgeCls ? ' ' + opts.badgeCls : '') + '">' + esc(opts.badge) + '</div>' : '';
+    const badge = opts.badge ? '<div class="badge' + (opts.badgeCls ? ' ' + opts.badgeCls : '') + '">' + opts.badge + '</div>' : '';
     let track = '';
     if (!card.spirit) {
       track = '<div class="track">' + card.pts.map((v, i) => {
@@ -1315,10 +1466,10 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
       }).reverse().join('') + '</div>';
     }
     const foot = card.spirit ? '<div class="rule">' + esc(card.rule) + '</div>' :
-      '<div class="foot">' + (opts.done ? '✓ terminée · ' + card.pts[card.pts.length - 1] + ' pts' : (placed ? placed + '/' + card.pts.length + ' posé' + (placed > 1 ? 's' : '') + ' · ' + E.cardValue(card, left) + ' pts' : card.pts.length + ' cubes · jusqu\'à ' + card.pts[card.pts.length - 1] + ' pts')) + '</div>';
+      '<div class="foot">' + (opts.done ? 'terminée · ' + card.pts[card.pts.length - 1] + ' pts' : (placed ? placed + '/' + card.pts.length + ' posé' + (placed > 1 ? 's' : '') + ' · ' + E.cardValue(card, left) + ' pts' : card.pts.length + ' cubes · jusqu\'à ' + card.pts[card.pts.length - 1] + ' pts')) + '</div>';
     return '<div class="' + cls + '" data-card="' + card.id + '" ' + (opts.attrs || '') + '>' +
       '<div class="stripe" style="background:' + R.cubeColorOf(card) + '"></div>' + badge +
-      '<div class="art">' + R.sceneSVG(card, ++sceneUid) + '<div class="emoji">' + card.emoji + '</div><div class="name">' + esc(card.fr) + '</div></div>' +
+      '<div class="art">' + R.sceneSVG(card) + R.animalSVG(card.id) + '<div class="name">' + esc(card.fr) + '</div></div>' +
       track + R.patternSVG(card) + foot + '</div>';
   }
   function cardDetail(card, extraHTML) {
@@ -1326,13 +1477,17 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     const cubeColor = step.s[0] === 7 ? 6 : step.s[0];
     const howto = card.spirit
       ? '<p><b>Esprit de la Nature.</b> Pose son cube quand le motif est réalisé ; en fin de partie : ' + esc(card.rule) + '.</p>'
-      : '<p>Valeur selon le nombre de cubes posés : <b>' + card.pts.join(' → ') + '</b> pts. Le cube se pose sur le jeton <b>' + E.COLOR_NAMES[cubeColor] + '</b> ' + E.COLOR_EMOJI[cubeColor] + ' du motif (dans n\'importe quelle orientation).</p>';
-    modal('<h2>' + card.emoji + ' ' + esc(card.fr) + '</h2>' + cardHTML(card, { cls: 'big' }) + howto + (extraHTML || '') +
+      : '<p>Valeur selon le nombre de cubes posés : <b>' + card.pts.join(' → ') + '</b> pts. Le cube se pose sur le jeton <b>' + E.COLOR_NAMES[cubeColor] + '</b> ' + miniTok(cubeColor) + ' du motif, dans n\'importe quelle orientation.</p>';
+    modal('<h2>' + R.animalSVG(card.id, 'h') + esc(card.fr) + '</h2>' + cardHTML(card, { cls: 'big' }) + howto + (extraHTML || '') +
       '<div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>');
     $('#m-close').onclick = closeModal;
   }
 
   // ---------- Écran d'accueil ----------
+  function headerHTML(sub) {
+    return '<div class="hero">' + R.hillsSVG(400, 190, BANNER, { reeds: 14, seed: 7, cls: 'hero-hills' }) +
+      '<div class="hero-inner">' + R.logoSVG() + (sub ? '<div class="tagline">' + sub + '</div>' : '') + '</div></div>';
+  }
   function renderHome() {
     app.screen = 'home';
     document.title = 'Harmonies';
@@ -1340,20 +1495,21 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     const recent = ls.get('harmonies.recent', []);
     const opts = ls.get('harmonies.opts', { side: 'A', spirits: false });
     $('#app').innerHTML =
-      '<div class="screen home">' +
-      '<div class="logo"><div class="logo-art">' + R.tokenSVG(4) + R.tokenSVG(1) + R.tokenSVG(5) + '</div><h1>HARMONIES</h1><p>Compose tes paysages, accueille tes animaux.</p></div>' +
+      '<div class="screen home">' + headerHTML('Compose tes paysages, accueille tes animaux') +
+      '<div class="home-body">' +
       '<div class="panel"><div class="field"><label>Ton prénom</label><input type="text" id="name" maxlength="16" placeholder="Ex. Hadrien" value="' + esc(myName()) + '"></div>' +
-      '<div class="field"><label>Plateau personnel</label><div class="seg" id="side"><button data-v="A" class="' + (opts.side === 'A' ? 'on' : '') + '">Face A · rivière</button><button data-v="B" class="' + (opts.side === 'B' ? 'on' : '') + '">Face B · îles</button></div></div>' +
-      '<label class="check"><input type="checkbox" id="spirits" ' + (opts.spirits ? 'checked' : '') + '> Cartes Esprit de la Nature (variante avancée)</label>' +
-      '<div class="row" style="margin-top:6px"><button class="btn" id="create" ' + (ONLINE_OK ? '' : 'disabled') + '>🌐 Créer une partie en ligne</button></div>' +
+      '<div class="field"><label>Plateau personnel</label><div class="seg" id="side"><button data-v="A" class="' + (opts.side === 'A' ? 'on' : '') + '">' + miniTok(1) + 'Face A · rivière</button><button data-v="B" class="' + (opts.side === 'B' ? 'on' : '') + '">' + miniTok(5) + 'Face B · îles</button></div></div>' +
+      '<label class="check"><input type="checkbox" id="spirits" ' + (opts.spirits ? 'checked' : '') + '><span>' + ic('sparkles', 'inl') + ' Cartes Esprit de la Nature <em>(variante avancée)</em></span></label>' +
+      '<div class="row" style="margin-top:8px"><button class="btn primary" id="create" ' + (ONLINE_OK ? '' : 'disabled') + '>' + ic('globe') + 'Créer une partie en ligne</button></div>' +
       (ONLINE_OK ? '' : '<p class="note">Mode en ligne indisponible (pas de configuration serveur).</p>') +
-      '<div class="row" style="margin-top:10px"><button class="btn secondary" id="local">📱 Jouer sur ce téléphone</button></div></div>' +
-      '<div class="panel"><h2>Rejoindre une partie</h2><div class="row"><input type="text" id="code" placeholder="CODE" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-weight:700"><button class="btn" id="join" ' + (ONLINE_OK ? '' : 'disabled') + '>Rejoindre</button></div></div>' +
-      (recent.length ? '<div class="panel"><h2>Parties récentes</h2><ul class="recent">' + recent.map(g =>
-        '<li data-id="' + esc(g.id) + '" data-mode="' + g.mode + '"><span class="code">' + esc(g.mode === 'local' ? '📱' : g.id) + '</span><span class="meta">' + esc(g.label || '') + '<br>' + new Date(g.at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) + '</span><button class="btn small">Ouvrir</button></li>').join('') + '</ul></div>' : '') +
-      '<div class="panel rules"><h2>Comment jouer</h2><p>À ton tour : prends les <b>3 jetons</b> d\'un emplacement du plateau central et pose-les sur ton plateau (en respectant les règles d\'empilement). Tu peux aussi prendre <b>1 carte Animal</b> (max 4 devant toi) et poser des <b>cubes</b> dès que leur habitat est réalisé — ces actions sont possibles à tout moment du tour.</p>' +
-      '<p>Fin de partie : sac vide au moment de recharger, ou <b>2 cases vides ou moins</b> sur ton plateau (on finit la manche).</p><button class="btn ghost" id="rules-more">Voir le détail des règles et du score →</button></div>' +
-      '</div>';
+      '<div class="row" style="margin-top:10px"><button class="btn secondary" id="local">' + ic('phone') + 'Jouer sur ce téléphone</button></div></div>' +
+      '<div class="panel"><h2>' + ic('login', 'h') + 'Rejoindre une partie</h2><div class="row"><input type="text" id="code" placeholder="CODE" maxlength="6" class="code-input"><button class="btn primary" id="join" ' + (ONLINE_OK ? '' : 'disabled') + '>Rejoindre</button></div></div>' +
+      (recent.length ? '<div class="panel"><h2>' + ic('layers', 'h') + 'Parties récentes</h2><ul class="recent">' + recent.map(g =>
+        '<li data-id="' + esc(g.id) + '" data-mode="' + g.mode + '"><span class="code">' + (g.mode === 'local' ? ic('phone') : esc(g.id)) + '</span><span class="meta">' + esc(g.label || '') + '<br>' + new Date(g.at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) + '</span><button class="btn small secondary">Ouvrir</button></li>').join('') + '</ul></div>' : '') +
+      '<div class="panel rules"><h2>' + ic('book', 'h') + 'Comment jouer</h2><p>À ton tour : prends les <b>3 jetons</b> d\'un emplacement du plateau central et pose-les sur ton plateau (en respectant les règles d\'empilement). Tu peux aussi prendre <b>1 carte Animal</b> (max 4 devant toi) et poser des <b>cubes</b> dès que leur habitat est réalisé — ces actions sont possibles à tout moment du tour.</p>' +
+      '<p>Fin de partie : sac vide au moment de recharger, ou <b>2 cases vides ou moins</b> sur ton plateau (on finit la manche).</p><button class="btn ghost" id="rules-more">Le détail des règles et du score →</button></div>' +
+      '<p class="credits">Adaptation non officielle du jeu Harmonies (Johan Benvenuto, Libellud). Icônes animaux : OpenMoji (CC BY-SA 4.0).</p>' +
+      '</div></div>';
     $('#name').addEventListener('change', ev => ls.set('harmonies.name', ev.target.value.trim()));
     $('#side').addEventListener('click', ev => {
       const b = ev.target.closest('button'); if (!b) return;
@@ -1390,10 +1546,10 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
 
   function localSetup(opts) {
     const names = ls.get('harmonies.localNames', [myName() || 'Joueur 1', 'Joueur 2']);
-    modal('<h2>📱 Partie sur ce téléphone</h2><p class="note">Les joueurs se passent le téléphone à chaque tour.</p>' +
+    modal('<h2>' + ic('phone', 'h') + 'Partie sur ce téléphone</h2><p class="note">Les joueurs se passent le téléphone à chaque tour.</p>' +
       '<div id="names">' + names.map((n, i) => '<div class="field"><label>Joueur ' + (i + 1) + '</label><input type="text" maxlength="16" value="' + esc(n) + '"></div>').join('') + '</div>' +
-      '<div class="row"><button class="btn secondary small" id="m-add">+ joueur</button><button class="btn secondary small" id="m-del">− joueur</button></div>' +
-      '<div class="actions"><button class="btn secondary" id="m-cancel">Annuler</button><button class="btn" id="m-go">Commencer</button></div>');
+      '<div class="row"><button class="btn secondary small" id="m-add">' + ic('plus') + 'joueur</button><button class="btn secondary small" id="m-del">' + ic('minus') + 'joueur</button></div>' +
+      '<div class="actions"><button class="btn secondary" id="m-cancel">Annuler</button><button class="btn primary" id="m-go">Commencer</button></div>');
     const getNames = () => $$('#names input').map(i => i.value.trim());
     $('#m-add').onclick = () => { const ns = getNames(); if (ns.length < 4) { ns.push('Joueur ' + (ns.length + 1)); ls.set('harmonies.localNames', ns); localSetup(opts); } };
     $('#m-del').onclick = () => { const ns = getNames(); if (ns.length > 2) { ns.pop(); ls.set('harmonies.localNames', ns); localSetup(opts); } };
@@ -1476,13 +1632,13 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     const canReplay = remote && prev && prev.status === 'playing' && prev.log && s.log.length === prev.log.length + 1 && prev.turn === entry.p && prev.turnNo === entry.n && document.visibilityState === 'visible';
     app.lastLogLen = s.log ? s.log.length : 0;
     if (canReplay) { await replayTurn(prev, entry, s); return; }
-    if (remote) toast(who.name + ' : ' + (E.describeActions(entry.actions) || 'a joué'));
+    if (remote) toast(esc(who.name) + ' : ' + (actionsHTML(entry.actions) || 'a joué'));
     render();
     if (isMine() && s.status === 'playing' && !wasMine) announceMyTurn();
   }
   function announceMyTurn() {
     const me = E.current(app.committed);
-    turnOverlay('🫵 À toi de jouer' + (app.mode === 'online' ? ', ' + esc(me.name) : ' : ' + esc(me.name)) + ' !');
+    turnOverlay(ic('hand', 'big') + '<div>À toi de jouer' + (app.mode === 'online' ? ', ' + esc(me.name) : ' : ' + esc(me.name)) + ' !</div>');
     Sfx.turn(); vibrate([30, 40, 30]);
   }
 
@@ -1494,10 +1650,10 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     app.viewSeat = entry.p;
     const name = next.players[entry.p].name;
     renderGame();
-    showBanner('🎬 ' + esc(name) + ' joue son tour…', () => { if (app.replay) app.replay.abort = true; }, 'Passer ⏭');
+    showBanner(ic('film', 'inl') + ' ' + esc(name) + ' joue son tour…', () => { token.abort = true; }, ic('skip') + 'Passer');
     await wait(500);
     for (const a of entry.actions) {
-      if (!app.replay || app.replay.abort) break;
+      if (token.abort) break;
       try {
         if (a.a === 'take') {
           let slot = a.slot;
@@ -1512,12 +1668,12 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
         } else if (a.a === 'cube') {
           await animatedCube(state, a.id, a.cell);
         } else if (a.a === 'spirit') {
-          E.chooseSpirit(state, a.id); renderGame(); toast(name + ' choisit l\'esprit ' + E.CARD_BY_ID.get(a.id).fr);
+          E.chooseSpirit(state, a.id); renderGame(); toast(esc(name) + ' choisit l\'esprit ' + esc(E.CARD_BY_ID.get(a.id).fr));
         } else if (a.a === 'discard') {
           const idx = state.cur.tokens.indexOf(a.color); if (idx >= 0) E.discardToken(state, idx); renderGame();
         }
       } catch (e) { break; }
-      if (!app.replay || app.replay.abort) break;
+      if (token.abort) break;
       await wait(350);
     }
     const aborted = token.abort;
@@ -1560,19 +1716,18 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     const host = s.host === myPid();
     const inGame = s.players.some(p => p.pid === myPid());
     const link = location.origin + location.pathname + '?g=' + s.id;
-    $('#app').innerHTML = '<div class="screen home">' +
-      '<div class="logo"><h1>HARMONIES</h1><p>Salle d\'attente</p></div>' +
-      '<div class="panel"><h2>Code de la partie</h2><div class="code-big">' + esc(s.id) + '</div>' +
-      '<p class="note" style="text-align:center">' + esc(SIDE_LABEL[s.opts.side]) + (s.opts.spirits ? ' · Esprits de la Nature' : '') + '</p>' +
-      '<div class="row"><button class="btn" id="share">📤 Envoyer le lien</button><button class="btn secondary" id="copy">Copier</button></div></div>' +
-      '<div class="panel"><h2>Joueurs (' + s.players.length + '/4)</h2><ul class="players-list">' + s.players.map((p, i) =>
-        '<li><span class="dot" style="background:' + SEAT_COLORS[i] + '"></span><b>' + esc(p.name) + '</b>' + (p.pid === s.host ? ' <span class="note">· hôte</span>' : '') + (p.pid === myPid() ? ' <span class="note">· toi</span>' : '') + '</li>').join('') + '</ul>' +
-      (inGame ? '' : '<div class="field" style="margin-top:10px"><label>Ton prénom</label><input type="text" id="jname" maxlength="16" value="' + esc(myName()) + '"></div><button class="btn block" id="joinbtn">Rejoindre la partie</button>') +
+    $('#app').innerHTML = '<div class="screen home">' + headerHTML('Salle d\'attente') + '<div class="home-body">' +
+      '<div class="panel"><h2>' + ic('users', 'h') + 'Code de la partie</h2><div class="code-big">' + esc(s.id) + '</div>' +
+      '<p class="note center">' + esc(SIDE_LABEL[s.opts.side]) + (s.opts.spirits ? ' · Esprits de la Nature' : '') + '</p>' +
+      '<div class="row"><button class="btn primary" id="share">' + ic('send') + 'Envoyer le lien</button><button class="btn secondary" id="copy">' + ic('copy') + 'Copier</button></div></div>' +
+      '<div class="panel"><h2>' + ic('users', 'h') + 'Joueurs (' + s.players.length + '/4)</h2><ul class="players-list">' + s.players.map((p, i) =>
+        '<li>' + seatDot(i) + '<b>' + esc(p.name) + '</b>' + (p.pid === s.host ? ' <span class="note">· hôte</span>' : '') + (p.pid === myPid() ? ' <span class="note">· toi</span>' : '') + '</li>').join('') + '</ul>' +
+      (inGame ? '' : '<div class="field" style="margin-top:10px"><label>Ton prénom</label><input type="text" id="jname" maxlength="16" value="' + esc(myName()) + '"></div><button class="btn primary block" id="joinbtn">Rejoindre la partie</button>') +
       '</div>' +
-      (host ? '<button class="btn block" id="start" ' + (s.players.length >= 2 ? '' : 'disabled') + '>Commencer la partie (' + s.players.length + ' joueur' + (s.players.length > 1 ? 's' : '') + ')</button>' +
-        (s.players.length < 2 ? '<p class="note" style="text-align:center">En attente d\'au moins un autre joueur… la page se met à jour toute seule.</p>' : '') :
-        '<p class="note" style="text-align:center">En attente que l\'hôte lance la partie… <span class="conn ' + (app.rtOk ? 'on' : '') + '" id="conn"></span></p>') +
-      '<button class="btn ghost" id="leave">← Retour à l\'accueil</button></div>';
+      (host ? '<button class="btn primary block big" id="start" ' + (s.players.length >= 2 ? '' : 'disabled') + '>' + ic('play') + 'Commencer la partie (' + s.players.length + ' joueur' + (s.players.length > 1 ? 's' : '') + ')</button>' +
+        (s.players.length < 2 ? '<p class="note center">En attente d\'au moins un autre joueur… la page se met à jour toute seule.</p>' : '') :
+        '<p class="note center">En attente que l\'hôte lance la partie… <span class="conn ' + (app.rtOk ? 'on' : '') + '" id="conn"></span></p>') +
+      '<button class="btn ghost" id="leave">' + ic('back') + 'Retour à l\'accueil</button></div></div>';
     $('#share').onclick = async () => {
       const text = 'Viens jouer à Harmonies avec moi ! Code ' + s.id + ' — ' + link;
       if (navigator.share) { try { await navigator.share({ title: 'Harmonies', text, url: link }); } catch (e) { /* annulé */ } }
@@ -1641,6 +1796,7 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     return true;
   }
   function scoreOf(seat) { const s = view(); return E.scorePlayer(s.players[seat], s.opts.side).total; }
+  const secTitle = (color, icon, text, extra) => '<h3 class="sec"><span class="pill ' + color + '">' + ic(icon) + text + '</span>' + (extra || '') + '</h3>';
 
   function renderGame(anim) {
     anim = anim || {};
@@ -1655,22 +1811,23 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     const viewingMine = mine && app.viewSeat === s.turn;
     const replaying = !!app.replay;
     const side = s.opts.side;
-    document.title = (mine && s.status === 'playing' ? '🫵 À toi · ' : '') + 'Harmonies · ' + (s.id || '');
+    document.title = (mine && s.status === 'playing' ? 'À toi · ' : '') + 'Harmonies · ' + (s.id || '');
 
     const scores = s.players.map(p => E.scorePlayer(p, side));
 
     // Message d'état
-    let msg;
-    if (s.status === 'finished') msg = '🏁 Partie terminée';
-    else if (replaying) msg = '🎬 ' + esc(E.current(s).name) + ' joue…';
+    let msg, msgIcon = 'hourglass', msgCls = '';
+    if (s.status === 'finished') { msg = 'Partie terminée'; msgIcon = 'flag'; }
+    else if (replaying) { msg = esc(E.current(s).name) + ' joue…'; msgIcon = 'film'; }
     else if (mine) {
       const st = E.turnStatus(s);
-      if (app.cubeMode) msg = 'Tape une case orange pour le cube ' + E.CARD_BY_ID.get(app.cubeMode.id).emoji;
-      else if (cur.slot === null && !s.market.every(m => !m.length)) msg = '🫵 À toi : prends un groupe de 3 jetons';
-      else if (cur.tokens.length) msg = '🫵 Pose tes jetons (' + cur.tokens.length + ' restant' + (cur.tokens.length > 1 ? 's' : '') + ')';
-      else if (!st.ok) msg = '🫵 ' + st.reasons[0];
-      else msg = '✅ Une carte ou un cube à poser ? Sinon, termine ton tour';
-    } else msg = '⏳ Tour de ' + esc(E.current(s).name) + (app.mode === 'online' ? '…' : '');
+      msgIcon = 'hand'; msgCls = ' mine';
+      if (app.cubeMode) { msg = 'Tape une case orange pour poser le cube'; msgIcon = 'cube'; }
+      else if (cur.slot === null && !s.market.every(m => !m.length)) msg = 'À toi : prends un groupe de 3 jetons';
+      else if (cur.tokens.length) msg = 'Pose tes jetons (' + cur.tokens.length + ' restant' + (cur.tokens.length > 1 ? 's' : '') + ')';
+      else if (!st.ok) msg = st.reasons[0];
+      else { msg = 'Une carte ou un cube à poser ? Sinon, termine ton tour'; msgIcon = 'check'; }
+    } else msg = 'Tour de ' + esc(E.current(s).name) + (app.mode === 'online' ? '…' : '');
 
     const legal = new Set(), targets = new Set(), last = new Set();
     if (viewingMine && !app.cubeMode && app.selToken !== null && cur.tokens[app.selToken] !== undefined) {
@@ -1688,16 +1845,16 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     const canTake = mine && E.canTakeCard(s);
 
     let html = '<div class="screen game">' +
-      '<div class="topbar"><span class="title">HARMONIES</span><span class="code">' + esc(s.id || '') + '</span>' +
+      '<div class="topbar">' + R.logoSVG('logo-small') + '<span class="code">' + esc(s.id || '') + '</span>' +
       (app.mode === 'online' ? '<span class="conn ' + (app.rtOk ? 'on' : 'off') + '" id="conn" title="temps réel"></span>' : '') +
-      '<span class="spacer"></span><button class="icon-btn" id="sound" title="Sons">' + (Sfx.enabled ? '🔊' : '🔇') + '</button><button class="icon-btn" id="menu">☰</button></div>' +
-      '<div class="status' + (mine ? ' mine' : '') + '"><span class="msg">' + msg + '</span><span class="scores">' +
-      s.players.map((p, i) => '<span class="score-chip' + (i === app.viewSeat ? ' active' : '') + '" data-seat="' + i + '"><span class="dot" style="background:' + SEAT_COLORS[i] + '"></span>' + esc(p.name) + (i === s.turn && s.status === 'playing' ? ' 🎲' : '') + ' <b>' + scores[i].total + '</b></span>').join('') +
+      '<span class="spacer"></span><button class="icon-btn" id="sound" title="Sons">' + ic(Sfx.enabled ? 'sound' : 'mute') + '</button><button class="icon-btn" id="menu" title="Menu">' + ic('menu') + '</button></div>' +
+      '<div class="status' + msgCls + '"><span class="msg">' + ic(msgIcon, 'inl') + '<span>' + msg + '</span></span><span class="score-chips">' +
+      s.players.map((p, i) => '<span class="score-chip' + (i === app.viewSeat ? ' active' : '') + '" data-seat="' + i + '" style="--seat:' + SEAT_COLORS[i] + '">' + seatDot(i) + esc(p.name) + (i === s.turn && s.status === 'playing' ? ic('dice', 'inl') : '') + ' <b>' + scores[i].total + '</b></span>').join('') +
       '</span></div>';
 
     // Plateau central + sac
-    html += '<div class="section"><h3>Plateau central' + (mine && cur.slot === null && s.status === 'playing' && !app.cubeMode ? ' <span class="hint">← choisis un groupe</span>' : '') +
-      '<span class="spacer"></span><span class="pouch-wrap" title="Jetons restants dans le sac">' + R.pouchSVG(s.bag ? s.bag.length : 0) + '</span></h3><div class="market">' +
+    html += '<div class="section">' + secTitle('blue', 'grid', 'Plateau central', (mine && cur.slot === null && s.status === 'playing' && !app.cubeMode ? '<span class="hint">choisis un groupe</span>' : '') +
+      '<span class="spacer"></span><span class="pouch-wrap" title="Jetons restants dans le sac">' + R.pouchSVG(s.bag ? s.bag.length : 0) + '</span>') + '<div class="market">' +
       s.market.map((m, i) => {
         const takeable = mine && cur.slot === null && m.length > 0 && !app.cubeMode;
         const arriving = anim.refillSlot === i;
@@ -1705,11 +1862,11 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
       }).join('') + '</div></div>';
 
     // Plateaux
-    html += '<div class="board-tabs">' + s.players.map((p, i) => '<button data-seat="' + i + '" class="' + (i === app.viewSeat ? 'on' : '') + '"><span class="dot" style="background:' + SEAT_COLORS[i] + '"></span>' + esc(p.name) + (i === me && app.mode === 'online' ? ' (toi)' : '') + ' · ' + E.emptyCount(p.board) + ' vides</button>').join('') + '</div>' +
+    html += '<div class="board-tabs">' + s.players.map((p, i) => '<button data-seat="' + i + '" class="' + (i === app.viewSeat ? 'on' : '') + '" style="--seat:' + SEAT_COLORS[i] + '">' + seatDot(i) + esc(p.name) + (i === me && app.mode === 'online' ? ' (toi)' : '') + '<em>' + E.emptyCount(p.board) + ' vides</em></button>').join('') + '</div>' +
       '<div class="board-wrap">' + R.boardSVG(viewing.board, { legal, targets, last, readonly: !viewingMine, newTop: anim.newTop, newCube: anim.newCube }) + '</div>';
 
     // Cartes disponibles + pioche
-    html += '<div class="section"><h3>Animaux disponibles' + (canTake ? ' <span class="hint">· tu peux en prendre une</span>' : (mine && cur.cardTaken ? ' <span class="hint" style="color:var(--muted)">· carte prise ce tour</span>' : '')) + '</h3><div class="cards-strip">' +
+    html += '<div class="section">' + secTitle('orange', 'star', 'Animaux disponibles', (canTake ? '<span class="hint">tu peux en prendre une</span>' : (mine && cur.cardTaken ? '<span class="hint muted">carte prise ce tour</span>' : ''))) + '<div class="cards-strip">' +
       '<div class="deck-wrap" title="Pioche">' + R.deckSVG(s.deck.length) + '</div>' +
       s.display.map((id, i) => {
         if (!id) return '<div class="card empty" data-display="' + i + '"></div>';
@@ -1721,53 +1878,53 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     // Cartes du joueur affiché
     const p = viewing;
     const items = [];
-    if (p.spiritChoices && viewingMine) items.push('<div class="card spirit choose" id="spirit-choose"><div class="art"><div class="emoji">✨</div><div class="name">Esprit</div></div><div class="choose-body">Choisis ton Esprit de la Nature</div><div class="foot">2 cartes à découvrir</div></div>');
+    if (p.spiritChoices && viewingMine) items.push('<div class="card spirit choose" id="spirit-choose"><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '<div class="name">Esprit</div></div><div class="choose-body">' + ic('sparkles') + 'Choisis ton Esprit de la Nature</div><div class="foot">2 cartes à découvrir</div></div>');
     if (p.spirit) {
       const card = E.CARD_BY_ID.get(p.spirit.id);
       const pl = placeableIds.has(card.id) && viewingMine;
-      items.push(cardHTML(card, { cls: (pl ? 'placeable' : '') + (p.spirit.placed ? ' done' : ''), badge: pl ? 'Poser' : (p.spirit.placed ? '✓ posé' : ''), badgeCls: p.spirit.placed ? 'teal' : '', attrs: 'data-mine="1"' }));
+      items.push(cardHTML(card, { cls: (pl ? 'placeable' : '') + (p.spirit.placed ? ' done' : ''), badge: pl ? 'Poser' : (p.spirit.placed ? ic('check') + 'posé' : ''), badgeCls: p.spirit.placed ? 'teal' : '', attrs: 'data-mine="1"' }));
     }
     for (const h of p.hand) {
       const card = E.CARD_BY_ID.get(h.id);
       const pl = placeableIds.has(h.id) && viewingMine;
       items.push(cardHTML(card, { left: h.left, cls: (pl ? 'placeable' : '') + (anim.arrivingCard === h.id ? ' arriving' : ''), badge: pl ? 'Poser' : '', attrs: 'data-mine="1"' }));
     }
-    for (const d of p.done) items.push(cardHTML(E.CARD_BY_ID.get(d.id), { left: 0, cls: 'done', done: true, badge: '✓', badgeCls: 'teal', attrs: 'data-mine="1"' }));
+    for (const d of p.done) items.push(cardHTML(E.CARD_BY_ID.get(d.id), { left: 0, cls: 'done', done: true, badge: ic('check'), badgeCls: 'teal', attrs: 'data-mine="1"' }));
     const active = E.activeCount(p);
-    html += '<div class="section"><h3>Cartes de ' + esc(p.name) + ' <span class="hint" style="color:var(--muted)">· ' + active + '/4 en cours' + (p.done.length ? ' · ' + p.done.length + ' terminée' + (p.done.length > 1 ? 's' : '') : '') + '</span></h3><div class="cards-strip">' +
+    html += '<div class="section">' + secTitle('teal', 'layers', 'Cartes de ' + esc(p.name), '<span class="hint muted">' + active + '/4 en cours' + (p.done.length ? ' · ' + p.done.length + ' terminée' + (p.done.length > 1 ? 's' : '') : '') + '</span>') + '<div class="cards-strip">' +
       (items.length ? items.join('') : '<div class="card empty"><div class="empty-text">aucune carte</div></div>') + '</div></div>';
 
     // Journal
     const log = (s.log || []).slice(-8).reverse();
-    html += '<div class="section"><h3>Journal</h3></div><ul class="log">' + (log.length ? log.map(l =>
-      '<li>Tour ' + l.n + ' · <b>' + esc(s.players[l.p].name) + '</b> : ' + esc(E.describeActions(l.actions) || '—') + '</li>').join('') : '<li>Début de partie.</li>') + '</ul>';
+    html += '<div class="section">' + secTitle('purple', 'scroll', 'Journal') + '</div><ul class="log">' + (log.length ? log.map(l =>
+      '<li><span class="turnno">T' + l.n + '</span>' + seatDot(l.p) + '<b>' + esc(s.players[l.p].name) + '</b><span class="acts">' + (actionsHTML(l.actions) || '—') + '</span></li>').join('') : '<li>Début de partie.</li>') + '</ul>';
 
     // Barre du bas
     html += '<div class="handbar">';
     if (s.status === 'finished') {
-      html += '<div class="tokens"><span class="placeholder">Partie terminée</span></div><div class="actions"><button class="btn" id="results">Résultats</button></div>';
+      html += '<div class="tokens"><span class="placeholder">Partie terminée</span></div><div class="actions"><button class="btn primary" id="results">' + ic('trophy') + 'Résultats</button></div>';
     } else if (replaying) {
       html += '<div class="tokens">' + (cur.tokens.length ? cur.tokens.map((t, i) => '<span class="tok' + (anim.arrivingHand ? ' arriving' : '') + '" data-tok="' + i + '">' + R.tokenSVG(t) + '</span>').join('') : '<span class="placeholder">' + esc(E.current(s).name) + ' joue…</span>') + '</div>';
     } else if (!mine) {
       html += '<div class="tokens"><span class="placeholder">' + (app.mode === 'online' ? 'En attente de ' + esc(E.current(s).name) + '…' : 'Tour de ' + esc(E.current(s).name)) + '</span></div><div class="actions">' +
-        (app.mode === 'online' ? '<button class="btn secondary" id="reload" title="Actualiser">↻</button>' : '') + '</div>';
+        (app.mode === 'online' ? '<button class="btn secondary icon" id="reload" title="Actualiser">' + ic('refresh') + '</button>' : '') + '</div>';
     } else {
       const st = E.turnStatus(s);
       html += '<div class="tokens">' + (cur.slot === null && cur.tokens.length === 0 ?
-        '<span class="placeholder">' + (s.market.every(m => !m.length) ? 'Plus de jetons à prendre' : 'Prends 3 jetons ↑') + '</span>' :
+        '<span class="placeholder">' + (s.market.every(m => !m.length) ? 'Plus de jetons à prendre' : 'Prends 3 jetons en haut') + '</span>' :
         cur.tokens.map((t, i) => {
           const dead = !E.legalCells(E.current(s).board, t).length;
           return '<button class="tok' + (i === app.selToken ? ' sel' : '') + (dead ? ' dead' : '') + (anim.arrivingHand ? ' arriving' : '') + '" data-tok="' + i + '" title="' + E.COLOR_NAMES[t] + '">' + R.tokenSVG(t) + '</button>';
-        }).join('') + (cur.tokens.length === 0 ? '<span class="placeholder">Jetons posés ✓</span>' : '')) + '</div>' +
-        '<div class="actions"><button class="btn secondary" id="undo" ' + (app.undo.length ? '' : 'disabled') + '>Annuler</button>' +
-        '<button class="btn' + (st.ok ? ' ready' : '') + '" id="end" ' + (st.ok ? '' : 'disabled') + '>Fin du tour</button></div>';
+        }).join('') + (cur.tokens.length === 0 ? '<span class="placeholder">' + ic('check', 'inl') + 'Jetons posés</span>' : '')) + '</div>' +
+        '<div class="actions"><button class="btn secondary" id="undo" ' + (app.undo.length ? '' : 'disabled') + '>' + ic('undo') + '<span class="lbl">Annuler</span></button>' +
+        '<button class="btn primary' + (st.ok ? ' ready' : '') + '" id="end" ' + (st.ok ? '' : 'disabled') + '>Fin du tour</button></div>';
     }
     html += '</div></div>';
     $('#app').innerHTML = html;
     bindGame(s, mine, viewingMine, placeable);
 
     if (replaying) { /* bannière gérée par le rejeu */ }
-    else if (mine && app.cubeMode) showBanner('Pose le cube ' + E.CARD_BY_ID.get(app.cubeMode.id).emoji + ' ' + esc(E.CARD_BY_ID.get(app.cubeMode.id).fr) + ' : tape une case orange', () => { app.cubeMode = null; renderGame(); });
+    else if (mine && app.cubeMode) showBanner('Pose le cube ' + miniAnimal(app.cubeMode.id) + ' ' + esc(E.CARD_BY_ID.get(app.cubeMode.id).fr) + ' : tape une case orange', () => { app.cubeMode = null; renderGame(); }, 'Annuler');
     else if (mine && app.selToken !== null && cur.tokens[app.selToken] !== undefined && !E.legalCells(E.current(s).board, cur.tokens[app.selToken]).length) {
       showBanner('Aucune case possible pour ce jeton', () => { const sel = app.selToken; if (act(w => E.discardToken(w, sel))) Sfx.undo(); app.selToken = app.work.cur.tokens.length ? 0 : null; renderGame(); }, 'Défausser');
     } else hideBanner();
@@ -1778,7 +1935,7 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
 
   function bindGame(s, mine, viewingMine, placeable) {
     $('#menu').onclick = showMenu;
-    $('#sound').onclick = () => { const on = Sfx.toggle(); $('#sound').textContent = on ? '🔊' : '🔇'; toast(on ? 'Sons activés' : 'Sons coupés'); };
+    $('#sound').onclick = () => { const on = Sfx.toggle(); $('#sound').innerHTML = ic(on ? 'sound' : 'mute'); toast(on ? 'Sons activés' : 'Sons coupés'); };
     $$('.score-chip').forEach(chip => { chip.onclick = () => { const seat = +chip.dataset.seat; if (app.viewSeat === seat) showScores(); else { app.viewSeat = seat; renderGame(); } }; });
     $$('.board-tabs button').forEach(b => { b.onclick = () => { app.viewSeat = +b.dataset.seat; renderGame(); }; });
     const reload = $('#reload'); if (reload) reload.onclick = () => { refresh(); toast('Mise à jour…'); };
@@ -1790,7 +1947,7 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
         const card = E.CARD_BY_ID.get(+c.dataset.card);
         const canTake = mine && !app.busy && E.canTakeCard(app.work);
         if (ev.target.closest('.badge') && canTake) { interactiveCard(+c.dataset.display); return; }
-        cardDetail(card, canTake ? '<button class="btn block" id="m-take">Prendre cette carte</button>' : (mine ? '<p class="note">' + (app.work.cur.cardTaken ? 'Tu as déjà pris une carte ce tour.' : 'Tu as déjà 4 cartes en cours.') + '</p>' : ''));
+        cardDetail(card, canTake ? '<button class="btn primary block" id="m-take">Prendre cette carte</button>' : (mine ? '<p class="note">' + (app.work.cur.cardTaken ? 'Tu as déjà pris une carte ce tour.' : 'Tu as déjà 4 cartes en cours.') + '</p>' : ''));
         const b = $('#m-take'); if (b) b.onclick = () => { closeModal(); interactiveCard(+c.dataset.display); };
       };
     });
@@ -1800,7 +1957,7 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
         const card = E.CARD_BY_ID.get(id);
         const pc = mine && !app.busy ? placeable.find(x => x.id === id) : null;
         if (pc && viewingMine && ev.target.closest('.badge')) { startCube(pc); return; }
-        cardDetail(card, pc && viewingMine ? '<button class="btn block warn" id="m-cube">Poser un cube ' + card.emoji + '</button>' : '');
+        cardDetail(card, pc && viewingMine ? '<button class="btn warn block" id="m-cube">' + ic('cube') + 'Poser un cube</button>' : '');
         const b = $('#m-cube'); if (b) b.onclick = () => { closeModal(); startCube(pc); };
       };
     });
@@ -1880,7 +2037,7 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     renderGame({ arrivingCard: id });
     Sfx.card();
     const target = $('.card.arriving[data-card="' + id + '"]');
-    await fly(from, rectOf(target), '<div class="ghost-card" style="border-color:' + R.cubeColorOf(card) + '">' + card.emoji + '</div>', { duration: 520, arc: -30 });
+    await fly(from, rectOf(target), '<div class="ghost-card" style="border-color:' + R.cubeColorOf(card) + '">' + R.animalSVG(card.id) + '</div>', { duration: 520, arc: -30 });
     reveal(target, 'pop');
   }
   async function animatedCube(state, cardId, cellIdx) {
@@ -1939,7 +2096,7 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     withAnim(() => animatedPlace(app.work, handIdx, cellIdx)).then(() => {
       if (!app.work) return;
       const now = E.placeableCubes(app.work);
-      if (now.length && app.work.cur.tokens.length === 0) toast('Habitat réalisé : ' + now.map(x => E.CARD_BY_ID.get(x.id).emoji).join(' ') + ' → « Poser »');
+      if (now.length && app.work.cur.tokens.length === 0) toast('Habitat réalisé : ' + now.map(x => miniAnimal(x.id) + ' ' + esc(E.CARD_BY_ID.get(x.id).fr)).join(', ') + ' → « Poser »');
     });
   }
   function interactiveCard(displayIdx) { withAnim(() => animatedCard(app.work, displayIdx)); }
@@ -1966,7 +2123,7 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
       renderGame({ refillSlot: slot, newDisplay });
       await animateRefill(slot, newDisplay);
       if (app.mode === 'local') {
-        modal('<h2>📱 Au tour de ' + esc(E.current(w).name) + '</h2><p>Passe le téléphone à ' + esc(E.current(w).name) + '.</p><div class="actions"><button class="btn" id="m-ok">C\'est parti</button></div>', { sticky: true });
+        modal('<h2>' + ic('phone', 'h') + 'Au tour de ' + esc(E.current(w).name) + '</h2><p>Passe le téléphone à ' + esc(E.current(w).name) + '.</p><div class="actions"><button class="btn primary" id="m-ok">C\'est parti</button></div>', { sticky: true });
         $('#m-ok').onclick = () => { closeModal(); render(); announceMyTurn(); };
       } else render();
     } catch (e) {
@@ -1981,14 +2138,14 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     if (!app.work) return;
     const p = E.current(app.work);
     if (!p.spiritChoices) return;
-    modal('<h2>✨ Choisis ton Esprit de la Nature</h2><p class="note">Une seule carte est gardée, l\'autre retourne dans la boîte. Elle compte dans ta limite de 4 cartes tant que son cube n\'est pas posé.</p>' +
+    modal('<h2>' + ic('sparkles', 'h') + 'Choisis ton Esprit de la Nature</h2><p class="note">Une seule carte est gardée, l\'autre retourne dans la boîte. Elle compte dans ta limite de 4 cartes tant que son cube n\'est pas posé.</p>' +
       '<div class="choice-grid">' + p.spiritChoices.map(id => cardHTML(E.CARD_BY_ID.get(id), { attrs: 'data-choose="' + id + '"' })).join('') + '</div>' +
       '<div class="actions"><button class="btn secondary" id="m-later">Plus tard</button></div>');
     $('#m-later').onclick = closeModal;
-    $$('[data-choose]').forEach(c => { c.onclick = () => { const id = +c.dataset.choose; closeModal(); if (act(w => E.chooseSpirit(w, id))) { Sfx.card(); toast('Esprit choisi : ' + E.CARD_BY_ID.get(id).fr); } renderGame(); }; });
+    $$('[data-choose]').forEach(c => { c.onclick = () => { const id = +c.dataset.choose; closeModal(); if (act(w => E.chooseSpirit(w, id))) { Sfx.card(); toast('Esprit choisi : ' + esc(E.CARD_BY_ID.get(id).fr)); } renderGame(); }; });
   }
   function scoreTable(s) {
-    const rows = [['trees', '🌳 Arbres'], ['mountains', '⛰️ Montagnes'], ['fields', '🌾 Champs'], ['buildings', '🏠 Bâtiments'], ['water', s.opts.side === 'B' ? '🏝️ Îles' : '🌊 Rivière'], ['animals', '🐾 Animaux'], ['spirit', '✨ Esprit']];
+    const rows = [['trees', miniTok(4) + 'Arbres'], ['mountains', miniTok(2) + 'Montagnes'], ['fields', miniTok(5) + 'Champs'], ['buildings', miniTok(6) + 'Bâtiments'], ['water', miniTok(1) + (s.opts.side === 'B' ? 'Îles' : 'Rivière')], ['animals', '<span class="mcube"></span>Animaux'], ['spirit', ic('sparkles', 'inl') + 'Esprit']];
     const scores = s.players.map(p => E.scorePlayer(p, s.opts.side));
     return '<table class="scores"><tr><th></th>' + s.players.map((p, i) => '<th style="color:' + SEAT_COLORS[i] + '">' + esc(p.name) + '</th>').join('') + '</tr>' +
       rows.filter(([k]) => k !== 'spirit' || s.opts.spirits).map(([k, label]) => '<tr><td>' + label + '</td>' + scores.map(sc => '<td>' + sc[k] + '</td>').join('') + '</tr>').join('') +
@@ -1997,7 +2154,7 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
   }
   function showScores() {
     const s = view();
-    modal('<h2>Score en direct</h2>' + scoreTable(s) + '<p class="note">Estimation calculée sur l\'état actuel des plateaux (' + esc(SIDE_LABEL[s.opts.side]) + ').</p><div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>');
+    modal('<h2>' + ic('chart', 'h') + 'Score en direct</h2>' + scoreTable(s) + '<p class="note">Estimation calculée sur l\'état actuel des plateaux (' + esc(SIDE_LABEL[s.opts.side]) + ').</p><div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>');
     $('#m-close').onclick = closeModal;
   }
   function showResults() {
@@ -2006,9 +2163,9 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     const winners = s.result.winners.map(i => s.players[i].name);
     const iWon = app.mode === 'local' || s.result.winners.includes(mySeat());
     const reason = s.endReason === 'bag' ? 'le sac était vide' : 'un plateau n\'avait plus que 2 cases vides ou moins';
-    modal('<h2>🏁 Fin de partie</h2><div class="winner">' + (winners.length > 1 ? 'Égalité : ' + esc(winners.join(' & ')) : '🏆 ' + esc(winners[0]) + ' gagne !') + '</div>' +
+    modal('<h2>' + ic('flag', 'h') + 'Fin de partie</h2><div class="winner">' + ic('trophy', 'big') + (winners.length > 1 ? 'Égalité : ' + esc(winners.join(' & ')) : esc(winners[0]) + ' gagne !') + '</div>' +
       scoreTable(s) + '<p class="note">Fin déclenchée car ' + reason + '. En cas d\'égalité, le plus grand nombre de cubes posés l\'emporte.</p>' +
-      '<div class="actions"><button class="btn secondary" id="m-close">Voir les plateaux</button><button class="btn" id="m-again">Revanche</button></div>');
+      '<div class="actions"><button class="btn secondary" id="m-close">Voir les plateaux</button><button class="btn primary" id="m-again">' + ic('refresh') + 'Revanche</button></div>');
     $('#m-close').onclick = closeModal;
     $('#m-again').onclick = rematch;
     if (iWon) { confetti(); Sfx.win(); } else Sfx.lose();
@@ -2032,12 +2189,12 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
   function showMenu() {
     const s = app.committed;
     const link = location.origin + location.pathname + '?g=' + (s.id || '');
-    modal('<h2>Menu</h2><ul class="menu">' +
-      (app.mode === 'online' ? '<li id="mn-share">📤 Partager le lien de la partie</li>' : '') +
-      '<li id="mn-scores">📊 Score détaillé</li><li id="mn-rules">📖 Règles et légende</li>' +
-      (app.mode === 'online' && s.status === 'playing' && mySeat() < 0 ? '<li id="mn-claim">🪪 Je suis un des joueurs (reprendre ma place)</li>' : '') +
-      (app.mode === 'online' ? '<li id="mn-reload">↻ Recharger la partie</li>' : '') +
-      '<li id="mn-home">🏠 Retour à l\'accueil</li></ul>' +
+    modal('<h2>' + ic('menu', 'h') + 'Menu</h2><ul class="menu">' +
+      (app.mode === 'online' ? '<li id="mn-share">' + ic('share') + 'Partager le lien de la partie</li>' : '') +
+      '<li id="mn-scores">' + ic('chart') + 'Score détaillé</li><li id="mn-rules">' + ic('book') + 'Règles et légende</li>' +
+      (app.mode === 'online' && s.status === 'playing' && mySeat() < 0 ? '<li id="mn-claim">' + ic('users') + 'Je suis un des joueurs (reprendre ma place)</li>' : '') +
+      (app.mode === 'online' ? '<li id="mn-reload">' + ic('refresh') + 'Recharger la partie</li>' : '') +
+      '<li id="mn-home">' + ic('home') + 'Retour à l\'accueil</li></ul>' +
       '<p class="note">' + (app.mode === 'online' ? 'Partie en ligne · code ' + esc(s.id) + ' · ' : 'Partie locale · ') + esc(SIDE_LABEL[s.opts.side]) + (s.opts.spirits ? ' · Esprits' : '') + '</p>' +
       '<div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>');
     $('#m-close').onclick = closeModal;
@@ -2049,19 +2206,19 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
     on('#mn-home', () => { closeModal(); leaveGame(); renderHome(); });
     on('#mn-claim', () => {
       closeModal();
-      modal('<h2>Qui es-tu ?</h2><p class="note">Cet appareil n\'est associé à aucun joueur de la partie (nouveau téléphone, données effacées…).</p><ul class="menu">' +
-        s.players.map((p, i) => '<li data-seat="' + i + '"><span class="dot" style="background:' + SEAT_COLORS[i] + '"></span>' + esc(p.name) + '</li>').join('') + '</ul><div class="actions"><button class="btn secondary" id="m-close">Annuler</button></div>');
+      modal('<h2>' + ic('users', 'h') + 'Qui es-tu ?</h2><p class="note">Cet appareil n\'est associé à aucun joueur de la partie (nouveau téléphone, données effacées…).</p><ul class="menu">' +
+        s.players.map((p, i) => '<li data-seat="' + i + '">' + seatDot(i) + esc(p.name) + '</li>').join('') + '</ul><div class="actions"><button class="btn secondary" id="m-close">Annuler</button></div>');
       $('#m-close').onclick = closeModal;
       $$('.menu li[data-seat]').forEach(li => { li.onclick = async () => {
         const st = E.clone(app.committed); st.players[+li.dataset.seat].pid = myPid();
-        try { const r = await app.net.saveGame(app.gameId, st, app.version); app.committed = st; app.version = r.version; app.work = null; closeModal(); render(); toast('Bienvenue, ' + st.players[+li.dataset.seat].name); }
+        try { const r = await app.net.saveGame(app.gameId, st, app.version); app.committed = st; app.version = r.version; app.work = null; closeModal(); render(); toast('Bienvenue, ' + esc(st.players[+li.dataset.seat].name)); }
         catch (e) { toast('Échec : ' + e.message, true); refresh(); }
       }; });
     });
   }
   function showRules() {
     const tok = c => R.tokenSVG(c);
-    modal('<h2>📖 Règles essentielles</h2><div class="rules">' +
+    modal('<h2>' + ic('book', 'h') + 'Règles essentielles</h2><div class="rules">' +
       '<p><b>Tour de jeu</b> — obligatoire : prendre les 3 jetons d\'un emplacement du plateau central et les poser. Optionnel (à tout moment, même entre deux jetons) : prendre 1 carte Animal (une par tour, max 4 cartes en cours) et poser des cubes (sans limite).</p>' +
       '<p><b>Empilement</b> — bleu et jaune : uniquement au sol, rien dessus. Gris : au sol ou sur du gris (max 3). Marron : au sol ou sur 1 marron. Vert : au sol (buisson) ou sur 1 ou 2 marrons (arbre). Rouge : au sol ou sur 1 gris / marron / rouge (bâtiment). Jamais sur une case qui porte un cube.</p>' +
       '<div class="legend">' +
@@ -2081,13 +2238,13 @@ else if (typeof self !== 'undefined') self.CARDS = CARDS;
 
   // ---------- Démarrage ----------
   function boot() {
-    document.body.insertAdjacentHTML('afterbegin', R.defsSVG());
+    document.body.insertAdjacentHTML('afterbegin', R.defsSVG() + (root.ANIMAL_SPRITE || ''));
     const params = new URLSearchParams(location.search);
     const code = (params.get('g') || '').toUpperCase();
     if (params.get('pid')) { try { sessionStorage.setItem('harmonies.pid', params.get('pid')); } catch (e) { /* ignore */ } }
     if (params.get('name')) ls.set('harmonies.name', params.get('name'));
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && app.mode === 'online' && app.gameId) refresh(); });
-    document.addEventListener('pointerdown', () => Sfx.unlock(), { once: true, passive: true });
+    document.addEventListener('pointerdown', () => { interacted = true; Sfx.unlock(); }, { once: true, passive: true });
     if (code && ONLINE_OK) {
       renderHome();
       openOnline(code).then(async () => {
