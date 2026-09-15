@@ -232,21 +232,23 @@
     opts = opts || {};
     const left = opts.left === undefined ? card.pts.length : opts.left;
     const placed = card.pts.length - left;
-    const cls = 'card' + (card.spirit ? ' spirit' : '') + (opts.cls ? ' ' + opts.cls : '');
+    const cubeStep = card.pat.find(p => p.cube);
+    const tone = card.spirit ? 'sp' : (cubeStep.s[0] === 7 ? 6 : cubeStep.s[0]);
+    const cls = 'card tone-' + tone + (card.spirit ? ' spirit' : '') + (opts.cls ? ' ' + opts.cls : '');
     const badge = opts.badge ? '<div class="badge' + (opts.badgeCls ? ' ' + opts.badgeCls : '') + '">' + opts.badge + '</div>' : '';
     let track = '';
     if (!card.spirit) {
       track = '<div class="track">' + card.pts.map((v, i) => {
         const c = i < placed ? 'step got' + (i === placed - 1 ? ' cur' : '') : 'step cube';
-        return '<div class="' + c + '" data-step="' + i + '" title="' + v + ' pts">' + (i < placed ? v : '') + '</div>';
-      }).reverse().join('') + '</div>';
+        return '<div class="' + c + '" data-step="' + i + '" title="' + v + ' pts"><span>' + v + '</span></div>';
+      }).join('') + '</div>';
     }
     const foot = card.spirit ? '<div class="rule">' + esc(card.rule) + '</div>' :
-      '<div class="foot">' + (opts.done ? 'terminée · ' + card.pts[card.pts.length - 1] + ' pts' : (placed ? placed + '/' + card.pts.length + ' posé' + (placed > 1 ? 's' : '') + ' · ' + E.cardValue(card, left) + ' pts' : card.pts.length + ' cubes · jusqu\'à ' + card.pts[card.pts.length - 1] + ' pts')) + '</div>';
-    return '<div class="' + cls + '" data-card="' + card.id + '" ' + (opts.attrs || '') + '>' +
-      '<div class="stripe" style="background:' + R.cubeColorOf(card) + '"></div>' + badge +
-      '<div class="art">' + R.sceneSVG(card) + R.animalSVG(card.id) + '<div class="name">' + esc(card.fr) + '</div></div>' +
-      track + R.patternSVG(card) + foot + '</div>';
+      '<div class="foot">' + (opts.done ? 'terminée · ' + card.pts[card.pts.length - 1] + ' pts' : (placed ? placed + '/' + card.pts.length + ' posé' + (placed > 1 ? 's' : '') + ' · vaut ' + E.cardValue(card, left) + ' pts' : card.pts.length + ' cubes à poser')) + '</div>';
+    return '<div class="' + cls + '" data-card="' + card.id + '" ' + (opts.attrs || '') + '>' + badge +
+      '<div class="head">' + esc(card.fr) + '</div>' +
+      '<div class="art">' + R.sceneSVG(card) + R.animalSVG(card.id) + '</div>' +
+      R.patternSVG(card) + track + foot + '</div>';
   }
   function cardDetail(card, extraHTML) {
     const step = card.pat.find(p => p.cube);
@@ -254,7 +256,7 @@
     const howto = card.spirit
       ? '<p><b>Esprit de la Nature.</b> Pose son cube quand le motif est réalisé ; en fin de partie : ' + esc(card.rule) + '.</p>'
       : '<p>Valeur selon le nombre de cubes posés : <b>' + card.pts.join(' → ') + '</b> pts. Le cube se pose sur le jeton <b>' + E.COLOR_NAMES[cubeColor] + '</b> ' + miniTok(cubeColor) + ' du motif, dans n\'importe quelle orientation.</p>';
-    modal('<h2>' + R.animalSVG(card.id, 'h') + esc(card.fr) + '</h2>' + cardHTML(card, { cls: 'big' }) + howto + (extraHTML || '') +
+    modal(cardHTML(card, { cls: 'big' }) + howto + (extraHTML || '') +
       '<div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>');
     $('#m-close').onclick = closeModal;
   }
@@ -654,7 +656,7 @@
     // Cartes du joueur affiché
     const p = viewing;
     const items = [];
-    if (p.spiritChoices && viewingMine) items.push('<div class="card spirit choose" id="spirit-choose"><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '<div class="name">Esprit</div></div><div class="choose-body">' + ic('sparkles') + 'Choisis ton Esprit de la Nature</div><div class="foot">2 cartes à découvrir</div></div>');
+    if (p.spiritChoices && viewingMine) items.push('<div class="card tone-sp spirit choose" id="spirit-choose"><div class="head">Esprit de la Nature</div><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '</div><div class="choose-body">' + ic('sparkles') + 'Choisis ton Esprit</div><div class="foot">2 cartes à découvrir</div></div>');
     if (p.spirit) {
       const card = E.CARD_BY_ID.get(p.spirit.id);
       const pl = placeableIds.has(card.id) && viewingMine;
@@ -818,7 +820,7 @@
   }
   async function animatedCube(state, cardId, cellIdx) {
     const steps = $$('.card[data-mine][data-card="' + cardId + '"] .track .step.cube');
-    const from = rectOf(steps.length ? steps[steps.length - 1] : $('.card[data-mine][data-card="' + cardId + '"]'));
+    const from = rectOf(steps.length ? steps[0] : $('.card[data-mine][data-card="' + cardId + '"]'));
     const spirit = E.CARD_BY_ID.get(cardId).spirit;
     E.placeCube(state, cardId, cellIdx);
     renderGame({ newCube: cellIdx });

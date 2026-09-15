@@ -211,52 +211,61 @@ input[type=text]:focus { outline: none; border-color: var(--teal-l); box-shadow:
 @media (max-width: 380px) { .handbar .actions .lbl { display: none; } }
 
 /* Cartes */
-.cards-strip { display: flex; gap: 10px; overflow-x: auto; padding: 6px 12px 12px; scroll-snap-type: x proximity; align-items: stretch; }
+.cards-strip { display: flex; gap: 10px; overflow-x: auto; padding: 8px 12px 12px; scroll-snap-type: x proximity; align-items: stretch; }
 .deck-wrap { flex: 0 0 auto; width: 60px; display: flex; align-items: center; scroll-snap-align: start; }
 .deck-wrap .deck { width: 60px; height: 84px; display: block; filter: drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
 .card {
-  flex: 0 0 auto; width: 138px; background: var(--paper); border: 2px solid var(--line); border-radius: 18px; padding: 6px 30px 6px 10px;
-  box-shadow: var(--shadow); position: relative; scroll-snap-align: start; cursor: pointer; display: flex; flex-direction: column; gap: 4px;
-  transition: transform .12s, box-shadow .2s;
+  --tone: #2a8f8a; --tone-bg: #e3f2fb;
+  flex: 0 0 auto; width: 142px; border-radius: 18px; padding: 0 0 8px; border: 0; overflow: hidden;
+  background: var(--tone-bg); background-image: repeating-linear-gradient(-28deg, rgba(255,255,255,.4) 0 3px, transparent 3px 9px);
+  box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,.6); position: relative; scroll-snap-align: start; cursor: pointer;
+  display: flex; flex-direction: column; gap: 5px; transition: transform .12s, box-shadow .2s;
 }
+.card.tone-1 { --tone: #3d8fc4; --tone-bg: #e2f1fb; }
+.card.tone-2 { --tone: #6f767c; --tone-bg: #eceff2; }
+.card.tone-3 { --tone: #8a5a35; --tone-bg: #f4e7d7; }
+.card.tone-4 { --tone: #5f9a35; --tone-bg: #e8f4d9; }
+.card.tone-5 { --tone: #d9a419; --tone-bg: #fdf2c8; }
+.card.tone-6 { --tone: #c9433f; --tone-bg: #fbe4dc; }
+.card.tone-sp { --tone: #c8912a; --tone-bg: #fbeecb; }
 .card:active { transform: scale(.98); }
-.card.spirit { background: linear-gradient(180deg, #fff8e6, #fbebc4); border-color: #e2b95a; }
-.card.takeable { border-color: var(--teal-l); }
-.card.placeable { border-color: var(--orange); animation: placeable 1.6s ease-in-out infinite; }
-@keyframes placeable { 0%, 100% { box-shadow: 0 0 0 3px rgba(232,135,58,.28), var(--shadow); } 50% { box-shadow: 0 0 0 7px rgba(232,135,58,.06), var(--shadow); } }
+.card.takeable { box-shadow: 0 0 0 2px var(--teal-l), var(--shadow); }
+.card.placeable { animation: placeable 1.6s ease-in-out infinite; }
+@keyframes placeable { 0%, 100% { box-shadow: 0 0 0 3px rgba(232,135,58,.6), var(--shadow); } 50% { box-shadow: 0 0 0 7px rgba(232,135,58,.12), var(--shadow); } }
 .card.done { opacity: .78; }
-.card .art { position: relative; height: 64px; border-radius: 12px; overflow: hidden; }
+.card .head { background: var(--tone); color: #fff; font-family: var(--display); font-weight: 600; font-size: 14px; line-height: 1.15; padding: 7px 10px 6px; text-align: center; letter-spacing: .2px; text-shadow: 0 1px 0 rgba(0,0,0,.15); }
+.card .art { position: relative; height: 66px; margin: 0 7px; border-radius: 12px; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(255,255,255,.5); }
 .card .art .scene { position: absolute; inset: 0; width: 100%; height: 100%; }
-.card .art .animal { position: absolute; left: 3px; bottom: 1px; width: 48px; height: 48px; filter: drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
-.card .art .name { position: absolute; right: 5px; top: 5px; font-family: var(--display); font-size: 12px; font-weight: 600; color: var(--navy); background: rgba(255,253,248,.9); padding: 2px 8px; border-radius: 999px; max-width: 80px; text-align: right; line-height: 1.15; }
-.card .pattern { width: 100%; height: 62px; display: block; }
-.card .track { position: absolute; right: 5px; top: 8px; bottom: 8px; display: flex; flex-direction: column; justify-content: flex-end; gap: 3px; }
+.card .art .animal { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 54px; height: 54px; filter: drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
+.card .pattern { width: calc(100% - 8px); height: 60px; display: block; margin: 0 auto; }
+.card .track { display: flex; justify-content: center; gap: 4px; padding: 0 6px; }
 .card .track .step {
-  width: 21px; height: 21px; border-radius: 6px; display: grid; place-items: center; font-family: var(--display); font-size: 11.5px; font-weight: 600;
-  background: #eee6d4; color: var(--muted);
+  width: 24px; height: 26px; border-radius: 7px; display: grid; place-items: center; font-family: var(--display); font-size: 12px; font-weight: 600;
+  background: rgba(255,255,255,.75); color: var(--muted); box-shadow: inset 0 0 0 1px rgba(30,42,90,.08);
 }
-.card .track .step.cube { background: linear-gradient(180deg, #4a3a2c 0 35%, #2b2118 35%); box-shadow: 0 1px 2px rgba(0,0,0,.4); }
+.card .track .step.cube { background: linear-gradient(180deg, #4a3a2c 0 35%, #2b2118 35%); color: rgba(255,255,255,.55); box-shadow: 0 1px 2px rgba(0,0,0,.4); }
 .card.spirit .track .step.cube { background: linear-gradient(180deg, #f0c975 0 35%, #d9a441 35%); }
-.card .track .step.got { background: #e3f1ef; color: var(--teal-d); }
-.card .track .step.cur { background: var(--teal); color: #fff; box-shadow: 0 0 0 2px rgba(42,143,138,.3); }
-.card .stripe { position: absolute; left: 0; top: 12px; bottom: 12px; width: 5px; border-radius: 0 4px 4px 0; }
+.card .track .step.got { background: #fff; color: var(--teal-d); }
+.card .track .step.cur { background: var(--teal); color: #fff; box-shadow: 0 0 0 2px rgba(42,143,138,.3); transform: scale(1.08); }
 .card .badge {
-  position: absolute; right: -4px; top: -8px; background: linear-gradient(135deg, #f4a55c, var(--orange)); color: #fff; border-radius: 999px; font-family: var(--display); font-size: 12.5px; font-weight: 600; padding: 4px 10px;
-  box-shadow: var(--shadow); z-index: 2; display: inline-flex; align-items: center; gap: 4px;
+  position: absolute; right: 6px; top: 34px; background: linear-gradient(135deg, #f4a55c, var(--orange)); color: #fff; border-radius: 999px; font-family: var(--display); font-size: 12.5px; font-weight: 600; padding: 4px 10px;
+  box-shadow: var(--shadow-lg); z-index: 2; display: inline-flex; align-items: center; gap: 4px;
 }
 .card .badge .ic { width: 14px; height: 14px; }
 .card .badge.teal { background: linear-gradient(135deg, var(--teal-l), var(--teal)); }
-.card .rule { font-size: 11px; color: var(--muted); line-height: 1.2; font-weight: 700; }
-.card .foot { font-size: 11px; color: var(--muted); text-align: center; font-weight: 700; }
-.card.empty { border-style: dashed; background: transparent; box-shadow: none; cursor: default; min-height: 170px; padding: 0; }
+.card .rule { font-size: 11px; color: var(--ink); line-height: 1.25; font-weight: 700; padding: 0 8px; text-align: center; }
+.card .foot { font-size: 11px; color: var(--muted); text-align: center; font-weight: 700; padding: 0 6px; }
+.card.empty { border: 2px dashed var(--line); background: transparent; box-shadow: none; cursor: default; min-height: 190px; padding: 0; }
 .card .empty-text { display: grid; place-items: center; height: 100%; color: var(--muted); font-size: 13px; font-weight: 700; }
-.card.choose { padding-right: 10px; }
-.card .choose-body { font-family: var(--display); font-size: 13.5px; font-weight: 500; color: var(--navy); text-align: center; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.card .choose-body { font-family: var(--display); font-size: 13.5px; font-weight: 500; color: var(--navy); text-align: center; padding: 6px 6px; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; justify-content: center; }
 .card .choose-body .ic { width: 26px; height: 26px; color: var(--orange); }
 .card.big { width: 100%; cursor: default; }
-.card.big .art { height: 96px; }
-.card.big .art .animal { width: 64px; height: 64px; }
+.card.big .head { font-size: 17px; padding: 9px 12px; }
+.card.big .art { height: 110px; margin: 0 10px; }
+.card.big .art .animal { width: 84px; height: 84px; }
 .card.big .pattern { height: 120px; }
+.card.big .track .step { width: 34px; height: 34px; font-size: 15px; border-radius: 9px; }
+.card.big .foot, .card.big .rule { font-size: 13px; }
 
 /* Journal */
 .log { list-style: none; padding: 0 12px 12px; margin: 0; font-size: 13px; color: var(--muted); }
@@ -269,7 +278,7 @@ input[type=text]:focus { outline: none; border-color: var(--teal-l); box-shadow:
 .arriving { visibility: hidden; }
 .fly { position: fixed; z-index: 100; pointer-events: none; transform-origin: top left; will-change: transform; }
 .fly svg { width: 100%; height: 100%; display: block; }
-.ghost-card { width: 100%; height: 100%; border-radius: 16px; background: var(--paper); border: 3px solid var(--line); display: grid; place-items: center; box-shadow: 0 6px 14px rgba(0,0,0,.3); }
+.ghost-card { width: 100%; height: 100%; border-radius: 16px; background: var(--paper); border: 3px solid var(--tone, var(--line)); display: grid; place-items: center; box-shadow: 0 6px 14px rgba(0,0,0,.3); }
 .ghost-card .animal { width: 60%; height: 60%; }
 .ghost-card.back { background: #4e351d url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Ccircle cx='7' cy='8' r='2.6' fill='%23f3d9a6' opacity='.35'/%3E%3Ccircle cx='4' cy='4' r='1.1' fill='%23f3d9a6' opacity='.35'/%3E%3Ccircle cx='7' cy='2.6' r='1.1' fill='%23f3d9a6' opacity='.35'/%3E%3Ccircle cx='10' cy='4' r='1.1' fill='%23f3d9a6' opacity='.35'/%3E%3C/svg%3E"); border-color: #7a5d33; }
 .ghost-cube { width: 100%; height: 100%; border-radius: 15%; background: linear-gradient(180deg, #4a3a2c 0 35%, #2b2118 35%); box-shadow: 0 4px 10px rgba(0,0,0,.35); }
@@ -1456,21 +1465,23 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     opts = opts || {};
     const left = opts.left === undefined ? card.pts.length : opts.left;
     const placed = card.pts.length - left;
-    const cls = 'card' + (card.spirit ? ' spirit' : '') + (opts.cls ? ' ' + opts.cls : '');
+    const cubeStep = card.pat.find(p => p.cube);
+    const tone = card.spirit ? 'sp' : (cubeStep.s[0] === 7 ? 6 : cubeStep.s[0]);
+    const cls = 'card tone-' + tone + (card.spirit ? ' spirit' : '') + (opts.cls ? ' ' + opts.cls : '');
     const badge = opts.badge ? '<div class="badge' + (opts.badgeCls ? ' ' + opts.badgeCls : '') + '">' + opts.badge + '</div>' : '';
     let track = '';
     if (!card.spirit) {
       track = '<div class="track">' + card.pts.map((v, i) => {
         const c = i < placed ? 'step got' + (i === placed - 1 ? ' cur' : '') : 'step cube';
-        return '<div class="' + c + '" data-step="' + i + '" title="' + v + ' pts">' + (i < placed ? v : '') + '</div>';
-      }).reverse().join('') + '</div>';
+        return '<div class="' + c + '" data-step="' + i + '" title="' + v + ' pts"><span>' + v + '</span></div>';
+      }).join('') + '</div>';
     }
     const foot = card.spirit ? '<div class="rule">' + esc(card.rule) + '</div>' :
-      '<div class="foot">' + (opts.done ? 'terminée · ' + card.pts[card.pts.length - 1] + ' pts' : (placed ? placed + '/' + card.pts.length + ' posé' + (placed > 1 ? 's' : '') + ' · ' + E.cardValue(card, left) + ' pts' : card.pts.length + ' cubes · jusqu\'à ' + card.pts[card.pts.length - 1] + ' pts')) + '</div>';
-    return '<div class="' + cls + '" data-card="' + card.id + '" ' + (opts.attrs || '') + '>' +
-      '<div class="stripe" style="background:' + R.cubeColorOf(card) + '"></div>' + badge +
-      '<div class="art">' + R.sceneSVG(card) + R.animalSVG(card.id) + '<div class="name">' + esc(card.fr) + '</div></div>' +
-      track + R.patternSVG(card) + foot + '</div>';
+      '<div class="foot">' + (opts.done ? 'terminée · ' + card.pts[card.pts.length - 1] + ' pts' : (placed ? placed + '/' + card.pts.length + ' posé' + (placed > 1 ? 's' : '') + ' · vaut ' + E.cardValue(card, left) + ' pts' : card.pts.length + ' cubes à poser')) + '</div>';
+    return '<div class="' + cls + '" data-card="' + card.id + '" ' + (opts.attrs || '') + '>' + badge +
+      '<div class="head">' + esc(card.fr) + '</div>' +
+      '<div class="art">' + R.sceneSVG(card) + R.animalSVG(card.id) + '</div>' +
+      R.patternSVG(card) + track + foot + '</div>';
   }
   function cardDetail(card, extraHTML) {
     const step = card.pat.find(p => p.cube);
@@ -1478,7 +1489,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     const howto = card.spirit
       ? '<p><b>Esprit de la Nature.</b> Pose son cube quand le motif est réalisé ; en fin de partie : ' + esc(card.rule) + '.</p>'
       : '<p>Valeur selon le nombre de cubes posés : <b>' + card.pts.join(' → ') + '</b> pts. Le cube se pose sur le jeton <b>' + E.COLOR_NAMES[cubeColor] + '</b> ' + miniTok(cubeColor) + ' du motif, dans n\'importe quelle orientation.</p>';
-    modal('<h2>' + R.animalSVG(card.id, 'h') + esc(card.fr) + '</h2>' + cardHTML(card, { cls: 'big' }) + howto + (extraHTML || '') +
+    modal(cardHTML(card, { cls: 'big' }) + howto + (extraHTML || '') +
       '<div class="actions"><button class="btn secondary" id="m-close">Fermer</button></div>');
     $('#m-close').onclick = closeModal;
   }
@@ -1878,7 +1889,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     // Cartes du joueur affiché
     const p = viewing;
     const items = [];
-    if (p.spiritChoices && viewingMine) items.push('<div class="card spirit choose" id="spirit-choose"><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '<div class="name">Esprit</div></div><div class="choose-body">' + ic('sparkles') + 'Choisis ton Esprit de la Nature</div><div class="foot">2 cartes à découvrir</div></div>');
+    if (p.spiritChoices && viewingMine) items.push('<div class="card tone-sp spirit choose" id="spirit-choose"><div class="head">Esprit de la Nature</div><div class="art">' + R.hillsSVG(120, 70, ['#f2c94c', '#e8873a', '#d96a8e', '#6b4fa0'], { seed: 99, cls: 'scene' }) + '</div><div class="choose-body">' + ic('sparkles') + 'Choisis ton Esprit</div><div class="foot">2 cartes à découvrir</div></div>');
     if (p.spirit) {
       const card = E.CARD_BY_ID.get(p.spirit.id);
       const pl = placeableIds.has(card.id) && viewingMine;
@@ -2042,7 +2053,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
   }
   async function animatedCube(state, cardId, cellIdx) {
     const steps = $$('.card[data-mine][data-card="' + cardId + '"] .track .step.cube');
-    const from = rectOf(steps.length ? steps[steps.length - 1] : $('.card[data-mine][data-card="' + cardId + '"]'));
+    const from = rectOf(steps.length ? steps[0] : $('.card[data-mine][data-card="' + cardId + '"]'));
     const spirit = E.CARD_BY_ID.get(cardId).spirit;
     E.placeCube(state, cardId, cellIdx);
     renderGame({ newCube: cellIdx });
