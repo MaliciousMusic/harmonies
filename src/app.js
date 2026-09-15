@@ -245,6 +245,10 @@
   };
   // Chat de la partie (en ligne) : messages reçus, dernier id connu, non lus
   const chat = { msgs: [], lastId: 0, unread: 0, unsub: null, open: false };
+  // Compte (téléphone + PIN), amis, invitations reçues
+  const acct = { me: ls.get('harmonies.account', null), friends: [], invites: [], unsub: null, loading: false };
+  app.online = new Set(); // pids des joueurs actuellement connectés à la partie (présence temps réel)
+  app.invited = new Set(); // amis déjà invités à la partie en cours
   const view = () => (app.replay ? app.replay.state : (app.work || app.committed));
   const isMine = () => {
     const s = app.committed;
@@ -312,7 +316,9 @@
   function avatarHTML(p, seat, cls) {
     const color = seat >= 0 && seat < SEAT_COLORS.length ? SEAT_COLORS[seat] : '#2a8f8a';
     const id = (p && p.avatar) || (p && p.bot ? Bot.avatarFor(p.name) : 0);
-    return '<span class="avatar' + (cls ? ' ' + cls : '') + '" style="--seat:' + color + '">' + (id && E.CARD_BY_ID.has(id) ? R.animalSVG(id) : '<b>' + esc(String((p && p.name) || '?').slice(0, 1).toUpperCase()) + '</b>') + '</span>';
+    const pid = p && p.pid && !p.bot && app.mode === 'online' ? String(p.pid) : '';
+    return '<span class="avatar' + (cls ? ' ' + cls : '') + (pid && app.online.has(pid) ? ' online' : '') + '" style="--seat:' + color + '"' + (pid ? ' data-pid="' + esc(pid) + '"' : '') + '>' +
+      (id && E.CARD_BY_ID.has(id) ? R.animalSVG(id) : '<b>' + esc(String((p && p.name) || '?').slice(0, 1).toUpperCase()) + '</b>') + '</span>';
   }
   const namePlate = (p, seat, cls) => avatarHTML(p, seat, cls || 'xs') + '<b>' + esc(p.name) + '</b>';
   // Résumé HTML des actions d'un tour (journal, toasts)
@@ -371,6 +377,43 @@
     $$('.av-choice').forEach(b => { b.onclick = () => { const id = +b.dataset.av; closeModal(); Sfx.card(); onPick(id); }; });
   }
 
+  // ---------- Notifications (page en arrière-plan : « à toi de jouer », messages, invitations) ----------
+  const Notif = {
+    can() { return typeof Notification !== 'undefined'; },
+    ask() {
+      if (!this.can() || Notification.permission !== 'default') return;
+      try { const r = Notification.requestPermission(() => { /* ancien style */ }); if (r && r.catch) r.catch(() => { /* refusé */ }); } catch (e) { /* indisponible */ }
+    },
+    async show(title, body, tag) {
+      if (!this.can() || Notification.permission !== 'granted' || document.visibilityState === 'visible') return;
+      const opts = { body, icon: 'icon-192.png', badge: 'icon-192.png', tag: tag || 'harmonies', renotify: true };
+      try {
+        const reg = navigator.serviceWorker ? await navigator.serviceWorker.getRegistration() : null;
+        if (reg && reg.showNotification) { await reg.showNotification(title, opts); return; }
+        const n = new Notification(title, opts);
+        n.onclick = () => { try { root.focus(); } catch (e) { /* ignore */ } n.close(); };
+      } catch (e) { /* plateforme sans notifications de page */ }
+    },
+  };
+  async function pinHash(phone, pin) {
+    const data = new TextEncoder().encode('harmonies:' + phone + ':' + pin);
+    if (!(root.crypto && root.crypto.subtle)) throw new Error('This browser cannot secure the PIN (needs https)');
+    const buf = await root.crypto.subtle.digest('SHA-256', data);
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  // Numéro au format international (+33…) ; un numéro français peut être saisi 06…
+  function normalizePhone(raw) {
+    let t = String(raw || '').replace(/[\s().\-]/g, '');
+    if (t.startsWith('00')) t = '+' + t.slice(2);
+    if (!t.startsWith('+')) { if (/^0\d{9}$/.test(t)) t = '+33' + t.slice(1); else if (/^\d{7,15}$/.test(t)) t = '+' + t; }
+    return /^\+[1-9]\d{6,14}$/.test(t) ? t : null;
+  }
+  function fmtPhone(p) {
+    p = String(p || '');
+    if (/^\+33\d{9}$/.test(p)) return '+33 ' + p.slice(3, 4) + ' ' + p.slice(4).replace(/(\d\d)(?=\d)/g, '$1 ');
+    return p.replace(/(\d{3})(?=\d)/g, '$1 ');
+  }
+
   // ---------- Écran d'accueil (fond de collines plein écran, lion) ----------
   function bgHTML() {
     const w = Math.max(320, root.innerWidth || 400), h = Math.max(480, root.innerHeight || 800);
@@ -400,6 +443,7 @@
       '<div class="row" style="margin-top:8px"><button class="btn primary" id="create" ' + (ONLINE_OK ? '' : 'disabled') + '>' + ic('globe') + 'Create an online game</button></div>' +
       (ONLINE_OK ? '' : '<p class="note">Online play unavailable (no server configuration).</p>') +
       '<div class="row" style="margin-top:10px"><button class="btn secondary" id="local">' + ic('phone') + 'Play on this phone</button></div></div>' +
+      '<div id="acct-panel">' + accountPanel() + '</div>' +
       '<div class="panel glass"><h2>' + ic('login', 'h') + 'Join a game</h2><div class="row"><input type="text" id="code" placeholder="CODE" maxlength="6" class="code-input"><button class="btn primary" id="join" ' + (ONLINE_OK ? '' : 'disabled') + '>Join</button></div></div>' +
       (recent.length ? '<div class="panel glass"><h2>' + ic('layers', 'h') + 'Recent games</h2><ul class="recent">' + recent.map(g =>
         '<li data-id="' + esc(g.id) + '" data-mode="' + g.mode + '"><span class="code">' + (g.mode === 'local' ? ic('phone') : esc(g.id)) + '</span><span class="meta">' + esc(g.label || '') + '<br>' + new Date(g.at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' }) + '</span><button class="btn small secondary">Open</button></li>').join('') + '</ul></div>' : '') +
@@ -407,8 +451,10 @@
       '<p>Game end: bag empty when refilling, or <b>2 empty spaces or fewer</b> on your board (the round is completed).</p><button class="btn ghost" id="rules-more">Full rules and scoring →</button></div>' +
       '<p class="credits">Unofficial adaptation of Harmonies (Johan Benvenuto, Libellud). Animal icons: OpenMoji (CC BY-SA 4.0).</p>' +
       '</div></div></div>';
-    $('#name').addEventListener('change', ev => ls.set('harmonies.name', ev.target.value.trim()));
-    $('#avatar-btn').onclick = () => showAvatarPicker(myAvatar(), id => { ls.set('harmonies.avatar', id); $('#avatar-btn').innerHTML = avatarHTML({ avatar: id, name: myName() }, -1, 'lg') + '<i>' + ic('edit') + '</i>'; });
+    $('#name').addEventListener('change', ev => { ls.set('harmonies.name', ev.target.value.trim()); syncProfile(); });
+    $('#avatar-btn').onclick = () => showAvatarPicker(myAvatar(), id => { ls.set('harmonies.avatar', id); $('#avatar-btn').innerHTML = avatarHTML({ avatar: id, name: myName() }, -1, 'lg') + '<i>' + ic('edit') + '</i>'; syncProfile(); });
+    bindAccountPanel();
+    loadHome();
     $('#side').addEventListener('click', ev => {
       const b = ev.target.closest('button'); if (!b) return;
       [...$('#side').children].forEach(x => x.classList.toggle('on', x === b));
@@ -488,6 +534,7 @@
     enterGame(id, rec.state, rec.version);
   }
   async function createOnline(opts, name) {
+    Notif.ask();
     app.net = root.Net.makeOnline(CFG); app.mode = 'online';
     const id = randomId(5);
     const state = { status: 'lobby', id, opts, host: myPid(), players: [{ pid: myPid(), name, avatar: myAvatar() }], createdAt: Date.now() };
@@ -495,8 +542,10 @@
     rememberGame({ id, mode: 'online', label: 'Online · ' + SIDE_LABEL[opts.side] });
     history.replaceState(null, '', '?g=' + id);
     enterGame(id, state, 1);
+    return id;
   }
-  async function openOnline(id) {
+  // autoJoin : rejoindre d'office la salle d'attente avec son prénom (lien reçu, invitation)
+  async function openOnline(id, autoJoin) {
     if (!ONLINE_OK) { toast('Online play unavailable', true); return; }
     app.net = root.Net.makeOnline(CFG); app.mode = 'online';
     let rec;
@@ -504,6 +553,9 @@
     if (!rec) { toast('No game with code ' + id, true); history.replaceState(null, '', location.pathname); return; }
     history.replaceState(null, '', '?g=' + id);
     enterGame(id, rec.state, rec.version);
+    if (autoJoin && app.committed && app.committed.status === 'lobby' && !app.committed.players.some(p => p.pid === myPid()) && myName()) {
+      try { await joinLobby(myName()); render(); } catch (e) { toast('Could not join: ' + e.message, true); }
+    }
   }
 
   function enterGame(id, state, version) {
@@ -514,9 +566,18 @@
     app.selToken = null; app.cubeMode = null; app.endShown = false; app.spiritPrompted = false; app.lastLogLen = (state.log || []).length;
     app.viewSeat = 0; app.stageManual = false;
     chat.msgs = []; chat.lastId = 0; chat.unread = 0; chat.open = false;
-    app.unsub = app.net.subscribe(id, () => refresh(), ok => { app.rtOk = ok; const d = $('#conn'); if (d) d.className = 'conn ' + (ok ? 'on' : 'off'); });
+    app.online = new Set(); app.invited = new Set(); app.pollTick = 0;
+    const presence = app.mode === 'online' ? { pid: myPid(), onPresence: pids => { app.online = new Set(pids); updatePresence(); } } : null;
+    app.unsub = app.net.subscribe(id, () => refresh(), ok => { app.rtOk = ok; const d = $('#conn'); if (d) d.className = 'conn ' + (ok ? 'on' : 'off'); }, presence);
     if (app.mode === 'online') {
-      app.poll = setInterval(() => { if (document.visibilityState === 'visible') { refresh(); loadChat(false); } }, 15000);
+      // toutes les 15 s au premier plan, 30 s en arrière-plan (pour prévenir quand c'est à soi de jouer)
+      app.poll = setInterval(() => {
+        app.pollTick++;
+        const visible = document.visibilityState === 'visible';
+        if (!visible && app.pollTick % 2) return;
+        refresh();
+        if (visible) loadChat(false);
+      }, 15000);
       if (app.net.chat) { chat.unsub = app.net.subscribeChat(id, m => addChatMsg(m, true)); loadChat(true); }
     }
     render();
@@ -554,6 +615,11 @@
     const me = E.current(app.committed);
     turnOverlay(avatarHTML(me, app.committed.turn, 'big') + '<div>Your turn' + (app.mode === 'online' ? ', ' + esc(me.name) : ': ' + esc(me.name)) + '!</div>');
     Sfx.turn(); vibrate([30, 40, 30]);
+    if (app.mode === 'online') Notif.show('Harmonies', 'Your turn, ' + me.name + '!', 'turn');
+  }
+  // Pastilles « en ligne » (présence) sans re-rendu complet
+  function updatePresence() {
+    $$('.avatar[data-pid]').forEach(el => el.classList.toggle('online', app.online.has(el.dataset.pid)));
   }
 
   // ---------- Rejeu animé du tour d'un autre joueur ----------
@@ -691,6 +757,7 @@
       if (st.players.some(p => p.pid === myPid())) { app.committed = st; app.version = rec.version; return; }
       if (st.players.length >= 4) { toast('The game is full (4 players)', true); return; }
       st.players.push({ pid: myPid(), name, avatar: myAvatar() });
+      Notif.ask();
       try {
         const r = await app.net.saveGame(app.gameId, st, rec.version);
         app.committed = st; app.version = r.version;
@@ -719,6 +786,8 @@
       (host && s.players.length < 4 ? '<div class="row" style="margin-top:8px"><select id="botlvl" class="sel"><option value="1">Novice bot</option><option value="2" selected>Skilled bot</option><option value="3">Expert bot</option></select><button class="btn secondary small" id="addbot">' + ic('plus') + 'Add a bot</button></div>' : '') +
       (inGame ? '' : '<div class="field" style="margin-top:10px"><label>Your name and animal</label><div class="me-row">' + avatarBtnHTML(myAvatar(), 'avatar-btn') + '<input type="text" id="jname" maxlength="16" value="' + esc(myName()) + '" placeholder="Your name"></div></div><button class="btn primary block" id="joinbtn">Join the game</button>') +
       '</div>' +
+      (host && acct.me ? '<div class="panel glass"><h2>' + ic('users', 'h') + 'Invite friends</h2>' + (acct.friends.length ? '<ul class="friends">' + acct.friends.map(f => '<li>' + avatarHTML(f, -1, 'md') + '<div class="f-txt"><b>' + esc(f.name) + '</b><span class="note">' + esc(fmtPhone(f.phone)) + '</span></div>' +
+        (app.invited.has(f.phone) ? '<span class="note ok">' + ic('check', 'inl') + 'Invited</span>' : '<button class="btn small primary" data-invite="' + esc(f.phone) + '">' + ic('send') + 'Invite</button>') + '</li>').join('') + '</ul>' : '<p class="note">Add friends from the home screen to invite them here without a code.</p>') + '</div>' : '') +
       (host ? '<button class="btn primary block big" id="start" ' + (s.players.length >= 2 ? '' : 'disabled') + '>' + ic('play') + 'Start the game (' + plural(s.players.length, 'player') + ')</button>' +
         (s.players.length < 2 ? '<p class="note center light">Waiting for at least one more player… this page refreshes by itself.</p>' : '') :
         '<p class="note center light">Waiting for the host to start the game… <span class="conn ' + (app.rtOk ? 'on' : '') + '" id="conn"></span></p>') +
@@ -731,6 +800,7 @@
     $('#copy').onclick = async () => { await copyText(link); toast('Link copied'); };
     $('#leave').onclick = () => { leaveGame(); renderHome(); };
     const cb = $('#chat-btn'); if (cb) cb.onclick = openChat;
+    $$('[data-invite]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await sendInvite(b.dataset.invite, s.id); render(); } catch (e) { toast(e.message, true); b.disabled = false; } }; });
     const ab2 = $('#avatar-btn'); if (ab2) ab2.onclick = () => showAvatarPicker(myAvatar(), id => { ls.set('harmonies.avatar', id); ab2.innerHTML = avatarHTML({ avatar: id, name: myName() }, -1, 'lg') + '<i>' + ic('edit') + '</i>'; });
     if (!inGame) $('#joinbtn').onclick = async () => {
       const n = $('#jname').value.trim(); if (!n) { toast('Enter your name', true); return; }
@@ -749,7 +819,7 @@
     const ab = $('#addbot'); if (ab) ab.onclick = () => { const lvl = +$('#botlvl').value; saveLobby(st => { if (st.players.length < 4) { const name = 'Bot ' + botName(st.players, lvl); st.players.push({ pid: 'bot-' + randomId(6, 'abcdefghijklmnopqrstuvwxyz0123456789'), name, bot: lvl, avatar: Bot.avatarFor(name) }); } }); };
     $$('[data-rmbot]').forEach(b => { b.onclick = () => { const i = +b.dataset.rmbot; saveLobby(st => { if (st.players[i] && st.players[i].bot) st.players.splice(i, 1); }); }; });
     if (host) $('#start').onclick = async () => {
-      Sfx.unlock();
+      Sfx.unlock(); Notif.ask();
       if (s.players.every(p => p.bot)) { toast('At least one human player is needed', true); return; }
       const st = E.newGame(s.opts, s.players.map(p => ({ token: p.pid, name: p.name, bot: p.bot || 0, avatar: p.avatar || 0 })));
       st.players.forEach((p, i) => { p.pid = s.players[i].pid; });
@@ -988,7 +1058,7 @@
     else {
       const st = E.turnStatus(s);
       actionsHTML = '<button class="btn secondary' + (folded ? ' icon' : '') + '" id="undo" ' + (app.undo.length ? '' : 'disabled') + ' title="Undo">' + ic('undo') + '<span class="lbl">Undo</span></button>' +
-        '<button class="btn primary' + (st.ok ? ' ready' : '') + '" id="end" ' + (st.ok ? '' : 'disabled') + ' title="End turn">' + (folded ? ic('flag') : '') + '<span class="lbl">' + (folded ? 'End' : 'End turn') + '</span></button>';
+        (st.ok ? '<button class="btn primary ready" id="end" title="End turn">' + (folded ? ic('flag') : '') + '<span class="lbl">' + (folded ? 'End' : 'End turn') + '</span></button>' : '');
     }
     if (folded) {
       html += '<div class="footer folded"><div class="foot-row">' + tabsHTML + '<div class="foot-hand"><div class="tokens">' + handHTML + '</div></div><div class="foot-actions">' + actionsHTML + '</div></div>';
@@ -1383,7 +1453,7 @@
     chat.lastId = Math.max(chat.lastId, m.id);
     const mine = m.pid === myPid();
     if (chat.open) renderChatList();
-    else if (!mine && notify) { chat.unread++; updateChatBadge(); chatPop(m); Sfx.chat(); vibrate(15); }
+    else if (!mine && notify) { chat.unread++; updateChatBadge(); chatPop(m); Sfx.chat(); vibrate(15); Notif.show(m.name, m.text, 'chat'); }
     return true;
   }
   function chatPop(m) {
@@ -1438,6 +1508,164 @@
     catch (e) { toast('Message not sent: ' + e.message, true); }
   }
 
+  // ---------- Compte (téléphone + PIN), amis, invitations sans code ----------
+  const acctNet = () => { if (!app.net || !app.net.rpc) { const n = root.Net.makeOnline(CFG); if (!app.net) app.net = n; return n; } return app.net; };
+  const cred = () => ({ p_phone: acct.me.phone, p_secret: acct.me.secret });
+  function accountPanel() {
+    if (!ONLINE_OK) return '';
+    const me = acct.me;
+    if (!me) {
+      return '<div class="panel glass"><h2>' + ic('users', 'h') + 'Friends</h2><p class="note">Create a free account with your phone number to add friends and invite them to games without any code. No SMS is sent — you just choose a PIN.</p>' +
+        '<div class="row" style="margin-top:8px"><button class="btn primary" id="signup">' + ic('user') + 'Sign up</button><button class="btn secondary" id="signin">' + ic('login') + 'Sign in</button></div></div>';
+    }
+    return '<div class="panel glass"><h2>' + ic('users', 'h') + 'Friends<span class="spacer"></span><button class="btn small secondary" id="signout">Sign out</button></h2>' +
+      '<div class="me-line">' + avatarHTML(me, -1, 'sm') + '<b>' + esc(me.name) + '</b><span class="note">' + esc(fmtPhone(me.phone)) + '</span></div>' +
+      (acct.invites.length ? '<div class="invites">' + acct.invites.map(inv => '<div class="inv-row">' + avatarHTML(inv.from, -1, 'sm') + '<div class="f-txt"><b>' + esc(inv.from.name) + '</b> invites you to a game<span class="note">' + esc(SIDE_LABEL[inv.side] || '') + (inv.spirits ? ' · Spirits' : '') + '</span></div>' +
+        '<button class="btn small primary" data-join-inv="' + esc(inv.game) + '">' + ic('play') + 'Join</button><button class="btn small secondary icon" data-dismiss-inv="' + inv.id + '" title="Dismiss">' + ic('x') + '</button></div>').join('') + '</div>' : '') +
+      '<ul class="friends">' + (acct.friends.length ? acct.friends.map(f => '<li>' + avatarHTML(f, -1, 'md') + '<div class="f-txt"><b>' + esc(f.name) + '</b><span class="note">' + esc(fmtPhone(f.phone)) + '</span></div>' +
+        '<button class="btn small primary" data-invite-new="' + esc(f.phone) + '">' + ic('play') + 'Invite</button><button class="btn small secondary icon" data-unfriend="' + esc(f.phone) + '" title="Remove">' + ic('x') + '</button></li>').join('') :
+        '<li class="note">' + (acct.loading ? 'Loading…' : 'No friends yet — add them with their phone number.') + '</li>') + '</ul>' +
+      '<form class="row" id="addfriend" autocomplete="off"><input type="tel" id="friend-phone" placeholder="Friend\'s number (+33…)" autocomplete="tel"><button class="btn secondary" type="submit">' + ic('plus') + 'Add</button></form></div>';
+  }
+  function refreshAccountPanel() { const box = $('#acct-panel'); if (box) { box.innerHTML = accountPanel(); bindAccountPanel(); } }
+  function bindAccountPanel() {
+    const on = (sel, fn) => { const e = $(sel); if (e) e.onclick = fn; };
+    on('#signup', () => showSignup());
+    on('#signin', () => showSignin());
+    on('#signout', signOut);
+    const af = $('#addfriend'); if (af) af.onsubmit = ev => { ev.preventDefault(); addFriend($('#friend-phone').value); };
+    $$('[data-invite-new]').forEach(b => { b.onclick = () => inviteToNewGame(b.dataset.inviteNew); });
+    $$('[data-unfriend]').forEach(b => { b.onclick = () => removeFriend(b.dataset.unfriend); });
+    $$('[data-join-inv]').forEach(b => { b.onclick = () => { Sfx.unlock(); openOnline(b.dataset.joinInv, true); }; });
+    $$('[data-dismiss-inv]').forEach(b => { b.onclick = () => dismissInvite(+b.dataset.dismissInv); });
+  }
+  function setAccount(a) {
+    acct.me = a ? { phone: a.phone, name: a.name, avatar: a.avatar, secret: a.secret } : null;
+    if (acct.me) { ls.set('harmonies.account', acct.me); if (a.name) ls.set('harmonies.name', a.name); if (a.avatar) ls.set('harmonies.avatar', a.avatar); }
+    else ls.del('harmonies.account');
+    acct.friends = []; acct.invites = [];
+    startInvites();
+  }
+  function showSignup() {
+    modal('<h2>' + ic('user', 'h') + 'Sign up</h2><p class="note">Your number only lets friends find you. No SMS is sent: choose a PIN to sign in again on another phone.</p>' +
+      '<form id="su-form" autocomplete="off"><div class="field"><label>Phone number</label><input type="tel" id="su-phone" placeholder="+33 6 12 34 56 78" autocomplete="tel"></div>' +
+      '<div class="field"><label>Your name</label><input type="text" id="su-name" maxlength="16" value="' + esc(myName()) + '" placeholder="e.g. Hadrien"></div>' +
+      '<div class="field"><label>PIN (4 to 6 digits)</label><input type="password" id="su-pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="new-password"></div>' +
+      '<div class="actions"><button class="btn secondary" type="button" id="m-close">Cancel</button><button class="btn primary" type="submit" id="su-go">Create account</button></div></form>');
+    $('#m-close').onclick = closeModal;
+    $('#su-form').onsubmit = async ev => {
+      ev.preventDefault();
+      const phone = normalizePhone($('#su-phone').value), name = $('#su-name').value.trim(), pin = $('#su-pin').value.trim();
+      if (!phone) { toast('Enter a valid phone number (e.g. +33 6 12 34 56 78)', true); return; }
+      if (!name) { toast('Enter your name', true); return; }
+      if (!/^\d{4,6}$/.test(pin)) { toast('The PIN must be 4 to 6 digits', true); return; }
+      const btn = $('#su-go'); btn.disabled = true;
+      try {
+        const a = await acctNet().rpc('harmonies_signup', { p_phone: phone, p_name: name, p_avatar: myAvatar(), p_pin_hash: await pinHash(phone, pin) });
+        setAccount(a); closeModal(); toast('Welcome, ' + esc(a.name) + '!'); renderHome();
+      } catch (e) { toast(e.message, true); btn.disabled = false; }
+    };
+  }
+  function showSignin() {
+    modal('<h2>' + ic('login', 'h') + 'Sign in</h2><form id="si-form" autocomplete="off"><div class="field"><label>Phone number</label><input type="tel" id="si-phone" placeholder="+33 6 12 34 56 78" autocomplete="tel"></div>' +
+      '<div class="field"><label>PIN</label><input type="password" id="si-pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="current-password"></div>' +
+      '<div class="actions"><button class="btn secondary" type="button" id="m-close">Cancel</button><button class="btn primary" type="submit" id="si-go">Sign in</button></div></form>');
+    $('#m-close').onclick = closeModal;
+    $('#si-form').onsubmit = async ev => {
+      ev.preventDefault();
+      const phone = normalizePhone($('#si-phone').value), pin = $('#si-pin').value.trim();
+      if (!phone || !pin) { toast('Enter your number and PIN', true); return; }
+      const btn = $('#si-go'); btn.disabled = true;
+      try {
+        const a = await acctNet().rpc('harmonies_login', { p_phone: phone, p_pin_hash: await pinHash(phone, pin) });
+        setAccount(a); closeModal(); toast('Welcome back, ' + esc(a.name) + '!'); renderHome();
+      } catch (e) { toast(e.message, true); btn.disabled = false; }
+    };
+  }
+  function signOut() { setAccount(null); toast('Signed out'); renderHome(); }
+  async function loadHome() {
+    if (!acct.me || !ONLINE_OK) return;
+    acct.loading = true;
+    try {
+      const h = await acctNet().rpc('harmonies_home', cred());
+      acct.friends = h.friends || []; acct.invites = h.invites || [];
+      if (h.account && (h.account.name !== acct.me.name || h.account.avatar !== acct.me.avatar)) { acct.me.name = h.account.name; acct.me.avatar = h.account.avatar; ls.set('harmonies.account', acct.me); }
+    } catch (e) {
+      if (/not signed in/i.test(e.message)) { setAccount(null); toast('Your session expired, please sign in again', true); }
+    }
+    acct.loading = false;
+    if (app.screen === 'home') refreshAccountPanel();
+  }
+  let profileTimer = null;
+  function syncProfile() {
+    if (!acct.me) return;
+    clearTimeout(profileTimer);
+    profileTimer = setTimeout(async () => {
+      const name = myName() || acct.me.name, avatar = myAvatar();
+      try { await acctNet().rpc('harmonies_update_profile', Object.assign(cred(), { p_name: name, p_avatar: avatar })); acct.me.name = name; acct.me.avatar = avatar; ls.set('harmonies.account', acct.me); if (app.screen === 'home') refreshAccountPanel(); }
+      catch (e) { /* réessayé au prochain changement */ }
+    }, 600);
+  }
+  async function addFriend(raw) {
+    const phone = normalizePhone(raw);
+    if (!phone) { toast('Enter a valid phone number (e.g. +33 6 12 34 56 78)', true); return; }
+    try {
+      const f = await acctNet().rpc('harmonies_add_friend', Object.assign(cred(), { p_friend: phone }));
+      if (!acct.friends.some(x => x.phone === f.phone)) acct.friends.push(f);
+      acct.friends.sort((a, b) => a.name.localeCompare(b.name));
+      toast(esc(f.name) + ' added to your friends'); Sfx.card(); refreshAccountPanel();
+    } catch (e) { toast(e.message, true); }
+  }
+  async function removeFriend(phone) {
+    try { await acctNet().rpc('harmonies_remove_friend', Object.assign(cred(), { p_friend: phone })); acct.friends = acct.friends.filter(f => f.phone !== phone); refreshAccountPanel(); }
+    catch (e) { toast(e.message, true); }
+  }
+  // Envoie une invitation pour la partie `gameId` : enregistrée côté serveur + diffusée en direct à l'ami
+  async function sendInvite(phone, gameId) {
+    const inv = await acctNet().rpc('harmonies_invite', Object.assign(cred(), { p_to: phone, p_game: gameId }));
+    app.invited.add(phone);
+    try { await acctNet().pushInvite(phone, inv); } catch (e) { /* l'ami la verra sur son accueil */ }
+    const f = acct.friends.find(x => x.phone === phone);
+    toast('Invitation sent to ' + esc(f ? f.name : fmtPhone(phone)));
+    return inv;
+  }
+  async function inviteToNewGame(phone) {
+    const name = myName() || acct.me.name;
+    if (!name) { toast('Enter your name first', true); return; }
+    Sfx.unlock();
+    const opts = ls.get('harmonies.opts', { side: 'A', spirits: false });
+    try { const id = await createOnline(opts, name); await sendInvite(phone, id); render(); }
+    catch (e) { toast('Could not invite: ' + e.message, true); }
+  }
+  async function dismissInvite(id) {
+    acct.invites = acct.invites.filter(i => i.id !== id); refreshAccountPanel();
+    try { await acctNet().rpc('harmonies_dismiss_invite', Object.assign(cred(), { p_id: id })); } catch (e) { /* ignore */ }
+  }
+  function onInvite(inv) {
+    if (!inv || !inv.game || !inv.from) return;
+    if (!acct.invites.some(i => i.id === inv.id)) acct.invites.unshift(inv);
+    if (app.screen === 'home') refreshAccountPanel();
+    if (app.gameId === inv.game) return;
+    invitePop(inv); Sfx.chat(); vibrate([20, 30, 20]);
+    Notif.show('Harmonies', inv.from.name + ' invites you to a game', 'invite');
+  }
+  function invitePop(inv) {
+    let host = $('#chat-pops');
+    if (!host) { host = document.createElement('div'); host.id = 'chat-pops'; document.body.appendChild(host); }
+    const el = document.createElement('div');
+    el.className = 'chat-pop invite';
+    el.innerHTML = avatarHTML(inv.from, -1, 'sm') + '<div class="cp-body"><b>' + esc(inv.from.name) + '</b><span>invites you to a game · ' + esc(SIDE_LABEL[inv.side] || '') + '</span></div><button class="btn small primary">' + ic('play') + 'Join</button>';
+    el.querySelector('button').onclick = ev => { ev.stopPropagation(); el.remove(); Sfx.unlock(); openOnline(inv.game, true); };
+    el.onclick = () => { el.remove(); };
+    host.appendChild(el);
+    setTimeout(() => el.classList.add('out'), 14000); setTimeout(() => el.remove(), 14400);
+  }
+  function startInvites() {
+    if (acct.unsub) { acct.unsub(); acct.unsub = null; }
+    if (!acct.me || !ONLINE_OK) return;
+    try { acct.unsub = acctNet().subscribeInvites(acct.me.phone, onInvite); } catch (e) { /* hors ligne */ }
+  }
+
   // ---------- Démarrage ----------
   function boot() {
     document.body.insertAdjacentHTML('afterbegin', R.defsSVG() + (root.ANIMAL_SPRITE || ''));
@@ -1450,15 +1678,10 @@
     document.addEventListener('pointerdown', () => { interacted = true; Sfx.unlock(); }, { once: true, passive: true });
     // page publiée : service worker (installation sur l'écran d'accueil, cache de secours hors connexion)
     if (CFG.build && 'serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js').catch(() => { /* facultatif */ }); } catch (e) { /* facultatif */ } }
-    if (code && ONLINE_OK) {
-      renderHome();
-      openOnline(code).then(async () => {
-        if (app.committed && app.committed.status === 'lobby' && !app.committed.players.some(p => p.pid === myPid()) && myName()) {
-          try { await joinLobby(myName()); render(); } catch (e) { toast('Could not join: ' + e.message, true); }
-        }
-      });
-    } else renderHome();
+    startInvites();
+    if (code && ONLINE_OK) { renderHome(); openOnline(code, true); }
+    else renderHome();
   }
-  root.HarmoniesApp = { boot, app, render, act, endTurn, refresh, Sfx, chat, sendChat, openChat };
+  root.HarmoniesApp = { boot, app, render, act, endTurn, refresh, Sfx, chat, sendChat, openChat, acct, Notif };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })(typeof self !== 'undefined' ? self : this);

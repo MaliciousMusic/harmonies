@@ -8,6 +8,8 @@ depuis un téléphone, en ligne ou en « passe le téléphone ». L'interface du
 - Les 32 cartes Animaux et les 10 cartes Esprit reprennent les motifs, cubes et points des cartes physiques (données de `src/cards.js`).
 - Une seule page HTML autonome (`docs/index.html`), sans framework ; l'état des parties en ligne vit dans Supabase (Postgres + temps réel).
 - Profil (prénom + animal), chat de partie avec bulle sur l'écran des autres joueurs, bots à 3 niveaux, installable sur l'écran d'accueil (icône lion).
+- Comptes facultatifs (numéro de téléphone + PIN, sans SMS) : liste d'amis et invitations directes sans code, présence « en ligne »
+  des joueurs, notifications quand la page est en arrière-plan (tour à jouer, message, invitation).
 
 ## Structure
 
@@ -27,7 +29,7 @@ depuis un téléphone, en ligne ou en « passe le téléphone ». L'interface du
 | `sw.js` | Service worker de la page publiée (réseau d'abord, cache de secours hors connexion). |
 | `tools/icons.html` | Génère les icônes PNG (lion) dans `assets/` via le serveur de développement. |
 | `test/engine.test.js` | Tests du moteur (`node --test test/engine.test.js`). |
-| `supabase/migrations/*.sql` | Schéma des tables `harmonies_games` et `harmonies_chat` (déjà appliqué sur le projet Supabase `harmonies`). |
+| `supabase/migrations/*.sql` | Schéma des tables `harmonies_games`, `harmonies_chat`, comptes/amis/invitations et leurs fonctions (déjà appliqué sur le projet Supabase `harmonies`). |
 
 ## Développement
 
@@ -55,3 +57,7 @@ reçoivent la mise à jour par le temps réel de Supabase (repli : rechargement 
 Les tours des bots sont joués par l'appareil de l'hôte ; si l'hôte est absent, le premier autre joueur humain connecté prend
 le relais après quelques secondes (le verrou optimiste évite les doublons).
 Le chat utilise la table `harmonies_chat` (une ligne par message, diffusée par le temps réel ; historique rechargé à l'ouverture).
+Les comptes (`harmonies_accounts`, `harmonies_friends`, `harmonies_invites`) ne sont accessibles que par des fonctions SQL
+`SECURITY DEFINER` qui vérifient le secret de l'appareil (obtenu à l'inscription ou à la connexion par numéro + PIN haché côté client) ;
+les invitations sont en plus poussées en direct par Realtime Broadcast (canal `acct-<numéro>`). La présence des joueurs passe par
+Realtime Presence sur le canal de la partie.

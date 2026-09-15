@@ -32,12 +32,38 @@
         if (!data || !data.length) { const e = new Error('conflict'); e.code = 'conflict'; throw e; }
         return { version: data[0].version };
       },
-      // onChange() est appelé à chaque modification distante ; onStatus(bool) reflète la connexion temps réel.
-      subscribe(id, onChange, onStatus) {
-        const channel = client.channel('game-' + id)
-          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: TABLE, filter: 'id=eq.' + id }, () => onChange())
-          .subscribe(status => { if (onStatus) onStatus(status === 'SUBSCRIBED'); });
+      // onChange() est appelé à chaque modification distante ; onStatus(bool) reflète la connexion temps réel ;
+      // opts.pid + opts.onPresence(pids) : présence des joueurs connectés à la partie.
+      subscribe(id, onChange, onStatus, opts) {
+        opts = opts || {};
+        const channel = client.channel('game-' + id, opts.pid ? { config: { presence: { key: opts.pid } } } : undefined)
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: TABLE, filter: 'id=eq.' + id }, () => onChange());
+        if (opts.onPresence) channel.on('presence', { event: 'sync' }, () => { try { opts.onPresence(Object.keys(channel.presenceState())); } catch (e) { /* ignore */ } });
+        channel.subscribe(async status => {
+          const ok = status === 'SUBSCRIBED';
+          if (onStatus) onStatus(ok);
+          if (ok && opts.pid) { try { await channel.track({ pid: opts.pid, at: Date.now() }); } catch (e) { /* présence facultative */ } }
+        });
         return () => { client.removeChannel(channel); };
+      },
+      // ---- comptes, amis, invitations : fonctions SQL (SECURITY DEFINER) ----
+      async rpc(name, params) {
+        const { data, error } = await client.rpc(name, params);
+        if (error) throw new Error(error.message || 'error');
+        return data;
+      },
+      subscribeInvites(phone, onInvite) {
+        const channel = client.channel('acct-' + phone, { config: { broadcast: { self: false } } })
+          .on('broadcast', { event: 'invite' }, msg => { if (msg && msg.payload) onInvite(msg.payload); })
+          .subscribe();
+        return () => { client.removeChannel(channel); };
+      },
+      // Envoi HTTP d'un message broadcast (le canal n'a pas besoin d'être rejoint)
+      async pushInvite(phone, payload) {
+        try { if (client.realtime && client.realtime.setAuth) await client.realtime.setAuth(); } catch (e) { /* ignore */ }
+        const ch = client.channel('acct-' + phone);
+        try { return await ch.send({ type: 'broadcast', event: 'invite', payload }); }
+        finally { try { client.removeChannel(ch); } catch (e) { /* ignore */ } }
       },
       // ---- chat : messages persistants (les 60 derniers au chargement), diffusés par le temps réel ----
       async loadChat(id, afterId) {
