@@ -555,11 +555,60 @@ input[type=password] { letter-spacing: 4px; }
 .chat-pop.invite { border-color: var(--teal-l); }
 .chat-pop.invite .btn.small { flex: none; }
 
+/* ---------- Accueil façon tableau de bord : profil, cloche, liste des parties, amis, nouvelle partie ---------- */
+.profile .me-row { align-items: center; }
+.bell { flex: none; border: 2px solid var(--line); background: #fff; color: var(--muted); border-radius: 14px; min-height: 46px; padding: 4px 10px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: pointer; font-family: var(--display); font-weight: 600; font-size: 10.5px; line-height: 1; min-width: 58px; }
+.bell .ic { width: 20px; height: 20px; margin: 0; }
+.bell.on { border-color: var(--teal-l); background: #dff2ec; color: var(--teal-d); }
+.bell:disabled { opacity: .5; }
+.icon-btn.light { color: var(--teal); background: transparent; width: 32px; height: 32px; }
+.gsec { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .4px; text-transform: uppercase; color: var(--muted); margin: 10px 0 2px; display: flex; align-items: center; gap: 8px; }
+.gsec.mine { color: var(--orange-d); }
+.gsec em { font-style: normal; background: var(--orange); color: #fff; border-radius: 999px; min-width: 20px; height: 20px; display: inline-grid; place-items: center; font-size: 12px; padding: 0 6px; }
+.games { list-style: none; margin: 0; padding: 0; }
+.games .grow { display: flex; align-items: center; gap: 10px; padding: 9px 4px; border-top: 1px solid var(--line); cursor: pointer; border-radius: 12px; }
+.games .grow:first-child { border-top: 0; }
+.games .grow:active { background: #f3ecdc; }
+.games .grow.mine { background: #fff4e3; border: 2px solid #f8d9b4; border-radius: 16px; padding: 9px 10px; margin: 4px 0; }
+.games .grow.mine + .grow.mine { border-top: 2px solid #f8d9b4; }
+.games .grow.done { opacity: .78; }
+.stack-av { display: inline-flex; flex: none; min-width: 42px; }
+.stack-av .avatar { margin-left: -12px; box-shadow: 0 0 0 2px var(--seat), 0 0 0 4px #fff; }
+.stack-av .avatar:first-child { margin-left: 0; }
+.stack-av.phone { width: 38px; height: 38px; border-radius: 50%; background: #eee6d4; color: var(--navy); display: grid; place-items: center; }
+.stack-av.phone .ic { width: 20px; height: 20px; margin: 0; }
+.g-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.g-txt b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--display); font-weight: 600; font-size: 15.5px; color: var(--navy); }
+.g-txt span { font-size: 12.5px; color: var(--muted); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.g-txt .yt { color: var(--orange-d); }
+.grow .chev { width: 20px; height: 20px; color: var(--muted); flex: none; }
+.hide-btn { flex: none; border: 0; background: transparent; color: var(--muted); width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; padding: 0; line-height: 0; }
+.hide-btn .ic { width: 16px; height: 16px; margin: 0; }
+.friends .f-txt .note .on { color: #2f9e5b; }
+.mycode { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line); flex-wrap: wrap; }
+.mycode .note { margin: 0; }
+.mycode b { font-family: var(--display); font-weight: 600; font-size: 20px; letter-spacing: 3px; color: var(--navy); flex: 1; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chips .chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px 5px 6px; font-size: 14px; }
+.chips .chip.on { border-color: var(--teal); background: #dff2ec; color: var(--teal-d); }
+.chips .chip.me { cursor: default; }
+.chips .chip.bot { border-color: #d9c9a8; background: #fff8ea; color: var(--orange-d); padding-left: 10px; }
+.chips .chip:disabled { opacity: .45; cursor: default; }
+.chips .chip .ic.inl { margin: 0; }
+.chip-sel { font: inherit; font-family: var(--display); font-weight: 500; font-size: 14px; padding: 6px 10px; border-radius: 999px; border: 2px dashed var(--line); background: #fff; color: var(--muted); }
+.modal .actions.col { flex-direction: column; }
+.menu li.danger { color: var(--coral); }
+.menu li.danger .ic { color: var(--coral); }
+.home-content .row .btn.ghost.light { flex: 1; }
+.modal ol { padding-left: 20px; margin: 6px 0; }
+.modal ol li { margin: 4px 0; }
+.btn.small .ic { width: 16px; height: 16px; }
+
 </style>
 </head>
 <body>
 <div id="app"></div>
-<script>window.HARMONIES_CONFIG = { url: "https://jeqdtpuoufapovxvwtwa.supabase.co", key: "sb_publishable_kTn0yH1LO-vQ7cpjMx8-hQ_ydhfxLDx", build: "20260915135932" };</script>
+<script>window.HARMONIES_CONFIG = { url: "https://jeqdtpuoufapovxvwtwa.supabase.co", key: "sb_publishable_kTn0yH1LO-vQ7cpjMx8-hQ_ydhfxLDx", vapid: "BEhl9Aga1Pn45IC87fu-IZYXV6bmAkVHnpxYlDnOiRPhi1mqwgDMUeOeiIAC6Iy4yUAOStCOt_UVQrwZ668CbwY", build: "20260920184627" };</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.min.js"></script>
 <script>
 // Données des 32 cartes Animaux (1-32) et 10 cartes Esprit de la Nature (33-42).
@@ -670,6 +719,11 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>',
     smile: '<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>',
     download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+    bell: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+    'bell-off': '<path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M18.63 13A17.89 17.89 0 0 1 18 8"/><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"/><path d="M18 8a6 6 0 0 0-9.33-5"/><line x1="1" y1="1" x2="23" y2="23"/>',
+    list: '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+    'user-plus': '<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>',
+    chevron: '<polyline points="9 18 15 12 9 6"/>',
   };
   function svg(name, cls, size) {
     const body = P[name] || P.info;
@@ -1066,11 +1120,21 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       state.cur = newTurn();
     }
   }
-  function finalResult(state) {
+  // Abandon : la partie s'arrête, le joueur qui abandonne ne peut pas gagner (les autres sont départagés normalement).
+  function resign(state, seat) {
+    assert(state.status === 'playing', 'the game is over');
+    assert(state.players[seat], 'unknown player');
+    state.status = 'finished';
+    state.endReason = 'resign';
+    state.resigned = seat;
+    state.cur = null;
+    state.result = finalResult(state, seat);
+  }
+  function finalResult(state, excluded) {
     const scores = state.players.map((p, i) => Object.assign({ seat: i, name: p.name, cubes: p.cubes }, scorePlayer(p, state.opts.side)));
-    const ranked = scores.slice().sort((a, b) => b.total - a.total || b.cubes - a.cubes);
+    const ranked = scores.filter(s => s.seat !== excluded).sort((a, b) => b.total - a.total || b.cubes - a.cubes);
     const best = ranked[0];
-    const winners = ranked.filter(s => s.total === best.total && s.cubes === best.cubes).map(s => s.seat);
+    const winners = best ? ranked.filter(s => s.total === best.total && s.cubes === best.cubes).map(s => s.seat) : [];
     return { scores, winners };
   }
 
@@ -1093,7 +1157,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     neighborCoord, canPlace, legalCells, patternCells, stackMatches, findMatches, cubeTargets,
     components, longestRiver, riverPoints, islands, scoreLandscape, scoreSpirit, scorePlayer, cardValue,
     newGame, newTurn, current, activeCount, emptyCount, takeTokens, placeToken, discardToken,
-    canTakeCard, takeCard, chooseSpirit, placeableCubes, placeCube, turnStatus, endTurn, finalResult,
+    canTakeCard, takeCard, chooseSpirit, placeableCubes, placeCube, turnStatus, endTurn, finalResult, resign,
     describeActions, shuffle, clone, emptyBoard, treeHeight, isMountain, isBuilding, top,
   };
 });
@@ -1632,7 +1696,9 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
 </script>
 <script>
 // Transport des parties : Supabase (en ligne) ou localStorage (même téléphone).
-// Interface commune : createGame, loadGame, saveGame (verrou optimiste), subscribe ; en ligne, aussi le chat (loadChat, sendChat, subscribeChat).
+// Interface commune : createGame, loadGame, saveGame (verrou optimiste), subscribe ; en ligne, aussi le chat (loadChat, sendChat,
+// subscribeChat), les fonctions SQL des profils (rpc), le canal d'événements du joueur (subscribeAccount / pushEvent),
+// la présence globale (subscribeOnline) et le suivi de plusieurs parties (subscribeGames).
 (function (root) {
   'use strict';
 
@@ -1646,6 +1712,13 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       realtime: { params: { eventsPerSecond: 5 } },
       auth: { persistSession: false, autoRefreshToken: false },
     });
+    // envoi HTTP d'un message broadcast (sans rejoindre le canal)
+    async function broadcast(topic, event, payload) {
+      try { if (client.realtime && client.realtime.setAuth) await client.realtime.setAuth(); } catch (e) { /* ignore */ }
+      const ch = client.channel(topic);
+      try { return await ch.send({ type: 'broadcast', event, payload }); }
+      finally { try { client.removeChannel(ch); } catch (e) { /* ignore */ } }
+    }
     return {
       mode: 'online',
       chat: true,
@@ -1679,25 +1752,36 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
         });
         return () => { client.removeChannel(channel); };
       },
-      // ---- comptes, amis, invitations : fonctions SQL (SECURITY DEFINER) ----
+      // Suivi de plusieurs parties (liste de l'accueil) : onChange(id) à chaque mise à jour de l'une d'elles.
+      subscribeGames(ids, onChange) {
+        ids = (ids || []).filter(id => /^[A-Z0-9]+$/.test(id)).slice(0, 30);
+        if (!ids.length) return () => {};
+        const channel = client.channel('games-' + ids.join('-').slice(0, 60) + '-' + Math.random().toString(36).slice(2, 6))
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: TABLE, filter: 'id=in.(' + ids.join(',') + ')' }, payload => onChange(payload && payload.new ? payload.new.id : null))
+          .subscribe();
+        return () => { client.removeChannel(channel); };
+      },
+      // Présence globale : qui a l'application ouverte (pastilles « en ligne » des amis, choix des notifications)
+      subscribeOnline(pid, onSync) {
+        const channel = client.channel('harmonies-online', { config: { presence: { key: pid } } })
+          .on('presence', { event: 'sync' }, () => { try { onSync(Object.keys(channel.presenceState())); } catch (e) { /* ignore */ } });
+        channel.subscribe(async status => { if (status === 'SUBSCRIBED') { try { await channel.track({ pid, at: Date.now() }); } catch (e) { /* facultatif */ } } });
+        return () => { client.removeChannel(channel); };
+      },
+      // ---- profils, amis, notifications : fonctions SQL (SECURITY DEFINER) ----
       async rpc(name, params) {
         const { data, error } = await client.rpc(name, params);
         if (error) throw new Error(error.message || 'error');
         return data;
       },
-      subscribeInvites(phone, onInvite) {
-        const channel = client.channel('acct-' + phone, { config: { broadcast: { self: false } } })
-          .on('broadcast', { event: 'invite' }, msg => { if (msg && msg.payload) onInvite(msg.payload); })
-          .subscribe();
+      // Canal d'événements d'un joueur (acct-<pid>) : 'game' (nouvelle partie), 'turn', 'finished', 'chat', 'friend'
+      subscribeAccount(pid, onEvent) {
+        const channel = client.channel('acct-' + pid, { config: { broadcast: { self: false } } });
+        ['game', 'turn', 'finished', 'chat', 'friend'].forEach(ev => channel.on('broadcast', { event: ev }, msg => { if (msg && msg.payload) onEvent(ev, msg.payload); }));
+        channel.subscribe();
         return () => { client.removeChannel(channel); };
       },
-      // Envoi HTTP d'un message broadcast (le canal n'a pas besoin d'être rejoint)
-      async pushInvite(phone, payload) {
-        try { if (client.realtime && client.realtime.setAuth) await client.realtime.setAuth(); } catch (e) { /* ignore */ }
-        const ch = client.channel('acct-' + phone);
-        try { return await ch.send({ type: 'broadcast', event: 'invite', payload }); }
-        finally { try { client.removeChannel(ch); } catch (e) { /* ignore */ } }
-      },
+      pushEvent(pid, event, payload) { return broadcast('acct-' + pid, event, payload); },
       // ---- chat : messages persistants (les 60 derniers au chargement), diffusés par le temps réel ----
       async loadChat(id, afterId) {
         let q = client.from(CHAT).select('id, pid, name, avatar, text, created_at').eq('game', id).order('id', { ascending: false }).limit(60);
@@ -1706,8 +1790,9 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
         if (error) throw new Error(error.message);
         return (data || []).reverse();
       },
+      // msg.present : joueurs actuellement connectés (ils ne reçoivent pas de notification push pour ce message)
       async sendChat(id, msg) {
-        const { data, error } = await client.from(CHAT).insert({ game: id, pid: msg.pid, name: msg.name, avatar: msg.avatar || 0, text: msg.text }).select('id, pid, name, avatar, text, created_at').single();
+        const { data, error } = await client.from(CHAT).insert({ game: id, pid: msg.pid, name: msg.name, avatar: msg.avatar || 0, text: msg.text, present: msg.present || [] }).select('id, pid, name, avatar, text, created_at').single();
         if (error) throw new Error(error.message);
         return data;
       },
@@ -1769,6 +1854,8 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
   const BOT_LABEL = { 1: 'Novice bot', 2: 'Skilled bot', 3: 'Expert bot' };
   const BOT_OPTIONS = [[0, 'Human'], [1, 'Novice bot'], [2, 'Skilled bot'], [3, 'Expert bot']];
   const QUICK_CHAT = ['👋 Hi!', 'GG!', 'Nice move!', 'Your turn 😉', 'One sec…', 'Well played!'];
+  const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const STANDALONE = !!(navigator.standalone || (root.matchMedia && root.matchMedia('(display-mode: standalone)').matches));
   const botName = (players, level) => { const used = new Set(players.map(p => p.name)); void level; return Bot.NAMES.find(n => !used.has('Bot ' + n) && !used.has(n)) || 'Bot'; };
   const BANNER = ['#f2c94c', '#e8873a', '#5cc2b7', '#2a8f8a', '#2c4a8a', '#1e2a5a'];
   const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -1795,6 +1882,19 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     let v = ls.get('harmonies.pid');
     if (!v) { v = randomId(12, 'abcdefghijklmnopqrstuvwxyz0123456789'); ls.set('harmonies.pid', v); }
     return v;
+  };
+  const pidOverride = () => { try { return !!sessionStorage.getItem('harmonies.pid'); } catch (e) { return false; } };
+  // Profil (pid + secret + code d'ami) : en sessionStorage quand l'identité est forcée par ?pid= (tests à plusieurs onglets)
+  const acctStore = {
+    get() {
+      try { if (pidOverride()) { const v = sessionStorage.getItem('harmonies.account'); return v ? JSON.parse(v) : null; } } catch (e) { /* ignore */ }
+      const a = ls.get('harmonies.account', null);
+      return a && a.pid === myPid() && a.secret ? a : null;
+    },
+    set(v) {
+      try { if (pidOverride()) { if (v) sessionStorage.setItem('harmonies.account', JSON.stringify(v)); else sessionStorage.removeItem('harmonies.account'); return; } } catch (e) { /* ignore */ }
+      if (v) ls.set('harmonies.account', v); else ls.del('harmonies.account');
+    },
   };
   const myName = () => ls.get('harmonies.name', '');
   // Avatar du profil : id d'une carte Animal (tiré au sort la première fois)
@@ -1932,6 +2032,10 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
   // ---------- Animations (vols d'éléments par-dessus la page) ----------
   const rectOf = el => (el ? el.getBoundingClientRect() : null);
   const canAnimate = () => typeof Element !== 'undefined' && !!Element.prototype.animate;
+  const flights = new Set(); // animations en vol (terminées d'un coup par flushFlights, bouton Skip)
+  function flushFlights() { flights.forEach(a => { try { a.finish(); } catch (e) { /* déjà finie */ } }); }
+  // attente interrompue dès que le rejeu est abandonné (Skip)
+  const pause = (ms, token) => (token && token.abort ? Promise.resolve() : wait(ms));
   function fly(from, to, html, opts) {
     opts = opts || {};
     return new Promise(resolve => {
@@ -1951,7 +2055,8 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
         { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sx + ',' + sy + ')' },
       ], { duration: dur, easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'forwards' });
       let done = false;
-      const finish = () => { if (done) return; done = true; el.remove(); resolve(); };
+      flights.add(a);
+      const finish = () => { if (done) return; done = true; flights.delete(a); el.remove(); resolve(); };
       a.onfinish = finish; a.oncancel = finish;
       setTimeout(finish, dur + 200);
     });
@@ -1998,14 +2103,15 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     committed: null, work: null, undo: [], viewSeat: 0, selToken: null, cubeMode: null,
     unsub: null, poll: null, rtOk: false, endShown: false, spiritPrompted: false, lastLogLen: 0,
     replay: null, busy: false, stage: 'play', stageManual: false, cardsOpen: ls.get('harmonies.cardsOpen', true), headerOpen: false, botRunning: false, botTimer: null,
-    modalClose: null,
+    modalClose: null, fast: false, bannerEl: null,
   };
   // Chat de la partie (en ligne) : messages reçus, dernier id connu, non lus
   const chat = { msgs: [], lastId: 0, unread: 0, unsub: null, open: false };
-  // Compte (téléphone + PIN), amis, invitations reçues
-  const acct = { me: ls.get('harmonies.account', null), friends: [], invites: [], unsub: null, loading: false };
+  // Profil du joueur (créé automatiquement dès qu'il a un prénom) : pid, secret, code d'ami
+  const acct = { me: null, registering: null };
+  // Tableau de bord : parties du joueur (résumés serveur), amis, joueurs connectés à l'application, événements
+  const hub = { games: [], friends: [], online: new Set(), myTurn: 0, loaded: false, loading: false, again: false, error: null, unsub: null, unsubGames: null, unsubOnline: null, watched: '', timer: null, skew: 0 };
   app.online = new Set(); // pids des joueurs actuellement connectés à la partie (présence temps réel)
-  app.invited = new Set(); // amis déjà invités à la partie en cours
   const view = () => (app.replay ? app.replay.state : (app.work || app.committed));
   const isMine = () => {
     const s = app.committed;
@@ -2055,17 +2161,36 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     app.banner = { html, onClick, label };
     mountBanner();
   }
+  // Le nœud de la bannière est conservé d'un rendu à l'autre : un toucher commencé avant un re-rendu aboutit quand même,
+  // et l'action part dès le pointerdown (les rendus pendant les animations des bots avalaient les clics).
   function mountBanner() {
-    const old = $('#banner'); if (old) old.remove();
-    if (!app.banner) return;
+    if (!app.banner) { if (app.bannerEl && app.bannerEl.parentNode) app.bannerEl.remove(); return; }
     const host = $('.stage') || document.body;
-    const b = document.createElement('div');
-    b.id = 'banner'; b.className = 'banner' + (host !== document.body ? ' in-stage' : '');
-    b.innerHTML = '<span>' + app.banner.html + '</span>' + (app.banner.onClick ? '<button>' + app.banner.label + '</button>' : '');
-    if (app.banner.onClick) b.querySelector('button').onclick = app.banner.onClick;
-    host.appendChild(b);
+    let b = app.bannerEl;
+    if (!b) {
+      b = document.createElement('div'); b.id = 'banner';
+      app.bannerEl = b;
+    }
+    b.className = 'banner' + (host !== document.body ? ' in-stage' : '');
+    const key = app.banner.html + '|' + (app.banner.onClick ? app.banner.label : '');
+    if (b.dataset.key !== key) {
+      b.dataset.key = key;
+      b.innerHTML = '<span>' + app.banner.html + '</span>' + (app.banner.onClick ? '<button type="button">' + app.banner.label + '</button>' : '');
+      const btn = b.querySelector('button');
+      if (btn) {
+        let fired = 0;
+        const fire = ev => {
+          if (ev && ev.cancelable) ev.preventDefault();
+          const now = Date.now(); if (now - fired < 600) return; fired = now;
+          const fn = app.banner && app.banner.onClick; if (fn) fn();
+        };
+        btn.addEventListener('pointerdown', fire);
+        btn.addEventListener('click', fire);
+      }
+    }
+    if (b.parentNode !== host) host.appendChild(b);
   }
-  function hideBanner() { app.banner = null; const b = $('#banner'); if (b) b.remove(); }
+  function hideBanner() { app.banner = null; if (app.bannerEl && app.bannerEl.parentNode) app.bannerEl.remove(); }
   const seatDot = i => '<span class="dot" style="background:' + SEAT_COLORS[i] + '"></span>';
   const miniTok = c => '<span class="mtok">' + R.tokenSVG(c) + '</span>';
   const miniAnimal = id => '<span class="manimal">' + R.animalSVG(id) + '</span>';
@@ -2073,11 +2198,24 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
   function avatarHTML(p, seat, cls) {
     const color = seat >= 0 && seat < SEAT_COLORS.length ? SEAT_COLORS[seat] : '#2a8f8a';
     const id = (p && p.avatar) || (p && p.bot ? Bot.avatarFor(p.name) : 0);
-    const pid = p && p.pid && !p.bot && app.mode === 'online' ? String(p.pid) : '';
-    return '<span class="avatar' + (cls ? ' ' + cls : '') + (pid && app.online.has(pid) ? ' online' : '') + '" style="--seat:' + color + '"' + (pid ? ' data-pid="' + esc(pid) + '"' : '') + '>' +
+    const pid = p && p.pid && !p.bot && !/^local/.test(String(p.pid)) ? String(p.pid) : '';
+    return '<span class="avatar' + (cls ? ' ' + cls : '') + (pid && isOnline(pid) ? ' online' : '') + '" style="--seat:' + color + '"' + (pid ? ' data-pid="' + esc(pid) + '"' : '') + '>' +
       (id && E.CARD_BY_ID.has(id) ? R.animalSVG(id) : '<b>' + esc(String((p && p.name) || '?').slice(0, 1).toUpperCase()) + '</b>') + '</span>';
   }
   const namePlate = (p, seat, cls) => avatarHTML(p, seat, cls || 'xs') + '<b>' + esc(p.name) + '</b>';
+  const isOnline = pid => pid !== myPid() && (app.online.has(pid) || hub.online.has(pid));
+  // moment relatif (« 5 min ago ») pour les listes
+  function ago(iso) {
+    const t = Date.parse(iso); if (!t) return '';
+    const d = Math.max(0, Date.now() + hub.skew - t);
+    if (d < 60000) return 'just now';
+    if (d < 3600000) return Math.round(d / 60000) + ' min ago';
+    if (d < 86400000) return Math.round(d / 3600000) + ' h ago';
+    if (d < 172800000) return 'yesterday';
+    if (d < 7 * 86400000) return Math.round(d / 86400000) + ' days ago';
+    try { return new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); } catch (e) { return ''; }
+  }
+  const fmtCode = c => String(c || '').replace(/^(...)(...)$/, '$1-$2');
   // Résumé HTML des actions d'un tour (journal, toasts)
   function actionsHTML(actions) {
     const parts = [];
@@ -2152,23 +2290,61 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       } catch (e) { /* plateforme sans notifications de page */ }
     },
   };
-  async function pinHash(phone, pin) {
-    const data = new TextEncoder().encode('harmonies:' + phone + ':' + pin);
-    if (!(root.crypto && root.crypto.subtle)) throw new Error('This browser cannot secure the PIN (needs https)');
-    const buf = await root.crypto.subtle.digest('SHA-256', data);
-    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+  // Web Push : « à toi de jouer », nouvelle partie, message — même application fermée (fonction Edge harmonies-push).
+  // Sur iPhone, seulement pour l'application ajoutée à l'écran d'accueil (iOS 16.4+).
+  const Push = {
+    supported() { return !!(CFG.vapid && 'serviceWorker' in navigator && 'PushManager' in root && typeof Notification !== 'undefined'); },
+    get on() { return !!ls.get('harmonies.push', false); },
+    get active() { return this.on && this.supported() && Notification.permission === 'granted'; },
+    keyBytes() { const t = CFG.vapid.replace(/-/g, '+').replace(/_/g, '/'); const p = t + '='.repeat((4 - t.length % 4) % 4); return Uint8Array.from(atob(p), c => c.charCodeAt(0)); },
+    async subscribeNow() {
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: this.keyBytes() });
+      await acctNet().rpc('harmonies_push_subscribe', Object.assign(cred(), { p_sub: sub.toJSON(), p_ua: navigator.userAgent.slice(0, 200) }));
+      return sub;
+    },
+    // depuis un geste de l'utilisateur (demande de permission)
+    async enable() {
+      if (!this.supported()) { showPushHelp(); return false; }
+      if (!(await ensureAccount())) { toast('Enter your name first', true); return false; }
+      let perm = Notification.permission;
+      if (perm !== 'granted') { try { perm = await Notification.requestPermission(); } catch (e) { perm = 'denied'; } }
+      if (perm !== 'granted') { toast(perm === 'denied' ? 'Notifications are blocked for Harmonies in your phone settings' : 'Notifications not allowed', true); return false; }
+      try { await this.subscribeNow(); }
+      catch (e) { toast('Could not enable notifications: ' + e.message, true); return false; }
+      ls.set('harmonies.push', true);
+      toast('Notifications on — you will be told when it is your turn');
+      return true;
+    },
+    async disable() {
+      ls.set('harmonies.push', false);
+      try {
+        const reg = await navigator.serviceWorker.getRegistration();
+        const sub = reg ? await reg.pushManager.getSubscription() : null;
+        if (sub) { try { if (acct.me) await acctNet().rpc('harmonies_push_unsubscribe', Object.assign(cred(), { p_endpoint: sub.endpoint })); } catch (e) { /* ignore */ } await sub.unsubscribe(); }
+      } catch (e) { /* ignore */ }
+      toast('Notifications off');
+    },
+    // au démarrage : l'abonnement peut avoir changé, on le renvoie au serveur (une fois par jour)
+    async sync() {
+      if (!this.active || !acct.me) return;
+      const last = ls.get('harmonies.pushSync', 0);
+      if (Date.now() - last < 86400000) return;
+      try { await this.subscribeNow(); ls.set('harmonies.pushSync', Date.now()); } catch (e) { /* réessayé plus tard */ }
+    },
+  };
+  function showPushHelp() {
+    const body = IOS && !STANDALONE
+      ? '<p>On iPhone, notifications only work once Harmonies is installed on your Home Screen:</p><ol><li>Tap the <b>Share</b> button in Safari,</li><li>choose <b>Add to Home Screen</b>,</li><li>open Harmonies from the icon and turn notifications on.</li></ol><p class="note">Requires iOS 16.4 or later.</p>'
+      : (IOS ? '<p>This version of iOS cannot receive web notifications (iOS 16.4 or later is required).</p>' : '<p>This browser cannot receive notifications. On Android, use Chrome and add Harmonies to your Home Screen.</p>');
+    modal('<h2>' + ic('bell', 'h') + 'Notifications</h2>' + body + '<div class="actions"><button class="btn secondary" id="m-close">Close</button></div>');
+    $('#m-close').onclick = closeModal;
   }
-  // Numéro au format international (+33…) ; un numéro français peut être saisi 06…
-  function normalizePhone(raw) {
-    let t = String(raw || '').replace(/[\s().\-]/g, '');
-    if (t.startsWith('00')) t = '+' + t.slice(2);
-    if (!t.startsWith('+')) { if (/^0\d{9}$/.test(t)) t = '+33' + t.slice(1); else if (/^\d{7,15}$/.test(t)) t = '+' + t; }
-    return /^\+[1-9]\d{6,14}$/.test(t) ? t : null;
-  }
-  function fmtPhone(p) {
-    p = String(p || '');
-    if (/^\+33\d{9}$/.test(p)) return '+33 ' + p.slice(3, 4) + ' ' + p.slice(4).replace(/(\d\d)(?=\d)/g, '$1 ');
-    return p.replace(/(\d{3})(?=\d)/g, '$1 ');
+  // Pastille de l'icône (nombre de parties où c'est à moi de jouer) — écran d'accueil iOS 16.4+, Android
+  function setAppBadge(n) {
+    if (!navigator.setAppBadge) return;
+    try { if (n > 0) navigator.setAppBadge(n).catch(() => {}); else navigator.clearAppBadge().catch(() => {}); } catch (e) { /* facultatif */ }
   }
 
   // ---------- Écran d'accueil (fond de collines plein écran, lion) ----------
@@ -2182,67 +2358,202 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       (opts.sub ? '<div class="tagline">' + opts.sub + '</div>' : '') + (opts.extra || '') + '</div>';
   }
   const avatarBtnHTML = (id, btnId) => '<button class="avatar-btn" id="' + btnId + '" title="Choose your animal">' + avatarHTML({ avatar: id, name: myName() }, -1, 'lg') + '<i>' + ic('edit') + '</i></button>';
+  function ensureName() {
+    const inp = $('#name');
+    const n = (inp ? inp.value : myName()).trim();
+    if (!n) { toast('Enter your name first', true); if (inp) inp.focus(); return null; }
+    if (n !== myName()) { ls.set('harmonies.name', n); syncProfile(); }
+    return n;
+  }
   function renderHome() {
     app.screen = 'home';
     document.body.classList.remove('in-game');
     document.body.classList.add('scenic');
     document.title = 'Harmonies';
     hideBanner();
-    const recent = ls.get('harmonies.recent', []);
-    const opts = ls.get('harmonies.opts', { side: 'A', spirits: false });
+    const fresh = !myName() && !hub.games.length;
     $('#app').innerHTML =
-      '<div class="screen home">' + bgHTML() + '<div class="home-content">' + heroHTML({ lion: true, sub: 'Compose your landscapes, welcome your animals' }) +
+      '<div class="screen home">' + bgHTML() + '<div class="home-content">' + heroHTML({ lion: fresh, sub: fresh ? 'Compose your landscapes, welcome your animals' : '' }) +
       '<div class="home-body">' +
-      '<div class="panel glass"><div class="field"><label>Your name and animal</label><div class="me-row">' + avatarBtnHTML(myAvatar(), 'avatar-btn') +
-      '<input type="text" id="name" maxlength="16" placeholder="e.g. Hadrien" value="' + esc(myName()) + '"></div></div>' +
-      '<div class="field"><label>Your board</label><div class="seg" id="side"><button data-v="A" class="' + (opts.side === 'A' ? 'on' : '') + '">' + miniTok(1) + 'Side A · river</button><button data-v="B" class="' + (opts.side === 'B' ? 'on' : '') + '">' + miniTok(5) + 'Side B · islands</button></div></div>' +
-      '<label class="check"><input type="checkbox" id="spirits" ' + (opts.spirits ? 'checked' : '') + '><span>' + ic('sparkles', 'inl') + ' Nature\'s Spirit cards <em>(advanced variant)</em></span></label>' +
-      '<div class="row" style="margin-top:8px"><button class="btn primary" id="create" ' + (ONLINE_OK ? '' : 'disabled') + '>' + ic('globe') + 'Create an online game</button></div>' +
-      (ONLINE_OK ? '' : '<p class="note">Online play unavailable (no server configuration).</p>') +
-      '<div class="row" style="margin-top:10px"><button class="btn secondary" id="local">' + ic('phone') + 'Play on this phone</button></div></div>' +
-      '<div id="acct-panel">' + accountPanel() + '</div>' +
-      '<div class="panel glass"><h2>' + ic('login', 'h') + 'Join a game</h2><div class="row"><input type="text" id="code" placeholder="CODE" maxlength="6" class="code-input"><button class="btn primary" id="join" ' + (ONLINE_OK ? '' : 'disabled') + '>Join</button></div></div>' +
-      (recent.length ? '<div class="panel glass"><h2>' + ic('layers', 'h') + 'Recent games</h2><ul class="recent">' + recent.map(g =>
-        '<li data-id="' + esc(g.id) + '" data-mode="' + g.mode + '"><span class="code">' + (g.mode === 'local' ? ic('phone') : esc(g.id)) + '</span><span class="meta">' + esc(g.label || '') + '<br>' + new Date(g.at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' }) + '</span><button class="btn small secondary">Open</button></li>').join('') + '</ul></div>' : '') +
+      '<div class="panel glass profile" id="profile-panel">' + profilePanel() + '</div>' +
+      '<div class="panel glass" id="play-panel">' + playPanel() + '</div>' +
+      '<div id="games-panel">' + gamesPanel() + '</div>' +
+      '<div id="friends-panel">' + friendsPanel() + '</div>' +
       '<div class="panel glass rules"><h2>' + ic('book', 'h') + 'How to play</h2><p>On your turn, take the <b>3 tokens</b> of one slot of the central board and place them on your board (following the stacking rules). You may also take <b>1 Animal card</b> (max 4 in front of you) and place <b>cubes</b> as soon as their habitat is built — these actions are possible at any time during the turn.</p>' +
       '<p>Game end: bag empty when refilling, or <b>2 empty spaces or fewer</b> on your board (the round is completed).</p><button class="btn ghost" id="rules-more">Full rules and scoring →</button></div>' +
       '<p class="credits">Unofficial adaptation of Harmonies (Johan Benvenuto, Libellud). Animal icons: OpenMoji (CC BY-SA 4.0).</p>' +
       '</div></div></div>';
-    $('#name').addEventListener('change', ev => { ls.set('harmonies.name', ev.target.value.trim()); syncProfile(); });
-    $('#avatar-btn').onclick = () => showAvatarPicker(myAvatar(), id => { ls.set('harmonies.avatar', id); $('#avatar-btn').innerHTML = avatarHTML({ avatar: id, name: myName() }, -1, 'lg') + '<i>' + ic('edit') + '</i>'; syncProfile(); });
-    bindAccountPanel();
-    loadHome();
-    $('#side').addEventListener('click', ev => {
-      const b = ev.target.closest('button'); if (!b) return;
-      [...$('#side').children].forEach(x => x.classList.toggle('on', x === b));
-      saveOpts();
-    });
-    $('#spirits').addEventListener('change', saveOpts);
-    function saveOpts() { ls.set('harmonies.opts', readOpts()); }
-    function readOpts() { return { side: $('#side .on').dataset.v, spirits: $('#spirits').checked }; }
-    function ensureName() {
-      const n = $('#name').value.trim();
-      if (!n) { toast('Enter your name first', true); $('#name').focus(); return null; }
-      ls.set('harmonies.name', n);
-      return n;
+    bindHome();
+    loadHub();
+  }
+  function profilePanel() {
+    const bell = ONLINE_OK ? '<button class="bell' + (Push.active ? ' on' : '') + '" id="bell" title="Notifications">' + ic(Push.active ? 'bell' : 'bell-off') + '<span>' + (Push.active ? 'Alerts on' : 'Alerts') + '</span></button>' : '';
+    return '<div class="me-row">' + avatarBtnHTML(myAvatar(), 'avatar-btn') + '<input type="text" id="name" maxlength="16" placeholder="Your name" value="' + esc(myName()) + '">' + bell + '</div>' +
+      (myName() || !ONLINE_OK ? '' : '<p class="note">Enter your name to play online, get a friend code and be told when it is your turn.</p>');
+  }
+  function playPanel() {
+    return '<div class="row"><button class="btn primary big" id="new-game" ' + (ONLINE_OK ? '' : 'disabled') + '>' + ic('play') + 'New game</button></div>' +
+      '<div class="row" style="margin-top:10px"><input type="text" id="code" placeholder="CODE" maxlength="6" class="code-input"><button class="btn secondary" id="join" ' + (ONLINE_OK ? '' : 'disabled') + '>' + ic('login') + 'Join</button></div>' +
+      '<div class="row" style="margin-top:10px"><button class="btn secondary" id="local">' + ic('phone') + 'Play on this phone</button></div>' +
+      (ONLINE_OK ? '' : '<p class="note">Online play unavailable (no server configuration).</p>');
+  }
+  // ---- liste des parties : à moi de jouer / en attente des autres / terminées / sur ce téléphone ----
+  const othersOf = g => g.players.filter(p => p.pid !== myPid());
+  const isMyTurnGame = g => g.status === 'playing' && !!g.players[g.turn] && g.players[g.turn].pid === myPid();
+  function gameTitle(g) {
+    const o = othersOf(g);
+    if (!o.length) return 'Solo';
+    return o.length === 1 ? 'vs ' + esc(o[0].name) : esc(o.map(p => p.name).join(', '));
+  }
+  function gameSub(g) {
+    const me = g.players.findIndex(p => p.pid === myPid());
+    const t = ago(g.updated_at);
+    if (g.status === 'lobby') return 'Waiting room · code ' + esc(g.id) + (g.host === myPid() ? ' · you host' : '') + ' · ' + t;
+    if (g.status === 'cancelled') return 'Cancelled · ' + t;
+    if (g.status === 'finished') {
+      const w = g.winners || [];
+      const totals = (g.totals || []).join('–');
+      let txt = w.length ? (w.includes(me) ? (w.length > 1 ? 'Tie' : 'You won') : esc((g.players[w[0]] || {}).name || '?') + ' won') : 'Game over';
+      if (g.endReason === 'resign') txt = (g.resigned === me ? 'You gave up' : esc((g.players[g.resigned] || {}).name || '?') + ' gave up') + (w.includes(me) ? ' · you won' : '');
+      return txt + (totals && g.endReason !== 'resign' ? ' ' + totals : '') + ' · ' + t;
     }
-    $('#create').onclick = async () => {
-      const n = ensureName(); if (!n) return;
-      Sfx.unlock();
-      try { await createOnline(readOpts(), n); } catch (e) { toast('Could not create the game: ' + e.message, true); }
-    };
+    const cur = g.players[g.turn];
+    if (cur && cur.pid === myPid()) return '<b class="yt">Your turn</b> · turn ' + g.turnNo + ' · ' + t;
+    return esc(cur ? cur.name : '?') + (cur && cur.bot ? ' (bot)' : '') + ' is playing · turn ' + g.turnNo + ' · ' + t;
+  }
+  function gameRow(g) {
+    const others = othersOf(g).slice(0, 3);
+    const done = g.status === 'finished' || g.status === 'cancelled';
+    return '<li class="grow' + (isMyTurnGame(g) ? ' mine' : '') + (done ? ' done' : '') + '" data-id="' + esc(g.id) + '" data-mode="online">' +
+      '<span class="stack-av">' + (others.length ? others.map(p => avatarHTML(p, g.players.indexOf(p), 'md')).join('') : avatarHTML({ name: '?' }, -1, 'md')) + '</span>' +
+      '<div class="g-txt"><b>' + gameTitle(g) + '</b><span>' + gameSub(g) + '</span></div>' +
+      (done ? '<button class="hide-btn" data-hide="' + esc(g.id) + '" title="Remove from the list">' + ic('x') + '</button>' : ic('chevron', 'chev')) + '</li>';
+  }
+  function gamesPanel() {
+    if (!ONLINE_OK) return localGamesHTML();
+    const hidden = new Set(ls.get('harmonies.hidden', []));
+    const games = hub.games.filter(g => !hidden.has(g.id) && g.players.some(p => p.pid === myPid()));
+    const mine = games.filter(isMyTurnGame);
+    const waiting = games.filter(g => g.status === 'lobby' || (g.status === 'playing' && !isMyTurnGame(g)));
+    const done = games.filter(g => g.status === 'finished' || g.status === 'cancelled');
+    const doneShown = hub.showAllDone ? done : done.slice(0, 4);
+    const section = (title, cls, arr) => (arr.length ? '<h3 class="gsec ' + cls + '">' + title + (cls === 'mine' ? '<em>' + arr.length + '</em>' : '') + '</h3><ul class="games">' + arr.map(gameRow).join('') + '</ul>' : '');
+    const local = localGamesHTML();
+    let body;
+    if (games.length) body = section('Your turn', 'mine', mine) + section('Waiting for others', 'wait', waiting) + section('Finished', 'done', doneShown) +
+      (done.length > doneShown.length ? '<button class="btn ghost" id="more-done">Show all finished games (' + done.length + ')</button>' : '');
+    else body = '<p class="note">' + (hub.loading && !hub.loaded ? 'Loading your games…' : (hub.error ? 'Could not load your games (' + esc(hub.error) + ')' : 'No online game yet — start one with a friend or a bot!')) + '</p>';
+    return '<div class="panel glass"><h2>' + ic('layers', 'h') + 'Your games<span class="spacer"></span><button class="icon-btn light" id="games-reload" title="Refresh">' + ic('refresh') + '</button></h2>' + body + local + '</div>';
+  }
+  function localGamesHTML() {
+    const local = ls.get('harmonies.recent', []).filter(g => g.mode === 'local').slice(0, 6);
+    if (!local.length) return ONLINE_OK ? '' : '<div class="panel glass"><h2>' + ic('phone', 'h') + 'On this phone</h2><p class="note">No game yet.</p></div>';
+    const rows = '<ul class="games">' + local.map(g => '<li class="grow" data-id="' + esc(g.id) + '" data-mode="local"><span class="stack-av phone">' + ic('phone') + '</span><div class="g-txt"><b>' + esc(g.label || 'Local game') + '</b><span>' + ago(new Date(g.at).toISOString()) + '</span></div>' + ic('chevron', 'chev') + '</li>').join('') + '</ul>';
+    return ONLINE_OK ? '<h3 class="gsec local">On this phone</h3>' + rows : '<div class="panel glass"><h2>' + ic('phone', 'h') + 'On this phone</h2>' + rows + '</div>';
+  }
+  function friendsPanel() {
+    if (!ONLINE_OK) return '';
+    if (!acct.me) return '<div class="panel glass"><h2>' + ic('users', 'h') + 'Friends</h2><p class="note">' + (myName() ? (hub.error ? 'Offline — friends will appear once connected.' : 'Connecting…') : 'Enter your name above to get your friend code and challenge friends without any game code.') + '</p></div>';
+    const seen = f => (isOnline(f.pid) ? '<b class="on">online</b>' : (f.last_seen ? 'seen ' + ago(f.last_seen) : ''));
+    return '<div class="panel glass"><h2>' + ic('users', 'h') + 'Friends<span class="spacer"></span><button class="btn small secondary" id="add-friend">' + ic('user-plus') + 'Add</button></h2>' +
+      (hub.friends.length ? '<ul class="friends">' + hub.friends.map(f => '<li>' + avatarHTML(f, -1, 'md') + '<div class="f-txt"><b>' + esc(f.name) + '</b><span class="note">' + seen(f) + '</span></div>' +
+        '<button class="btn small primary" data-play="' + esc(f.pid) + '">' + ic('play') + 'Play</button><button class="btn small secondary icon" data-unfriend="' + esc(f.pid) + '" title="Remove">' + ic('x') + '</button></li>').join('') + '</ul>' :
+        '<p class="note">No friends yet. Send your friend link, or enter a friend\'s code — then challenge them in one tap, no game code needed.</p>') +
+      '<div class="mycode"><span class="note">Your friend code</span><b>' + fmtCode(acct.me.code) + '</b><button class="btn small secondary" id="share-code">' + ic('share') + 'Share my link</button></div></div>';
+  }
+  function bindHome() {
+    $('#name').addEventListener('change', ev => { ls.set('harmonies.name', ev.target.value.trim()); syncProfile(); refreshHomePanels(); });
+    $('#avatar-btn').onclick = () => showAvatarPicker(myAvatar(), id => { ls.set('harmonies.avatar', id); $('#avatar-btn').innerHTML = avatarHTML({ avatar: id, name: myName() }, -1, 'lg') + '<i>' + ic('edit') + '</i>'; syncProfile(); });
+    const bell = $('#bell'); if (bell) bell.onclick = async () => { Sfx.unlock(); bell.disabled = true; try { if (Push.active) await Push.disable(); else await Push.enable(); } finally { bell.disabled = false; refreshHomePanels(); } };
+    $('#new-game').onclick = () => { if (!ensureName()) return; Sfx.unlock(); showNewGame(); };
     $('#join').onclick = async () => {
-      const n = ensureName(); if (!n) return;
+      if (!ensureName()) return;
       Sfx.unlock();
       const code = $('#code').value.trim().toUpperCase();
       if (code.length < 4) { toast('Invalid code', true); return; }
-      openOnline(code);
+      openOnline(code, true);
     };
-    $('#local').onclick = () => { Sfx.unlock(); localSetup(readOpts()); };
+    $('#local').onclick = () => { Sfx.unlock(); localSetup(ls.get('harmonies.opts', { side: 'A', spirits: false })); };
     $('#rules-more').onclick = showRules;
-    $$('.recent li').forEach(li => {
-      li.querySelector('button').onclick = () => { Sfx.unlock(); if (li.dataset.mode === 'local') openLocal(li.dataset.id); else openOnline(li.dataset.id); };
+    bindGamesPanel(); bindFriendsPanel();
+  }
+  function bindGamesPanel() {
+    $$('#games-panel .grow').forEach(li => {
+      li.onclick = ev => { if (ev.target.closest('[data-hide]')) return; Sfx.unlock(); if (li.dataset.mode === 'local') openLocal(li.dataset.id); else openOnline(li.dataset.id, true); };
     });
+    $$('#games-panel [data-hide]').forEach(b => { b.onclick = ev => { ev.stopPropagation(); const h = ls.get('harmonies.hidden', []); h.push(b.dataset.hide); ls.set('harmonies.hidden', h.slice(-100)); refreshHomePanels(); }; });
+    const more = $('#more-done'); if (more) more.onclick = () => { hub.showAllDone = true; refreshHomePanels(); };
+    const rl = $('#games-reload'); if (rl) rl.onclick = () => { loadHub(); toast('Refreshing…'); };
+  }
+  function bindFriendsPanel() {
+    const add = $('#add-friend'); if (add) add.onclick = showAddFriend;
+    const sh = $('#share-code'); if (sh) sh.onclick = shareFriendLink;
+    $$('#friends-panel [data-play]').forEach(b => { b.onclick = () => { if (!ensureName()) return; Sfx.unlock(); showNewGame({ friend: b.dataset.play }); }; });
+    $$('#friends-panel [data-unfriend]').forEach(b => { b.onclick = () => removeFriend(b.dataset.unfriend); });
+  }
+  function refreshHomePanels() {
+    if (app.screen !== 'home') return;
+    const g = $('#games-panel'); if (g) { g.innerHTML = gamesPanel(); bindGamesPanel(); }
+    const f = $('#friends-panel'); if (f) { f.innerHTML = friendsPanel(); bindFriendsPanel(); }
+    const bell = $('#bell'); if (bell) { bell.className = 'bell' + (Push.active ? ' on' : ''); bell.innerHTML = ic(Push.active ? 'bell' : 'bell-off') + '<span>' + (Push.active ? 'Alerts on' : 'Alerts') + '</span>'; }
+  }
+  // ---- nouvelle partie : plateau, amis (installés d'office et prévenus) et bots ; départ immédiat ou salle d'attente ----
+  function showNewGame(preset) {
+    const opts = ls.get('harmonies.opts', { side: 'A', spirits: false });
+    const setup = { side: opts.side === 'B' ? 'B' : 'A', spirits: !!opts.spirits, friends: [], bots: [] };
+    if (preset && preset.friend && hub.friends.some(f => f.pid === preset.friend)) setup.friends.push(preset.friend);
+    const draw = () => {
+      const count = 1 + setup.friends.length + setup.bots.length;
+      const chosen = f => setup.friends.includes(f.pid);
+      modal('<h2>' + ic('play', 'h') + 'New game</h2>' +
+        '<div class="field"><label>Board</label><div class="seg" id="ng-side"><button data-v="A" class="' + (setup.side === 'A' ? 'on' : '') + '">' + miniTok(1) + 'Side A · river</button><button data-v="B" class="' + (setup.side === 'B' ? 'on' : '') + '">' + miniTok(5) + 'Side B · islands</button></div></div>' +
+        '<label class="check"><input type="checkbox" id="ng-spirits" ' + (setup.spirits ? 'checked' : '') + '><span>' + ic('sparkles', 'inl') + ' Nature\'s Spirit cards <em>(advanced variant)</em></span></label>' +
+        '<div class="field"><label>Players (' + count + '/4)</label><div class="chips">' +
+        '<span class="chip on me">' + avatarHTML({ avatar: myAvatar(), name: myName() }, 0, 'xs') + esc(myName()) + '</span>' +
+        hub.friends.map(f => '<button type="button" class="chip' + (chosen(f) ? ' on' : '') + '" data-friend="' + esc(f.pid) + '" ' + (!chosen(f) && count >= 4 ? 'disabled' : '') + '>' + avatarHTML(f, -1, 'xs') + esc(f.name) + (chosen(f) ? ic('check', 'inl') : '') + '</button>').join('') +
+        setup.bots.map((lvl, i) => '<button type="button" class="chip on bot" data-bot="' + i + '" title="Remove">' + ic('cpu', 'inl') + esc(BOT_LABEL[lvl]) + ic('x', 'inl') + '</button>').join('') +
+        (count < 4 ? '<select class="chip-sel" id="ng-addbot"><option value="">+ bot…</option><option value="1">Novice bot</option><option value="2">Skilled bot</option><option value="3">Expert bot</option></select>' : '') +
+        '</div>' + (hub.friends.length ? '<p class="note">Tap friends to add them: they are seated right away and notified.</p>' : '<p class="note">No friends yet — add them from the Friends panel to challenge them here.</p>') + '</div>' +
+        '<div class="actions col"><button class="btn primary big" id="ng-start" ' + (count >= 2 ? '' : 'disabled') + '>' + ic('play') + 'Start now</button>' +
+        '<button class="btn secondary" id="ng-lobby">' + ic('globe') + 'Waiting room with a code</button></div>', { cls: 'sheet' });
+      $('#ng-side').addEventListener('click', ev => { const b = ev.target.closest('button'); if (!b) return; setup.side = b.dataset.v; [...$('#ng-side').children].forEach(x => x.classList.toggle('on', x === b)); saveOpts(); });
+      $('#ng-spirits').onchange = ev => { setup.spirits = ev.target.checked; saveOpts(); };
+      $$('#modal [data-friend]').forEach(b => { b.onclick = () => { const pid = b.dataset.friend; const i = setup.friends.indexOf(pid); if (i >= 0) setup.friends.splice(i, 1); else if (count < 4) setup.friends.push(pid); draw(); }; });
+      $$('#modal [data-bot]').forEach(b => { b.onclick = () => { setup.bots.splice(+b.dataset.bot, 1); draw(); }; });
+      const ab = $('#ng-addbot'); if (ab) ab.onchange = () => { const lvl = +ab.value; if (lvl && count < 4) setup.bots.push(lvl); draw(); };
+      $('#ng-start').onclick = () => go(true);
+      $('#ng-lobby').onclick = () => go(false);
+    };
+    const saveOpts = () => ls.set('harmonies.opts', { side: setup.side, spirits: setup.spirits });
+    const go = async start => {
+      const name = ensureName(); if (!name) return;
+      const seats = [];
+      const used = [name];
+      setup.friends.forEach(pid => { const f = hub.friends.find(x => x.pid === pid); if (f) { seats.push({ pid: f.pid, name: f.name, avatar: f.avatar }); used.push(f.name); } });
+      setup.bots.forEach(lvl => { const bn = 'Bot ' + botName(used.map(n => ({ name: n })), lvl); used.push(bn); seats.push({ bot: lvl, name: bn, avatar: Bot.avatarFor(bn) }); });
+      if (start && seats.length && seats.every(p => p.bot) && false) return;
+      closeModal();
+      try { await createOnline({ side: setup.side, spirits: setup.spirits }, name, seats, start); }
+      catch (e) { toast('Could not create the game: ' + e.message, true); }
+    };
+    draw();
+  }
+  function showAddFriend() {
+    modal('<h2>' + ic('user-plus', 'h') + 'Add a friend</h2><p class="note">Ask your friend for their code (shown in their Friends panel), or send them your link — friendship works both ways.</p>' +
+      '<form id="af-form" autocomplete="off"><div class="row"><input type="text" id="af-code" class="code-input" placeholder="ABC-DEF" maxlength="7" autocapitalize="characters"><button class="btn primary" type="submit">' + ic('plus') + 'Add</button></div></form>' +
+      '<div class="mycode" style="margin-top:14px"><span class="note">Your friend code</span><b>' + fmtCode(acct.me ? acct.me.code : '') + '</b><button class="btn small secondary" id="af-share">' + ic('share') + 'Share my link</button></div>' +
+      '<div class="actions"><button class="btn secondary" id="m-close">Close</button></div>');
+    $('#m-close').onclick = closeModal;
+    $('#af-share').onclick = shareFriendLink;
+    $('#af-form').onsubmit = async ev => { ev.preventDefault(); const code = $('#af-code').value; if (!code.trim()) return; if (await addFriend(code)) closeModal(); };
+    $('#af-code').focus();
+  }
+  async function shareFriendLink() {
+    if (!(await ensureAccount())) { toast('Enter your name first', true); return; }
+    const link = location.origin + location.pathname + '?add=' + acct.me.code;
+    const text = myName() + ' wants to play Harmonies with you! Add me as a friend: ' + link;
+    if (navigator.share) { try { await navigator.share({ title: 'Harmonies', text, url: link }); return; } catch (e) { /* annulé */ } }
+    await copyText(link); toast('Friend link copied — send it to your friend');
   }
   function playerRow(pl, i) {
     const av = pl.avatar || (pl.bot ? Bot.avatarFor(pl.name) : 0);
@@ -2290,16 +2601,44 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     if (!rec) { toast('Game not found on this device', true); return; }
     enterGame(id, rec.state, rec.version);
   }
-  async function createOnline(opts, name) {
-    Notif.ask();
+  // seats : autres joueurs installés d'office ({ pid, name, avatar } d'un ami — prévenu aussitôt — ou { bot, name, avatar }) ;
+  // start : la partie commence tout de suite (sans salle d'attente) dès qu'il y a au moins deux joueurs.
+  async function createOnline(opts, name, seats, start) {
+    if (!ONLINE_OK) throw new Error('online play unavailable');
+    if (!acct.me) await ensureAccount();
     app.net = root.Net.makeOnline(CFG); app.mode = 'online';
     const id = randomId(5);
-    const state = { status: 'lobby', id, opts, host: myPid(), players: [{ pid: myPid(), name, avatar: myAvatar() }], createdAt: Date.now() };
+    const players = [{ pid: myPid(), name, avatar: myAvatar() }].concat((seats || []).map(p => (p.bot
+      ? { pid: 'bot-' + randomId(6, 'abcdefghijklmnopqrstuvwxyz0123456789'), name: p.name, bot: p.bot, avatar: p.avatar || Bot.avatarFor(p.name) }
+      : { pid: p.pid, name: p.name, avatar: p.avatar || 0 })));
+    let state;
+    if (start && players.length >= 2) {
+      state = E.newGame(opts, players.map(p => ({ token: p.pid, name: p.name, bot: p.bot || 0, avatar: p.avatar || 0 })));
+      state.players.forEach((p, i) => { p.pid = players[i].pid; });
+      state.id = id; state.host = myPid(); state.mode = 'online';
+    } else state = { status: 'lobby', id, opts: { side: opts.side === 'B' ? 'B' : 'A', spirits: !!opts.spirits }, host: myPid(), players, createdAt: Date.now() };
+    stamp(state);
     await app.net.createGame(id, state);
     rememberGame({ id, mode: 'online', label: 'Online · ' + SIDE_LABEL[opts.side] });
+    notifyPlayers(state, 'game', { started: state.status === 'playing', lobby: state.status === 'lobby' });
     history.replaceState(null, '', '?g=' + id);
     enterGame(id, state, 1);
+    if (state.status === 'playing' && players.some(p => !p.bot && p.pid !== myPid())) toast('Game started — your friends have been notified');
     return id;
+  }
+  // Avant chaque enregistrement : qui a joué, et qui est connecté (ces joueurs ne reçoivent pas de notification push).
+  function stamp(state) {
+    state.lastBy = myPid();
+    state.present = (state.players || []).filter(p => !p.bot && p.pid && p.pid !== myPid() && isOnline(p.pid)).map(p => p.pid);
+    return state;
+  }
+  // Événement en direct (canal du joueur) pour les autres humains de la partie — ou seulement `pids`.
+  function notifyPlayers(state, event, extra, pids) {
+    if (!ONLINE_OK || !app.net || !app.net.pushEvent) return;
+    const targets = pids || (state.players || []).filter(p => !p.bot && p.pid && p.pid !== myPid()).map(p => p.pid);
+    const from = { pid: myPid(), name: myName() || 'A friend', avatar: myAvatar() };
+    const payload = Object.assign({ game: state.id, from, side: state.opts ? state.opts.side : 'A', at: Date.now() }, extra || {});
+    targets.forEach(pid => { try { app.net.pushEvent(pid, event, payload).catch(() => {}); } catch (e) { /* ignore */ } });
   }
   // autoJoin : rejoindre d'office la salle d'attente avec son prénom (lien reçu, invitation)
   async function openOnline(id, autoJoin) {
@@ -2314,6 +2653,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       try { await joinLobby(myName()); render(); } catch (e) { toast('Could not join: ' + e.message, true); }
     }
   }
+  function goHome() { leaveGame(); renderHome(); }
 
   function enterGame(id, state, version) {
     if (app.unsub) { app.unsub(); app.unsub = null; }
@@ -2323,7 +2663,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     app.selToken = null; app.cubeMode = null; app.endShown = false; app.spiritPrompted = false; app.lastLogLen = (state.log || []).length;
     app.viewSeat = 0; app.stageManual = false;
     chat.msgs = []; chat.lastId = 0; chat.unread = 0; chat.open = false;
-    app.online = new Set(); app.invited = new Set(); app.pollTick = 0;
+    app.online = new Set(); app.pollTick = 0; app.fast = false;
     const presence = app.mode === 'online' ? { pid: myPid(), onPresence: pids => { app.online = new Set(pids); updatePresence(); } } : null;
     app.unsub = app.net.subscribe(id, () => refresh(), ok => { app.rtOk = ok; const d = $('#conn'); if (d) d.className = 'conn ' + (ok ? 'on' : 'off'); }, presence);
     if (app.mode === 'online') {
@@ -2338,8 +2678,27 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       if (app.net.chat) { chat.unsub = app.net.subscribeChat(id, m => addChatMsg(m, true)); loadChat(true); }
     }
     render();
+    updateHub();
     if (isMine() && state.status === 'playing') announceMyTurn();
     maybeRunBot();
+    if (app.mode === 'online') setTimeout(maybeOfferPush, 2500);
+  }
+  // Une seule fois : proposer les notifications « à toi de jouer » (sur iPhone, seulement une fois l'app installée)
+  function maybeOfferPush() {
+    if (!ONLINE_OK || Push.on || ls.get('harmonies.pushAsked', false) || $('#modal') || app.screen === 'home') return;
+    if (!Push.supported() && !(IOS && !STANDALONE)) return;
+    if (Push.supported() && Notification.permission === 'denied') return;
+    ls.set('harmonies.pushAsked', true);
+    modal('<h2>' + ic('bell', 'h') + 'Know when it is your turn</h2><p>Harmonies can notify you when a friend plays, starts a game with you or sends a message — even when the app is closed.</p>' +
+      (IOS && !STANDALONE ? '<p class="note">On iPhone this works once Harmonies is added to your Home Screen (Share → Add to Home Screen), then turn alerts on from the home screen.</p>' : '') +
+      '<div class="actions"><button class="btn secondary" id="m-later">Later</button>' + (Push.supported() ? '<button class="btn primary" id="m-on">' + ic('bell') + 'Turn on</button>' : '') + '</div>');
+    $('#m-later').onclick = closeModal;
+    const on = $('#m-on'); if (on) on.onclick = async () => { closeModal(); await Push.enable(); };
+  }
+  // le mode « rapide » (bots joués sans animation après Skip) s'arrête dès qu'un humain doit jouer
+  function syncFast() {
+    const s = app.committed;
+    if (!s || s.status !== 'playing' || !E.current(s).bot) app.fast = false;
   }
   let refreshing = false;
   async function refresh() {
@@ -2360,12 +2719,15 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     const entry = s.log && s.log.length > app.lastLogLen ? s.log[s.log.length - 1] : null;
     const who = entry ? s.players[entry.p] : null;
     const remote = !!who && !(app.mode === 'online' && who.pid === myPid());
-    const canReplay = remote && prev && prev.status === 'playing' && prev.log && s.log.length === prev.log.length + 1 && prev.turn === entry.p && prev.turnNo === entry.n && document.visibilityState === 'visible';
+    const canReplay = remote && prev && prev.status === 'playing' && prev.log && s.log.length === prev.log.length + 1 && prev.turn === entry.p && prev.turnNo === entry.n && document.visibilityState === 'visible' && !(app.fast && who.bot);
     app.lastLogLen = s.log ? s.log.length : 0;
     if (canReplay) { await replayTurn(prev, entry, s); return; }
     if (remote) toast(avatarHTML(who, entry.p, 'xs') + esc(who.name) + ': ' + (actionsHTML(entry.actions) || 'played'));
+    syncFast();
+    if (s.status !== 'playing') hideBanner();
     render();
     if (isMine() && s.status === 'playing' && !wasMine) announceMyTurn();
+    if (s.status === 'finished' && prev && prev.status === 'playing') loadHub();
     maybeRunBot();
   }
   function announceMyTurn() {
@@ -2376,13 +2738,13 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
   }
   // Pastilles « en ligne » (présence) sans re-rendu complet
   function updatePresence() {
-    $$('.avatar[data-pid]').forEach(el => el.classList.toggle('online', app.online.has(el.dataset.pid)));
+    $$('.avatar[data-pid]').forEach(el => el.classList.toggle('online', isOnline(el.dataset.pid)));
   }
 
   // ---------- Rejeu animé du tour d'un autre joueur ----------
   // Joue visuellement une action (rejeu d'un adversaire ou tour d'un bot) sur `state`.
   async function performAction(state, a, name, token) {
-    const goStage = async st => { if (app.stage !== st) { app.stage = st; renderGame(); await wait(450); } };
+    const goStage = async st => { if (app.stage !== st) { app.stage = st; renderGame(); await pause(450, token); } };
     if (a.a === 'take') {
       let slot = a.slot;
       if (slot === undefined) slot = state.market.findIndex(m => m.length === a.tokens.length && m.every((t, i) => t === a.tokens[i]));
@@ -2410,13 +2772,13 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     const name = next.players[entry.p].name;
     app.stage = 'play'; app.stageManual = false;
     renderGame();
-    showBanner(ic('film', 'inl') + ' ' + esc(name) + ' is playing…', () => { token.abort = true; }, ic('skip') + 'Skip');
-    await wait(500);
+    showBanner(ic('film', 'inl') + ' ' + esc(name) + ' is playing…', () => { token.abort = true; if (next.players[entry.p].bot) app.fast = true; flushFlights(); }, ic('skip') + 'Skip');
+    await pause(500, token);
     for (const a of entry.actions) {
       if (token.abort) break;
       try { await performAction(state, a, name, token); } catch (e) { break; }
       if (token.abort) break;
-      await wait(350);
+      await pause(350, token);
     }
     const aborted = token.abort;
     if (app.replay !== token) return; // remplacé par un rejeu plus récent
@@ -2429,10 +2791,11 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     const mineNow = isMine();
     if (mineNow) ensureWork(); else app.viewSeat = mySeat() >= 0 ? mySeat() : entry.p;
     if (!aborted) await animateRefill(take ? take.slot : undefined, newDisplay);
+    syncFast();
     app.stageManual = false; app.stage = autoStage();
     renderGame();
     if (mineNow && next.status === 'playing') announceMyTurn();
-    if (next.status === 'finished' && !app.endShown) { app.endShown = true; showResults(); }
+    if (next.status === 'finished' && !app.endShown) { app.endShown = true; showResults(); loadHub(); }
     maybeRunBot();
   }
 
@@ -2440,7 +2803,7 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
   // Délai avant que cet appareil joue le tour du bot : l'hôte tout de suite, les autres humains après (au cas où l'hôte est absent).
   function botDelay() {
     const s = app.committed;
-    if (app.mode === 'local' || s.host === myPid()) return 700;
+    if (app.mode === 'local' || s.host === myPid()) return app.fast ? 120 : 700;
     const humans = s.players.filter(p => !p.bot && p.pid !== s.host).map(p => p.pid);
     const rank = humans.indexOf(myPid());
     return rank < 0 ? -1 : 7000 + rank * 4000;
@@ -2459,8 +2822,14 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       if (app.version !== version || app.botRunning || app.replay || !app.committed || app.committed.status !== 'playing') return;
       if (delay > 1000 && document.visibilityState !== 'visible') { maybeRunBot(); return; }
       app.botRunning = true;
-      runBotTurn();
+      runBotTurn().catch(e => { app.botRunning = false; if (app.replay && app.replay.bot) app.replay = null; hideBanner(); toast('Bot turn failed: ' + e.message, true); render(); });
     }, delay);
+  }
+  // Bouton Skip : termine l'animation en cours et joue les bots suivants sans animation, jusqu'au prochain tour humain.
+  function skipBots() {
+    app.fast = true;
+    if (app.replay) app.replay.abort = true;
+    flushFlights();
   }
   async function runBotTurn() {
     const s = app.committed;
@@ -2469,40 +2838,57 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     if (!p.bot) { app.botRunning = false; return; }
     const version = app.version;
     const planned = E.clone(s);
-    const actions = Bot.playTurn(planned, p.bot);
-    const vis = E.clone(s);
-    const token = { state: vis, seat: s.turn, abort: false, bot: true };
-    app.replay = token; app.viewSeat = s.turn; app.stage = 'choose'; app.stageManual = false;
-    renderGame();
-    showBanner(ic('dice', 'inl') + ' ' + esc(p.name) + ' (' + BOT_LABEL[p.bot].toLowerCase() + ') is playing…', () => { token.abort = true; }, ic('skip') + 'Skip');
-    await wait(600);
-    for (const a of actions) {
-      if (token.abort) break;
-      try { await performAction(vis, a, p.name, token); } catch (e) { break; }
-      if (token.abort) break;
-      await wait(300);
+    let actions;
+    try { actions = Bot.playTurn(planned, p.bot); E.endTurn(planned); }
+    catch (e) { app.botRunning = false; toast('Bot error: ' + e.message, true); return; }
+    stamp(planned);
+    const fast = app.fast;
+    let token = null, aborted = fast;
+    if (!fast) {
+      const vis = E.clone(s);
+      token = { state: vis, seat: s.turn, abort: false, bot: true };
+      app.replay = token; app.viewSeat = s.turn; app.stage = 'choose'; app.stageManual = false;
+      renderGame();
+      showBanner(ic('dice', 'inl') + ' ' + esc(p.name) + ' (' + BOT_LABEL[p.bot].toLowerCase() + ') is playing…', skipBots, ic('skip') + 'Skip');
+      await pause(600, token);
+      for (const a of actions) {
+        if (token.abort) break;
+        try { await performAction(vis, a, p.name, token); } catch (e) { break; }
+        if (token.abort) break;
+        await pause(300, token);
+      }
+      aborted = token.abort;
     }
-    const aborted = token.abort;
-    E.endTurn(planned);
     let saved = null;
     try { saved = await app.net.saveGame(app.gameId, planned, version); }
-    catch (e) { if (app.replay === token) app.replay = null; hideBanner(); app.botRunning = false; await refresh(); render(); maybeRunBot(); return; }
-    if (app.replay === token) app.replay = null;
+    catch (e) { if (token && app.replay === token) app.replay = null; hideBanner(); app.botRunning = false; await refresh(); render(); maybeRunBot(); return; }
+    if (token && app.replay === token) app.replay = null;
     hideBanner();
     const prevDisplay = s.display;
     app.committed = planned; app.version = saved.version; app.lastLogLen = planned.log.length;
     app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.spiritPrompted = false; app.stageManual = false;
-    if (planned.status === 'finished') { app.botRunning = false; render(); return; }
+    if (app.mode === 'online') notifyNextTurn(planned);
+    if (fast) toast(avatarHTML(p, s.turn, 'xs') + esc(p.name) + ': ' + (actionsHTML(actions) || 'played'));
+    if (planned.status === 'finished') { app.botRunning = false; syncFast(); render(); loadHub(); return; }
     const take = actions.find(x => x.a === 'take');
     const newDisplay = [];
     planned.display.forEach((id, i) => { if (id && prevDisplay[i] !== id) newDisplay.push(i); });
     if (!aborted) await animateRefill(take ? take.slot : undefined, newDisplay);
     app.botRunning = false;
+    syncFast();
     app.viewSeat = isMine() ? planned.turn : (mySeat() >= 0 ? mySeat() : planned.turn);
     app.stage = autoStage();
     render();
     if (isMine()) announceMyTurn();
     maybeRunBot();
+  }
+  // Après un tour enregistré : prévient en direct le prochain humain (ou tout le monde si la partie est finie).
+  function notifyNextTurn(state) {
+    if (app.mode !== 'online') return;
+    if (state.status === 'finished') { notifyPlayers(state, 'finished', {}); return; }
+    if (state.status !== 'playing') return;
+    const nxt = E.current(state);
+    if (nxt && !nxt.bot && nxt.pid && nxt.pid !== myPid()) notifyPlayers(state, 'turn', { turnNo: state.turnNo }, [nxt.pid]);
   }
 
   // ---------- Lobby ----------
@@ -2530,65 +2916,93 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     document.body.classList.add('scenic');
     hideBanner();
     const s = app.committed;
+    document.title = 'Harmonies · ' + (s.id || '');
     const host = s.host === myPid();
     const inGame = s.players.some(p => p.pid === myPid());
     const link = location.origin + location.pathname + '?g=' + s.id;
+    const friendOf = pid => hub.friends.some(f => f.pid === pid);
+    const hostP = s.players.find(p => p.pid === s.host);
+    const seated = new Set(s.players.map(p => p.pid));
+    const invitable = host && acct.me ? hub.friends.filter(f => !seated.has(f.pid)) : [];
     $('#app').innerHTML = '<div class="screen home">' + bgHTML() + '<div class="home-content">' + heroHTML({ sub: 'Waiting room', extra: chatBtnHTML('float') }) + '<div class="home-body">' +
       '<div class="panel glass"><h2>' + ic('users', 'h') + 'Game code</h2><div class="code-big">' + esc(s.id) + '</div>' +
       '<p class="note center">' + esc(SIDE_LABEL[s.opts.side]) + (s.opts.spirits ? ' · Nature\'s Spirits' : '') + '</p>' +
       '<div class="row"><button class="btn primary" id="share">' + ic('send') + 'Send the link</button><button class="btn secondary" id="copy">' + ic('copy') + 'Copy</button></div></div>' +
       '<div class="panel glass"><h2>' + ic('users', 'h') + 'Players (' + s.players.length + '/4)</h2><ul class="players-list">' + s.players.map((p, i) =>
         '<li>' + avatarHTML(p, i, 'md') + '<b>' + esc(p.name) + '</b>' + (p.bot ? ' <span class="note">· ' + BOT_LABEL[p.bot] + '</span>' : '') + (p.pid === s.host ? ' <span class="note">· host</span>' : '') + (p.pid === myPid() ? ' <span class="note">· you</span>' : '') +
-        (host && p.bot ? '<span class="spacer"></span><button class="btn small secondary icon" data-rmbot="' + i + '" title="Remove">' + ic('x') + '</button>' : '') + '</li>').join('') + '</ul>' +
+        '<span class="spacer"></span>' +
+        (!p.bot && p.pid !== myPid() && acct.me && !friendOf(p.pid) ? '<button class="btn small secondary" data-befriend="' + esc(p.pid) + '">' + ic('user-plus') + 'Add friend</button>' : '') +
+        (host && p.pid !== myPid() ? '<button class="btn small secondary icon" data-rm="' + i + '" title="Remove">' + ic('x') + '</button>' : '') + '</li>').join('') + '</ul>' +
       (host && s.players.length < 4 ? '<div class="row" style="margin-top:8px"><select id="botlvl" class="sel"><option value="1">Novice bot</option><option value="2" selected>Skilled bot</option><option value="3">Expert bot</option></select><button class="btn secondary small" id="addbot">' + ic('plus') + 'Add a bot</button></div>' : '') +
       (inGame ? '' : '<div class="field" style="margin-top:10px"><label>Your name and animal</label><div class="me-row">' + avatarBtnHTML(myAvatar(), 'avatar-btn') + '<input type="text" id="jname" maxlength="16" value="' + esc(myName()) + '" placeholder="Your name"></div></div><button class="btn primary block" id="joinbtn">Join the game</button>') +
       '</div>' +
-      (host && acct.me ? '<div class="panel glass"><h2>' + ic('users', 'h') + 'Invite friends</h2>' + (acct.friends.length ? '<ul class="friends">' + acct.friends.map(f => '<li>' + avatarHTML(f, -1, 'md') + '<div class="f-txt"><b>' + esc(f.name) + '</b><span class="note">' + esc(fmtPhone(f.phone)) + '</span></div>' +
-        (app.invited.has(f.phone) ? '<span class="note ok">' + ic('check', 'inl') + 'Invited</span>' : '<button class="btn small primary" data-invite="' + esc(f.phone) + '">' + ic('send') + 'Invite</button>') + '</li>').join('') + '</ul>' : '<p class="note">Add friends from the home screen to invite them here without a code.</p>') + '</div>' : '') +
+      (host && acct.me ? '<div class="panel glass"><h2>' + ic('users', 'h') + 'Invite friends</h2>' + (invitable.length ? '<ul class="friends">' + invitable.map(f => '<li>' + avatarHTML(f, -1, 'md') + '<div class="f-txt"><b>' + esc(f.name) + '</b><span class="note">' + (isOnline(f.pid) ? 'online' : (f.last_seen ? 'seen ' + ago(f.last_seen) : '')) + '</span></div>' +
+        '<button class="btn small primary" data-invite="' + esc(f.pid) + '" ' + (s.players.length >= 4 ? 'disabled' : '') + '>' + ic('send') + 'Invite</button></li>').join('') + '</ul>' :
+        '<p class="note">' + (hub.friends.length ? 'All your friends are already seated.' : 'Add friends from the home screen to seat them here without a code — they are notified right away.') + '</p>') + '</div>' : '') +
       (host ? '<button class="btn primary block big" id="start" ' + (s.players.length >= 2 ? '' : 'disabled') + '>' + ic('play') + 'Start the game (' + plural(s.players.length, 'player') + ')</button>' +
         (s.players.length < 2 ? '<p class="note center light">Waiting for at least one more player… this page refreshes by itself.</p>' : '') :
-        '<p class="note center light">Waiting for the host to start the game… <span class="conn ' + (app.rtOk ? 'on' : '') + '" id="conn"></span></p>') +
-      '<button class="btn ghost light" id="leave">' + ic('back') + 'Back to home</button></div></div></div>';
+        '<p class="note center light">Waiting for ' + esc(hostP ? hostP.name : 'the host') + ' to start the game… <span class="conn ' + (app.rtOk ? 'on' : '') + '" id="conn"></span></p>') +
+      '<div class="row"><button class="btn ghost light" id="leave">' + ic('back') + 'All games</button>' + (host ? '<button class="btn ghost light" id="cancel">' + ic('x') + 'Cancel this game</button>' : (inGame ? '<button class="btn ghost light" id="quit">' + ic('x') + 'Leave this game</button>' : '')) + '</div></div></div></div>';
     $('#share').onclick = async () => {
       const text = 'Come play Harmonies with me! Code ' + s.id + ' — ' + link;
       if (navigator.share) { try { await navigator.share({ title: 'Harmonies', text, url: link }); } catch (e) { /* annulé */ } }
       else { await copyText(link); toast('Link copied'); }
     };
     $('#copy').onclick = async () => { await copyText(link); toast('Link copied'); };
-    $('#leave').onclick = () => { leaveGame(); renderHome(); };
+    $('#leave').onclick = goHome;
     const cb = $('#chat-btn'); if (cb) cb.onclick = openChat;
-    $$('[data-invite]').forEach(b => { b.onclick = async () => { b.disabled = true; try { await sendInvite(b.dataset.invite, s.id); render(); } catch (e) { toast(e.message, true); b.disabled = false; } }; });
+    $$('[data-invite]').forEach(b => { b.onclick = async () => {
+      b.disabled = true;
+      const f = hub.friends.find(x => x.pid === b.dataset.invite); if (!f) return;
+      const ok = await saveLobby(st => { if (st.players.length < 4 && !st.players.some(p => p.pid === f.pid)) st.players.push({ pid: f.pid, name: f.name, avatar: f.avatar || 0 }); });
+      if (ok) { notifyPlayers(app.committed, 'game', { lobby: true }, [f.pid]); toast(esc(f.name) + ' is seated and has been notified'); }
+    }; });
+    $$('[data-befriend]').forEach(b => { b.onclick = async () => { b.disabled = true; if (await addFriend(null, b.dataset.befriend)) render(); else b.disabled = false; }; });
     const ab2 = $('#avatar-btn'); if (ab2) ab2.onclick = () => showAvatarPicker(myAvatar(), id => { ls.set('harmonies.avatar', id); ab2.innerHTML = avatarHTML({ avatar: id, name: myName() }, -1, 'lg') + '<i>' + ic('edit') + '</i>'; });
     if (!inGame) $('#joinbtn').onclick = async () => {
       const n = $('#jname').value.trim(); if (!n) { toast('Enter your name', true); return; }
-      ls.set('harmonies.name', n); Sfx.unlock();
+      ls.set('harmonies.name', n); Sfx.unlock(); syncProfile();
       try { await joinLobby(n); render(); } catch (e) { toast('Could not join: ' + e.message, true); }
     };
-    async function saveLobby(mut) {
-      for (let attempt = 0; attempt < 3; attempt++) {
-        const rec = await app.net.loadGame(app.gameId);
-        if (!rec || rec.state.status !== 'lobby') return;
-        const st = rec.state; mut(st);
-        try { const r = await app.net.saveGame(app.gameId, st, rec.version); app.committed = st; app.version = r.version; render(); return; }
-        catch (e) { if (e.code !== 'conflict') { toast('Failed: ' + e.message, true); return; } }
-      }
-    }
     const ab = $('#addbot'); if (ab) ab.onclick = () => { const lvl = +$('#botlvl').value; saveLobby(st => { if (st.players.length < 4) { const name = 'Bot ' + botName(st.players, lvl); st.players.push({ pid: 'bot-' + randomId(6, 'abcdefghijklmnopqrstuvwxyz0123456789'), name, bot: lvl, avatar: Bot.avatarFor(name) }); } }); };
-    $$('[data-rmbot]').forEach(b => { b.onclick = () => { const i = +b.dataset.rmbot; saveLobby(st => { if (st.players[i] && st.players[i].bot) st.players.splice(i, 1); }); }; });
+    $$('[data-rm]').forEach(b => { b.onclick = () => { const i = +b.dataset.rm; const gone = s.players[i]; saveLobby(st => { if (st.players[i] && st.players[i].pid !== st.host) st.players.splice(i, 1); }).then(ok => { if (ok && gone && !gone.bot) notifyPlayers(app.committed, 'finished', { cancelled: true, removed: true }, [gone.pid]); }); }; });
+    const cancel = $('#cancel'); if (cancel) cancel.onclick = () => confirmBox('Cancel this game?', 'The waiting room is closed for everyone.', async () => {
+      const ok = await saveLobby(st => { st.status = 'cancelled'; st.cancelledBy = 0; });
+      if (ok) { notifyPlayers(app.committed, 'finished', { cancelled: true }); goHome(); }
+    });
+    const quit = $('#quit'); if (quit) quit.onclick = async () => { const ok = await saveLobby(st => { const i = st.players.findIndex(p => p.pid === myPid()); if (i >= 0) st.players.splice(i, 1); }); if (ok) goHome(); };
     if (host) $('#start').onclick = async () => {
       Sfx.unlock(); Notif.ask();
       if (s.players.every(p => p.bot)) { toast('At least one human player is needed', true); return; }
       const st = E.newGame(s.opts, s.players.map(p => ({ token: p.pid, name: p.name, bot: p.bot || 0, avatar: p.avatar || 0 })));
       st.players.forEach((p, i) => { p.pid = s.players[i].pid; });
       st.id = s.id; st.host = s.host; st.mode = 'online';
+      stamp(st);
       try {
         const r = await app.net.saveGame(app.gameId, st, app.version);
         app.committed = st; app.version = r.version; app.lastLogLen = 0;
+        notifyPlayers(st, 'game', { started: true });
         render();
         if (isMine()) announceMyTurn();
         maybeRunBot();
       } catch (e) { toast('Could not start: ' + e.message, true); refresh(); }
     };
+  }
+  // Modifie la salle d'attente (relecture + verrou optimiste) ; renvoie true si enregistré.
+  async function saveLobby(mut) {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const rec = await app.net.loadGame(app.gameId);
+      if (!rec || rec.state.status !== 'lobby') { if (rec) { app.committed = rec.state; app.version = rec.version; render(); } return false; }
+      const st = rec.state; mut(st); stamp(st);
+      try { const r = await app.net.saveGame(app.gameId, st, rec.version); app.committed = st; app.version = r.version; if (st.status === 'lobby') render(); return true; }
+      catch (e) { if (e.code !== 'conflict') { toast('Failed: ' + e.message, true); return false; } }
+    }
+    return false;
+  }
+  function confirmBox(title, text, onYes) {
+    modal('<h2>' + ic('info', 'h') + esc(title) + '</h2><p>' + esc(text) + '</p><div class="actions"><button class="btn secondary" id="m-no">No</button><button class="btn warn" id="m-yes">Yes</button></div>');
+    $('#m-no').onclick = closeModal;
+    $('#m-yes').onclick = () => { closeModal(); onYes(); };
   }
   async function copyText(text) {
     try { await navigator.clipboard.writeText(text); } catch (e) { prompt('Copy this link:', text); }
@@ -2597,9 +3011,11 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     if (app.unsub) app.unsub();
     if (chat.unsub) chat.unsub();
     clearInterval(app.poll); clearTimeout(app.botTimer);
-    app.unsub = null; chat.unsub = null; app.botTimer = null; app.gameId = null; app.committed = null; app.work = null; app.replay = null; app.botRunning = false;
+    app.unsub = null; chat.unsub = null; app.botTimer = null; app.gameId = null; app.committed = null; app.work = null; app.replay = null; app.botRunning = false; app.fast = false;
     chat.msgs = []; chat.lastId = 0; chat.unread = 0; chat.open = false;
+    hideBanner();
     history.replaceState(null, '', location.pathname);
+    loadHub();
   }
 
   // ---------- Rendu principal ----------
@@ -2736,10 +3152,11 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       '<span class="stp' + (step === i + 1 ? ' cur' : (step > i + 1 ? ' done' : '')) + '"><b>' + (step > i + 1 ? ic('check') : n) + '</b><em>' + l + '</em></span>').join('') + '</span>' : '';
     const connHTML = app.mode === 'online' ? '<span class="conn ' + (app.rtOk ? 'on' : 'off') + '" id="conn" title="live connection"></span>' : '';
     const chatB = chatBtnHTML('hdr');
+    const gamesB = '<button class="chat-btn hdr" id="games-btn" title="All games">' + ic('list') + (hub.myTurn ? '<i class="badge-n">' + hub.myTurn + '</i>' : '') + '</button>';
     let html = '<div class="screen game">' +
       (app.headerOpen
-        ? '<div class="topbar" id="topbar">' + R.logoSVG('logo-small') + '<span class="code">' + esc(s.id || '') + '</span>' + connHTML + '<span class="spacer"></span>' + chatB + '<button class="icon-btn" id="hdr-toggle" title="Collapse">' + ic('minus') + '</button></div>'
-        : '<div class="topbar-mini"><button class="mini-main" id="hdr-toggle" title="Show the header"><span class="brand">HARMONIES</span><span class="code">' + esc(s.id || '') + '</span>' + connHTML + '</button>' + chatB + '</div>') +
+        ? '<div class="topbar" id="topbar">' + R.logoSVG('logo-small') + '<span class="code">' + esc(s.id || '') + '</span>' + connHTML + '<span class="spacer"></span>' + gamesB + chatB + '<button class="icon-btn" id="hdr-toggle" title="Collapse">' + ic('minus') + '</button></div>'
+        : '<div class="topbar-mini"><button class="mini-main" id="hdr-toggle" title="Show the header"><span class="brand">HARMONIES</span><span class="code">' + esc(s.id || '') + '</span>' + connHTML + '</button>' + gamesB + chatB + '</div>') +
       '<div class="status' + msgCls + '"><button class="icon-btn dark" id="menu" title="Menu">' + ic('menu') + '</button><span class="msg">' + ic(msgIcon, 'inl') + '<span>' + msg + '</span></span>' + steps +
       '<button class="icon-btn dark" id="music" title="Music">' + ic(Sfx.music ? 'music' : 'music-off') + '</button><button class="icon-btn dark" id="sound" title="Sounds">' + ic(Sfx.enabled ? 'sound' : 'mute') + '</button></div>';
 
@@ -2811,7 +3228,11 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     let actionsHTML = '';
     if (s.status === 'finished') actionsHTML = '<button class="btn primary" id="results">' + ic('trophy') + '<span class="lbl">Results</span></button>';
     else if (replaying) actionsHTML = folded ? '' : '<span class="placeholder">' + ic('film', 'inl') + 'Replaying the turn…</span>';
-    else if (!mine) actionsHTML = (folded ? '' : '<span class="placeholder">' + ic('hourglass', 'inl') + 'You play after ' + curName + '</span>') + (app.mode === 'online' ? '<button class="btn secondary icon" id="reload" title="Refresh">' + ic('refresh') + '</button>' : '');
+    else if (!mine) {
+      const nxt = app.mode === 'online' ? nextMyTurnGame() : null;
+      actionsHTML = (nxt ? '<button class="btn primary small" id="next-game">' + ic('play') + 'Your turn vs ' + esc(othersOf(nxt).map(p => p.name).join(', ') || '?') + '</button>' : (folded ? '' : '<span class="placeholder">' + ic('hourglass', 'inl') + 'You play after ' + curName + '</span>')) +
+        (app.mode === 'online' ? '<button class="btn secondary icon" id="reload" title="Refresh">' + ic('refresh') + '</button>' : '');
+    }
     else {
       const st = E.turnStatus(s);
       actionsHTML = '<button class="btn secondary' + (folded ? ' icon' : '') + '" id="undo" ' + (app.undo.length ? '' : 'disabled') + ' title="Undo">' + ic('undo') + '<span class="lbl">Undo</span></button>' +
@@ -2845,6 +3266,8 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     $('#music').onclick = () => { const on = Sfx.toggleMusic(); $('#music').innerHTML = ic(on ? 'music' : 'music-off'); toast(on ? 'Ambient music on' : 'Music off'); };
     $('#hdr-toggle').onclick = () => { app.headerOpen = !app.headerOpen; renderGame(); };
     const cb = $('#chat-btn'); if (cb) cb.onclick = openChat;
+    const gb = $('#games-btn'); if (gb) gb.onclick = goHome;
+    const ng = $('#next-game'); if (ng) ng.onclick = () => { const nxt = nextMyTurnGame(); if (nxt) { leaveGame(); openOnline(nxt.id); } };
     $$('.view-tabs button').forEach(b => { b.onclick = () => { if (app.replay) return; setStage(b.dataset.stage, true); }; });
     $$('.board-tabs button').forEach(b => { b.onclick = () => { const seat = +b.dataset.seat; if (app.viewSeat === seat) showScores(); else { app.viewSeat = seat; renderGame(); } }; });
     const reload = $('#reload'); if (reload) reload.onclick = () => { refresh(); loadChat(false); toast('Refreshing…'); };
@@ -3053,15 +3476,18 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     try { E.endTurn(w); } catch (e) { toast(e.message, true); return; }
     const btn = $('#end'); if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
     app.busy = true;
+    if (app.mode === 'online') stamp(w);
     try {
       const r = await app.net.saveGame(app.gameId, w, app.version);
       app.committed = w; app.version = r.version; app.work = null; app.undo = []; app.selToken = null; app.cubeMode = null; app.spiritPrompted = false; app.stageManual = false;
       app.lastLogLen = w.log.length;
       ls.del('harmonies.draft.' + app.gameId);
       app.busy = false;
+      notifyNextTurn(w);
+      if (app.mode === 'online') updateHub();
       const newDisplay = [];
       w.display.forEach((id, i) => { if (id && prevDisplay[i] !== id) newDisplay.push(i); });
-      if (w.status === 'finished') { render(); return; }
+      if (w.status === 'finished') { render(); loadHub(); return; }
       if (app.mode === 'local') app.viewSeat = w.turn;
       await animateRefill(slot, newDisplay);
       app.stage = autoStage();
@@ -3109,11 +3535,13 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     const iWon = app.mode === 'local' || winners.includes(mySeat());
     const reason = s.endReason === 'bag' ? 'the bag was empty' : 'a board had 2 empty spaces or fewer';
     modal('<h2>' + ic('flag', 'h') + 'Game over</h2><div class="winner">' + ic('trophy', 'big') + '<div class="winner-row">' + winners.map(i => avatarHTML(s.players[i], i, 'md')).join('') + '</div>' +
-      (winners.length > 1 ? 'Tie: ' + esc(winners.map(i => s.players[i].name).join(' & ')) : esc(s.players[winners[0]].name) + ' wins!') + '</div>' +
-      scoreTable(s) + '<p class="note">The end was triggered because ' + reason + '. Ties are broken by the number of cubes placed.</p>' +
-      '<div class="actions"><button class="btn secondary" id="m-close">See the boards</button><button class="btn primary" id="m-again">' + ic('refresh') + 'Rematch</button></div>');
+      (winners.length > 1 ? 'Tie: ' + esc(winners.map(i => s.players[i].name).join(' & ')) : (winners.length ? esc(s.players[winners[0]].name) + ' wins!' : 'Game over')) + '</div>' +
+      scoreTable(s) + '<p class="note">' + (s.endReason === 'resign' ? esc(s.players[s.resigned].name) + ' gave up.' : 'The end was triggered because ' + reason + '. Ties are broken by the number of cubes placed.') + '</p>' +
+      '<div class="actions"><button class="btn secondary" id="m-close">See the boards</button><button class="btn primary" id="m-again">' + ic('refresh') + 'Rematch</button></div>' +
+      (app.mode === 'online' ? '<button class="btn ghost block" id="m-games" style="margin-top:8px">' + ic('list') + 'All games' + (hub.myTurn ? ' · your turn in ' + hub.myTurn : '') + '</button>' : ''));
     $('#m-close').onclick = closeModal;
     $('#m-again').onclick = rematch;
+    const mg = $('#m-games'); if (mg) mg.onclick = () => { closeModal(); goHome(); };
     if (iWon) { confetti(); Sfx.win(); } else Sfx.lose();
   }
   async function rematch() {
@@ -3121,15 +3549,15 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     closeModal();
     if (app.mode === 'local') { startLocal(s.opts, s.players.map(p => ({ name: p.name, bot: p.bot || 0, avatar: p.avatar || 0 }))); return; }
     if (s.rematch) { openOnline(s.rematch); return; }
+    // revanche directe : mêmes joueurs (moi en hôte), la partie commence tout de suite et les autres sont prévenus
+    const me = s.players.find(p => p.pid === myPid());
+    if (!me) { toast('Only a player of this game can start a rematch', true); return; }
+    const seats = s.players.filter(p => p !== me).map(p => (p.bot ? { bot: p.bot, name: p.name, avatar: p.avatar || 0 } : { pid: p.pid, name: p.name, avatar: p.avatar || 0 }));
+    const oldId = app.gameId, oldVersion = app.version, old = E.clone(s);
     try {
-      const id = randomId(5);
-      const state = { status: 'lobby', id, opts: s.opts, host: myPid(), players: s.players.map(p => ({ pid: p.pid, name: p.name, avatar: p.avatar || 0, bot: p.bot || 0 })), createdAt: Date.now() };
-      await app.net.createGame(id, state);
-      const old = E.clone(s); old.rematch = id;
-      try { await app.net.saveGame(app.gameId, old, app.version); } catch (e) { /* peu importe */ }
-      rememberGame({ id, mode: 'online', label: 'Online · ' + SIDE_LABEL[s.opts.side] });
-      history.replaceState(null, '', '?g=' + id);
-      enterGame(id, state, 1);
+      const id = await createOnline(s.opts, me.name, seats, true);
+      old.rematch = id;
+      try { await app.net.saveGame(oldId, old, oldVersion); } catch (e) { /* peu importe */ }
     } catch (e) { toast('Rematch failed: ' + e.message, true); }
   }
   function showMenu() {
@@ -3139,9 +3567,11 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
       (chatAvailable() ? '<li id="mn-chat">' + ic('chat') + 'Chat' + (chat.unread ? ' <span class="badge-n inl">' + chat.unread + '</span>' : '') + '</li>' : '') +
       (app.mode === 'online' ? '<li id="mn-share">' + ic('share') + 'Share the game link</li>' : '') +
       '<li id="mn-scores">' + ic('chart') + 'Detailed score</li><li id="mn-journal">' + ic('scroll') + 'Game log</li><li id="mn-rules">' + ic('book') + 'Rules and legend</li>' +
+      (app.mode === 'online' ? '<li id="mn-players">' + ic('user-plus') + 'Players & friends</li>' : '') +
       (app.mode === 'online' && s.status === 'playing' && mySeat() < 0 ? '<li id="mn-claim">' + ic('users') + 'I am one of the players (take my seat back)</li>' : '') +
       (app.mode === 'online' ? '<li id="mn-reload">' + ic('refresh') + 'Reload the game</li>' : '') +
-      '<li id="mn-home">' + ic('home') + 'Back to home</li></ul>' +
+      (app.mode === 'online' && s.status === 'playing' && mySeat() >= 0 ? '<li id="mn-leave" class="danger">' + ic('flag') + ((s.log || []).length ? 'Give up this game' : 'Cancel this game') + '</li>' : '') +
+      '<li id="mn-home">' + ic('list') + (app.mode === 'online' ? 'All games' + (hub.myTurn ? ' <span class="badge-n inl">' + hub.myTurn + '</span>' : '') : 'Back to home') + '</li></ul>' +
       '<p class="note">' + (app.mode === 'online' ? 'Online game · code ' + esc(s.id) + ' · ' : 'Local game · ') + esc(SIDE_LABEL[s.opts.side]) + (s.opts.spirits ? ' · Spirits' : '') + '</p>' +
       '<div class="actions"><button class="btn secondary" id="m-close">Close</button></div>');
     $('#m-close').onclick = closeModal;
@@ -3152,18 +3582,45 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     on('#mn-journal', () => { closeModal(); showJournal(); });
     on('#mn-rules', () => { closeModal(); showRules(); });
     on('#mn-reload', () => { closeModal(); app.version = 0; refresh(); });
-    on('#mn-home', () => { closeModal(); leaveGame(); renderHome(); });
+    on('#mn-home', () => { closeModal(); goHome(); });
+    on('#mn-players', () => { closeModal(); showPlayers(); });
+    on('#mn-leave', () => {
+      closeModal();
+      const played = (s.log || []).length > 0;
+      confirmBox(played ? 'Give up this game?' : 'Cancel this game?', played ? 'The game ends now and the other players win.' : 'Nobody has played yet: the game is cancelled for everyone.', async () => {
+        const st = E.clone(app.committed);
+        if (played) E.resign(st, mySeat()); else { st.status = 'cancelled'; st.cancelledBy = mySeat(); st.cur = null; }
+        stamp(st);
+        try {
+          const r = await app.net.saveGame(app.gameId, st, app.version);
+          app.committed = st; app.version = r.version; app.work = null; ls.del('harmonies.draft.' + app.gameId);
+          notifyPlayers(st, 'finished', { cancelled: !played, resigned: played });
+          if (played) { app.endShown = true; render(); showResults(); } else goHome();
+        } catch (e) { toast('Failed: ' + e.message, true); refresh(); }
+      });
+    });
     on('#mn-claim', () => {
       closeModal();
       modal('<h2>' + ic('users', 'h') + 'Who are you?</h2><p class="note">This device is not linked to any player of this game (new phone, cleared data…).</p><ul class="menu">' +
         s.players.map((p, i) => '<li data-seat="' + i + '">' + avatarHTML(p, i, 'sm') + esc(p.name) + '</li>').join('') + '</ul><div class="actions"><button class="btn secondary" id="m-close">Cancel</button></div>');
       $('#m-close').onclick = closeModal;
       $$('.menu li[data-seat]').forEach(li => { li.onclick = async () => {
-        const st = E.clone(app.committed); st.players[+li.dataset.seat].pid = myPid();
+        const st = E.clone(app.committed); st.players[+li.dataset.seat].pid = myPid(); stamp(st);
         try { const r = await app.net.saveGame(app.gameId, st, app.version); app.committed = st; app.version = r.version; app.work = null; closeModal(); render(); toast('Welcome back, ' + esc(st.players[+li.dataset.seat].name)); }
         catch (e) { toast('Failed: ' + e.message, true); refresh(); }
       }; });
     });
+  }
+  // Joueurs de la partie : ajouter comme ami en un geste
+  function showPlayers() {
+    const s = app.committed;
+    const friendOf = pid => hub.friends.some(f => f.pid === pid);
+    modal('<h2>' + ic('users', 'h') + 'Players</h2><ul class="players-list">' + s.players.map((p, i) => '<li>' + avatarHTML(p, i, 'md') + '<b>' + esc(p.name) + '</b>' + (p.bot ? ' <span class="note">· ' + BOT_LABEL[p.bot] + '</span>' : '') + (p.pid === myPid() ? ' <span class="note">· you</span>' : '') + '<span class="spacer"></span>' +
+      (!p.bot && p.pid !== myPid() ? (friendOf(p.pid) ? '<span class="note ok">' + ic('check', 'inl') + 'Friend</span>' : (acct.me ? '<button class="btn small secondary" data-befriend="' + esc(p.pid) + '">' + ic('user-plus') + 'Add friend</button>' : '')) : '') + '</li>').join('') + '</ul>' +
+      (acct.me ? '<p class="note">Friends can be challenged from the home screen without any game code.</p>' : '<p class="note">Enter your name on the home screen to add friends.</p>') +
+      '<div class="actions"><button class="btn secondary" id="m-close">Close</button></div>');
+    $('#m-close').onclick = closeModal;
+    $$('#modal [data-befriend]').forEach(b => { b.onclick = async () => { b.disabled = true; if (await addFriend(null, b.dataset.befriend)) showPlayers(); else b.disabled = false; }; });
   }
   function showJournal() {
     const s = view();
@@ -3259,171 +3716,186 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     if (!text || !chatAvailable()) return;
     const s = app.committed;
     const me = s && s.players ? s.players.find(p => p.pid === myPid()) : null;
-    const msg = { pid: myPid(), name: (me && me.name) || myName() || 'Player', avatar: (me && me.avatar) || myAvatar(), text };
+    const present = s && s.players ? s.players.filter(p => !p.bot && p.pid !== myPid() && app.online.has(p.pid)).map(p => p.pid) : [];
+    const msg = { pid: myPid(), name: (me && me.name) || myName() || 'Player', avatar: (me && me.avatar) || myAvatar(), text, present };
     const inp = $('#chat-input'); if (inp) { inp.value = ''; inp.focus(); }
-    try { const row = await app.net.sendChat(app.gameId, msg); addChatMsg(row, false); Sfx.chat(); }
-    catch (e) { toast('Message not sent: ' + e.message, true); }
+    try {
+      const row = await app.net.sendChat(app.gameId, msg); addChatMsg(row, false); Sfx.chat();
+      if (s && s.players) notifyPlayers(s, 'chat', { text }, s.players.filter(p => !p.bot && p.pid !== myPid() && !app.online.has(p.pid)).map(p => p.pid));
+    } catch (e) { toast('Message not sent: ' + e.message, true); }
   }
 
-  // ---------- Compte (téléphone + PIN), amis, invitations sans code ----------
+  // ---------- Profil (automatique), amis, tableau de bord des parties, événements en direct ----------
   const acctNet = () => { if (!app.net || !app.net.rpc) { const n = root.Net.makeOnline(CFG); if (!app.net) app.net = n; return n; } return app.net; };
-  const cred = () => ({ p_phone: acct.me.phone, p_secret: acct.me.secret });
-  function accountPanel() {
-    if (!ONLINE_OK) return '';
-    const me = acct.me;
-    if (!me) {
-      return '<div class="panel glass"><h2>' + ic('users', 'h') + 'Friends</h2><p class="note">Create a free account with your phone number to add friends and invite them to games without any code. No SMS is sent — you just choose a PIN.</p>' +
-        '<div class="row" style="margin-top:8px"><button class="btn primary" id="signup">' + ic('user') + 'Sign up</button><button class="btn secondary" id="signin">' + ic('login') + 'Sign in</button></div></div>';
-    }
-    return '<div class="panel glass"><h2>' + ic('users', 'h') + 'Friends<span class="spacer"></span><button class="btn small secondary" id="signout">Sign out</button></h2>' +
-      '<div class="me-line">' + avatarHTML(me, -1, 'sm') + '<b>' + esc(me.name) + '</b><span class="note">' + esc(fmtPhone(me.phone)) + '</span></div>' +
-      (acct.invites.length ? '<div class="invites">' + acct.invites.map(inv => '<div class="inv-row">' + avatarHTML(inv.from, -1, 'sm') + '<div class="f-txt"><b>' + esc(inv.from.name) + '</b> invites you to a game<span class="note">' + esc(SIDE_LABEL[inv.side] || '') + (inv.spirits ? ' · Spirits' : '') + '</span></div>' +
-        '<button class="btn small primary" data-join-inv="' + esc(inv.game) + '">' + ic('play') + 'Join</button><button class="btn small secondary icon" data-dismiss-inv="' + inv.id + '" title="Dismiss">' + ic('x') + '</button></div>').join('') + '</div>' : '') +
-      '<ul class="friends">' + (acct.friends.length ? acct.friends.map(f => '<li>' + avatarHTML(f, -1, 'md') + '<div class="f-txt"><b>' + esc(f.name) + '</b><span class="note">' + esc(fmtPhone(f.phone)) + '</span></div>' +
-        '<button class="btn small primary" data-invite-new="' + esc(f.phone) + '">' + ic('play') + 'Invite</button><button class="btn small secondary icon" data-unfriend="' + esc(f.phone) + '" title="Remove">' + ic('x') + '</button></li>').join('') :
-        '<li class="note">' + (acct.loading ? 'Loading…' : 'No friends yet — add them with their phone number.') + '</li>') + '</ul>' +
-      '<form class="row" id="addfriend" autocomplete="off"><input type="tel" id="friend-phone" placeholder="Friend\'s number (+33…)" autocomplete="tel"><button class="btn secondary" type="submit">' + ic('plus') + 'Add</button></form></div>';
-  }
-  function refreshAccountPanel() { const box = $('#acct-panel'); if (box) { box.innerHTML = accountPanel(); bindAccountPanel(); } }
-  function bindAccountPanel() {
-    const on = (sel, fn) => { const e = $(sel); if (e) e.onclick = fn; };
-    on('#signup', () => showSignup());
-    on('#signin', () => showSignin());
-    on('#signout', signOut);
-    const af = $('#addfriend'); if (af) af.onsubmit = ev => { ev.preventDefault(); addFriend($('#friend-phone').value); };
-    $$('[data-invite-new]').forEach(b => { b.onclick = () => inviteToNewGame(b.dataset.inviteNew); });
-    $$('[data-unfriend]').forEach(b => { b.onclick = () => removeFriend(b.dataset.unfriend); });
-    $$('[data-join-inv]').forEach(b => { b.onclick = () => { Sfx.unlock(); openOnline(b.dataset.joinInv, true); }; });
-    $$('[data-dismiss-inv]').forEach(b => { b.onclick = () => dismissInvite(+b.dataset.dismissInv); });
+  const cred = () => ({ p_pid: acct.me.pid, p_secret: acct.me.secret });
+  acct.me = acctStore.get();
+  // Crée le profil du joueur (pid de l'appareil + prénom) s'il n'existe pas encore ; renvoie le profil ou null.
+  async function ensureAccount() {
+    if (!ONLINE_OK) return null;
+    if (acct.me) return acct.me;
+    const name = myName();
+    if (!name) return null;
+    if (acct.registering) return acct.registering;
+    acct.registering = (async () => {
+      try {
+        const a = await acctNet().rpc('harmonies_register', { p_pid: myPid(), p_name: name, p_avatar: myAvatar() });
+        setAccount(a);
+      } catch (e) {
+        if (/exists/i.test(e.message) && !pidOverride()) {
+          // ce pid a déjà un profil dont cet appareil n'a plus le secret (données effacées) : nouvelle identité
+          ls.set('harmonies.pid', randomId(12, 'abcdefghijklmnopqrstuvwxyz0123456789'));
+          try { const a = await acctNet().rpc('harmonies_register', { p_pid: myPid(), p_name: name, p_avatar: myAvatar() }); setAccount(a); } catch (e2) { hub.error = e2.message; }
+        } else hub.error = e.message;
+      } finally { acct.registering = null; }
+      return acct.me;
+    })();
+    return acct.registering;
   }
   function setAccount(a) {
-    acct.me = a ? { phone: a.phone, name: a.name, avatar: a.avatar, secret: a.secret } : null;
-    if (acct.me) { ls.set('harmonies.account', acct.me); if (a.name) ls.set('harmonies.name', a.name); if (a.avatar) ls.set('harmonies.avatar', a.avatar); }
-    else ls.del('harmonies.account');
-    acct.friends = []; acct.invites = [];
-    startInvites();
-  }
-  function showSignup() {
-    modal('<h2>' + ic('user', 'h') + 'Sign up</h2><p class="note">Your number only lets friends find you. No SMS is sent: choose a PIN to sign in again on another phone.</p>' +
-      '<form id="su-form" autocomplete="off"><div class="field"><label>Phone number</label><input type="tel" id="su-phone" placeholder="+33 6 12 34 56 78" autocomplete="tel"></div>' +
-      '<div class="field"><label>Your name</label><input type="text" id="su-name" maxlength="16" value="' + esc(myName()) + '" placeholder="e.g. Hadrien"></div>' +
-      '<div class="field"><label>PIN (4 to 6 digits)</label><input type="password" id="su-pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="new-password"></div>' +
-      '<div class="actions"><button class="btn secondary" type="button" id="m-close">Cancel</button><button class="btn primary" type="submit" id="su-go">Create account</button></div></form>');
-    $('#m-close').onclick = closeModal;
-    $('#su-form').onsubmit = async ev => {
-      ev.preventDefault();
-      const phone = normalizePhone($('#su-phone').value), name = $('#su-name').value.trim(), pin = $('#su-pin').value.trim();
-      if (!phone) { toast('Enter a valid phone number (e.g. +33 6 12 34 56 78)', true); return; }
-      if (!name) { toast('Enter your name', true); return; }
-      if (!/^\d{4,6}$/.test(pin)) { toast('The PIN must be 4 to 6 digits', true); return; }
-      const btn = $('#su-go'); btn.disabled = true;
-      try {
-        const a = await acctNet().rpc('harmonies_signup', { p_phone: phone, p_name: name, p_avatar: myAvatar(), p_pin_hash: await pinHash(phone, pin) });
-        setAccount(a); closeModal(); toast('Welcome, ' + esc(a.name) + '!'); renderHome();
-      } catch (e) { toast(e.message, true); btn.disabled = false; }
-    };
-  }
-  function showSignin() {
-    modal('<h2>' + ic('login', 'h') + 'Sign in</h2><form id="si-form" autocomplete="off"><div class="field"><label>Phone number</label><input type="tel" id="si-phone" placeholder="+33 6 12 34 56 78" autocomplete="tel"></div>' +
-      '<div class="field"><label>PIN</label><input type="password" id="si-pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="current-password"></div>' +
-      '<div class="actions"><button class="btn secondary" type="button" id="m-close">Cancel</button><button class="btn primary" type="submit" id="si-go">Sign in</button></div></form>');
-    $('#m-close').onclick = closeModal;
-    $('#si-form').onsubmit = async ev => {
-      ev.preventDefault();
-      const phone = normalizePhone($('#si-phone').value), pin = $('#si-pin').value.trim();
-      if (!phone || !pin) { toast('Enter your number and PIN', true); return; }
-      const btn = $('#si-go'); btn.disabled = true;
-      try {
-        const a = await acctNet().rpc('harmonies_login', { p_phone: phone, p_pin_hash: await pinHash(phone, pin) });
-        setAccount(a); closeModal(); toast('Welcome back, ' + esc(a.name) + '!'); renderHome();
-      } catch (e) { toast(e.message, true); btn.disabled = false; }
-    };
-  }
-  function signOut() { setAccount(null); toast('Signed out'); renderHome(); }
-  async function loadHome() {
-    if (!acct.me || !ONLINE_OK) return;
-    acct.loading = true;
-    try {
-      const h = await acctNet().rpc('harmonies_home', cred());
-      acct.friends = h.friends || []; acct.invites = h.invites || [];
-      if (h.account && (h.account.name !== acct.me.name || h.account.avatar !== acct.me.avatar)) { acct.me.name = h.account.name; acct.me.avatar = h.account.avatar; ls.set('harmonies.account', acct.me); }
-    } catch (e) {
-      if (/not signed in/i.test(e.message)) { setAccount(null); toast('Your session expired, please sign in again', true); }
-    }
-    acct.loading = false;
-    if (app.screen === 'home') refreshAccountPanel();
+    acct.me = a ? { pid: a.pid, secret: a.secret, code: a.code, name: a.name, avatar: a.avatar } : null;
+    acctStore.set(acct.me);
+    hub.friends = [];
+    startHub();
+    if (app.screen === 'home') refreshHomePanels();
+    if (acct.me && app.pendingFriend) { const c = app.pendingFriend; app.pendingFriend = null; addFriend(c); }
+    if (acct.me) Push.sync();
   }
   let profileTimer = null;
   function syncProfile() {
-    if (!acct.me) return;
+    if (!ONLINE_OK) return;
+    if (!acct.me) { ensureAccount(); return; }
     clearTimeout(profileTimer);
     profileTimer = setTimeout(async () => {
       const name = myName() || acct.me.name, avatar = myAvatar();
-      try { await acctNet().rpc('harmonies_update_profile', Object.assign(cred(), { p_name: name, p_avatar: avatar })); acct.me.name = name; acct.me.avatar = avatar; ls.set('harmonies.account', acct.me); if (app.screen === 'home') refreshAccountPanel(); }
+      try { await acctNet().rpc('harmonies_update_profile', Object.assign(cred(), { p_name: name, p_avatar: avatar })); acct.me.name = name; acct.me.avatar = avatar; acctStore.set(acct.me); }
       catch (e) { /* réessayé au prochain changement */ }
     }, 600);
   }
-  async function addFriend(raw) {
-    const phone = normalizePhone(raw);
-    if (!phone) { toast('Enter a valid phone number (e.g. +33 6 12 34 56 78)', true); return; }
+  // ---- tableau de bord : parties (résumés serveur) + amis ; rechargé sur événement, au retour au premier plan et périodiquement ----
+  async function loadHub() {
+    if (!ONLINE_OK) return;
+    if (hub.loading) { hub.again = true; return; }
+    hub.loading = true;
+    if (app.screen === 'home' && !hub.loaded) refreshHomePanels();
     try {
-      const f = await acctNet().rpc('harmonies_add_friend', Object.assign(cred(), { p_friend: phone }));
-      if (!acct.friends.some(x => x.phone === f.phone)) acct.friends.push(f);
-      acct.friends.sort((a, b) => a.name.localeCompare(b.name));
-      toast(esc(f.name) + ' added to your friends'); Sfx.card(); refreshAccountPanel();
-    } catch (e) { toast(e.message, true); }
+      if (!acct.me) await ensureAccount();
+      if (acct.me) {
+        const h = await acctNet().rpc('harmonies_home', cred());
+        hub.friends = h.friends || []; hub.games = h.games || [];
+        if (h.now) hub.skew = Date.parse(h.now) - Date.now();
+        if (h.account && (h.account.name !== acct.me.name || h.account.avatar !== acct.me.avatar || h.account.code !== acct.me.code)) { acct.me.name = h.account.name; acct.me.avatar = h.account.avatar; acct.me.code = h.account.code; acctStore.set(acct.me); }
+      } else {
+        const ids = ls.get('harmonies.recent', []).filter(g => g.mode === 'online').map(g => g.id).slice(0, 20);
+        hub.games = ids.length ? (await acctNet().rpc('harmonies_summaries', { p_ids: ids })) || [] : [];
+      }
+      hub.loaded = true; hub.error = null;
+    } catch (e) {
+      hub.error = e.message;
+      if (/not signed in/i.test(e.message)) { acct.me = null; acctStore.set(null); ensureAccount(); }
+    }
+    hub.loading = false;
+    updateHub();
+    if (hub.again) { hub.again = false; loadHub(); }
   }
-  async function removeFriend(phone) {
-    try { await acctNet().rpc('harmonies_remove_friend', Object.assign(cred(), { p_friend: phone })); acct.friends = acct.friends.filter(f => f.phone !== phone); refreshAccountPanel(); }
-    catch (e) { toast(e.message, true); }
+  // Recalcule la pastille « à toi de jouer », l'icône, les panneaux de l'accueil et le suivi temps réel des parties actives.
+  function updateHub() {
+    const mine = hub.games.filter(g => isMyTurnGame(g) && g.players.some(p => p.pid === myPid()));
+    hub.myTurn = mine.filter(g => g.id !== app.gameId).length;
+    setAppBadge(mine.length);
+    if (app.screen === 'home') refreshHomePanels();
+    else if (app.screen === 'game') { const b = $('#games-btn'); if (b) { let n = b.querySelector('.badge-n'); if (hub.myTurn) { if (!n) { n = document.createElement('i'); n.className = 'badge-n'; b.appendChild(n); } n.textContent = hub.myTurn; } else if (n) n.remove(); } }
+    watchGames();
   }
-  // Envoie une invitation pour la partie `gameId` : enregistrée côté serveur + diffusée en direct à l'ami
-  async function sendInvite(phone, gameId) {
-    const inv = await acctNet().rpc('harmonies_invite', Object.assign(cred(), { p_to: phone, p_game: gameId }));
-    app.invited.add(phone);
-    try { await acctNet().pushInvite(phone, inv); } catch (e) { /* l'ami la verra sur son accueil */ }
-    const f = acct.friends.find(x => x.phone === phone);
-    toast('Invitation sent to ' + esc(f ? f.name : fmtPhone(phone)));
-    return inv;
+  const nextMyTurnGame = () => hub.games.find(g => isMyTurnGame(g) && g.id !== app.gameId && g.players.some(p => p.pid === myPid())) || null;
+  function watchGames() {
+    if (!ONLINE_OK || !app.net || !app.net.subscribeGames) return;
+    const ids = hub.games.filter(g => g.status === 'playing' || g.status === 'lobby').map(g => g.id).slice(0, 30).sort();
+    const key = ids.join(',');
+    if (key === hub.watched) return;
+    hub.watched = key;
+    if (hub.unsubGames) { hub.unsubGames(); hub.unsubGames = null; }
+    if (ids.length) hub.unsubGames = app.net.subscribeGames(ids, id => { if (id !== app.gameId) scheduleHub(); });
   }
-  async function inviteToNewGame(phone) {
-    const name = myName() || acct.me.name;
-    if (!name) { toast('Enter your name first', true); return; }
-    Sfx.unlock();
-    const opts = ls.get('harmonies.opts', { side: 'A', spirits: false });
-    try { const id = await createOnline(opts, name); await sendInvite(phone, id); render(); }
-    catch (e) { toast('Could not invite: ' + e.message, true); }
+  let hubTimer = null;
+  function scheduleHub() { clearTimeout(hubTimer); hubTimer = setTimeout(loadHub, 400); }
+  function startHub() {
+    if (hub.unsub) { hub.unsub(); hub.unsub = null; }
+    if (hub.unsubOnline) { hub.unsubOnline(); hub.unsubOnline = null; }
+    if (!acct.me || !ONLINE_OK) return;
+    try {
+      hub.unsub = acctNet().subscribeAccount(acct.me.pid, onHubEvent);
+      hub.unsubOnline = acctNet().subscribeOnline(acct.me.pid, pids => { hub.online = new Set(pids); updatePresence(); if (app.screen === 'home') refreshHomePanels(); });
+    } catch (e) { /* hors ligne */ }
+    if (!hub.timer) hub.timer = setInterval(() => { if (document.visibilityState === 'visible') loadHub(); }, app.screen === 'home' ? 30000 : 60000);
+    loadHub();
   }
-  async function dismissInvite(id) {
-    acct.invites = acct.invites.filter(i => i.id !== id); refreshAccountPanel();
-    try { await acctNet().rpc('harmonies_dismiss_invite', Object.assign(cred(), { p_id: id })); } catch (e) { /* ignore */ }
+  // Événement reçu sur mon canal : nouvelle partie, à moi de jouer, partie finie, message, nouvel ami
+  function onHubEvent(ev, payload) {
+    if (!payload || !payload.from) return;
+    const from = payload.from;
+    const same = payload.game && payload.game === app.gameId;
+    scheduleHub();
+    if (ev === 'friend') { toast(avatarHTML(from, -1, 'xs') + esc(from.name) + ' added you as a friend'); Sfx.chat(); return; }
+    if (same) { if (ev !== 'chat') refresh(); return; } // la partie ouverte reçoit déjà ses propres mises à jour
+    if (ev === 'game') {
+      hubPop(from, payload.lobby ? 'invites you to a game · ' + esc(SIDE_LABEL[payload.side] || '') : 'started a game with you · ' + esc(SIDE_LABEL[payload.side] || ''), payload.game, payload.lobby ? 'Join' : 'Play');
+      Sfx.turn(); vibrate([20, 30, 20]);
+      Notif.show('Harmonies', from.name + (payload.lobby ? ' invites you to a game' : ' started a game with you'), 'game-' + payload.game);
+    } else if (ev === 'turn') {
+      hubPop(from, 'played — your turn!', payload.game, 'Play');
+      Sfx.turn(); vibrate([30, 40, 30]);
+      Notif.show('Your turn!', 'Game with ' + from.name, 'game-' + payload.game);
+    } else if (ev === 'finished') {
+      hubPop(from, payload.cancelled ? (payload.removed ? 'removed you from a game' : 'cancelled a game') : (payload.resigned ? 'gave up — you win!' : 'finished your game'), payload.cancelled ? null : payload.game, 'See');
+      Sfx.chat();
+      Notif.show('Harmonies', from.name + (payload.cancelled ? ' cancelled a game' : (payload.resigned ? ' gave up — you win!' : ' finished your game')), 'game-' + payload.game);
+    } else if (ev === 'chat') {
+      hubPop(from, esc(String(payload.text || '')).slice(0, 120), payload.game, 'Open');
+      Sfx.chat(); vibrate(15);
+      Notif.show(from.name, String(payload.text || ''), 'chat-' + payload.game);
+    }
   }
-  function onInvite(inv) {
-    if (!inv || !inv.game || !inv.from) return;
-    if (!acct.invites.some(i => i.id === inv.id)) acct.invites.unshift(inv);
-    if (app.screen === 'home') refreshAccountPanel();
-    if (app.gameId === inv.game) return;
-    invitePop(inv); Sfx.chat(); vibrate([20, 30, 20]);
-    Notif.show('Harmonies', inv.from.name + ' invites you to a game', 'invite');
-  }
-  function invitePop(inv) {
+  function hubPop(from, text, gameId, label) {
     let host = $('#chat-pops');
     if (!host) { host = document.createElement('div'); host.id = 'chat-pops'; document.body.appendChild(host); }
     const el = document.createElement('div');
     el.className = 'chat-pop invite';
-    el.innerHTML = avatarHTML(inv.from, -1, 'sm') + '<div class="cp-body"><b>' + esc(inv.from.name) + '</b><span>invites you to a game · ' + esc(SIDE_LABEL[inv.side] || '') + '</span></div><button class="btn small primary">' + ic('play') + 'Join</button>';
-    el.querySelector('button').onclick = ev => { ev.stopPropagation(); el.remove(); Sfx.unlock(); openOnline(inv.game, true); };
+    el.innerHTML = avatarHTML(from, -1, 'sm') + '<div class="cp-body"><b>' + esc(from.name || '?') + '</b><span>' + text + '</span></div>' + (gameId ? '<button class="btn small primary">' + ic('play') + label + '</button>' : '');
+    const b = el.querySelector('button');
+    if (b) b.onclick = ev => { ev.stopPropagation(); el.remove(); Sfx.unlock(); if (app.gameId) leaveGame(); openOnline(gameId, true); };
     el.onclick = () => { el.remove(); };
     host.appendChild(el);
-    setTimeout(() => el.classList.add('out'), 14000); setTimeout(() => el.remove(), 14400);
+    while (host.children.length > 3) host.firstChild.remove();
+    setTimeout(() => el.classList.add('out'), 12000); setTimeout(() => el.remove(), 12400);
   }
-  function startInvites() {
-    if (acct.unsub) { acct.unsub(); acct.unsub = null; }
-    if (!acct.me || !ONLINE_OK) return;
-    try { acct.unsub = acctNet().subscribeInvites(acct.me.phone, onInvite); } catch (e) { /* hors ligne */ }
+  // ---- amis ----
+  async function addFriend(code, pid) {
+    if (!(await ensureAccount())) { toast('Enter your name first', true); return false; }
+    try {
+      const f = await acctNet().rpc('harmonies_add_friend', Object.assign(cred(), { p_code: code || null, p_friend: pid || null }));
+      if (!hub.friends.some(x => x.pid === f.pid)) hub.friends.push(f);
+      hub.friends.sort((a, b) => a.name.localeCompare(b.name));
+      toast('You and ' + esc(f.name) + ' are now friends'); Sfx.card();
+      try { acctNet().pushEvent(f.pid, 'friend', { from: { pid: myPid(), name: myName(), avatar: myAvatar() } }).catch(() => {}); } catch (e) { /* ignore */ }
+      if (app.screen === 'home') refreshHomePanels();
+      return true;
+    } catch (e) { toast(e.message, true); return false; }
+  }
+  async function removeFriend(pid) {
+    const f = hub.friends.find(x => x.pid === pid);
+    confirmBox('Remove ' + (f ? f.name : 'this friend') + '?', 'You will no longer see each other in your friends lists.', async () => {
+      try { await acctNet().rpc('harmonies_remove_friend', Object.assign(cred(), { p_friend: pid })); hub.friends = hub.friends.filter(x => x.pid !== pid); refreshHomePanels(); }
+      catch (e) { toast(e.message, true); }
+    });
   }
 
   // ---------- Démarrage ----------
+  function openFromUrl(url) {
+    let code = '';
+    try { code = (new URL(url, location.href).searchParams.get('g') || '').toUpperCase(); } catch (e) { /* ignore */ }
+    if (code && ONLINE_OK) { if (code !== app.gameId) { if (app.gameId) leaveGame(); openOnline(code, true); } else refresh(); }
+    else if (!app.gameId) renderHome();
+  }
   function boot() {
     document.body.insertAdjacentHTML('afterbegin', R.defsSVG() + (root.ANIMAL_SPRITE || ''));
     const params = new URLSearchParams(location.search);
@@ -3431,15 +3903,33 @@ else if (typeof self !== 'undefined') self.ANIMAL_SPRITE = ANIMAL_SPRITE;
     if (params.get('pid')) { try { sessionStorage.setItem('harmonies.pid', params.get('pid')); } catch (e) { /* ignore */ } }
     if (params.get('name')) ls.set('harmonies.name', params.get('name'));
     if (params.get('avatar')) ls.set('harmonies.avatar', +params.get('avatar'));
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && app.mode === 'online' && app.gameId) { refresh(); loadChat(false); maybeRunBot(); } });
+    if (params.get('add')) { app.pendingFriend = params.get('add'); history.replaceState(null, '', location.pathname); }
+    acct.me = acctStore.get();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'visible') return;
+      if (app.mode === 'online' && app.gameId) { refresh(); loadChat(false); maybeRunBot(); }
+      loadHub();
+    });
     document.addEventListener('pointerdown', () => { interacted = true; Sfx.unlock(); }, { once: true, passive: true });
-    // page publiée : service worker (installation sur l'écran d'accueil, cache de secours hors connexion)
-    if (CFG.build && 'serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js').catch(() => { /* facultatif */ }); } catch (e) { /* facultatif */ } }
-    startInvites();
+    // service worker : installation sur l'écran d'accueil, cache hors connexion, notifications push (page publiée ou dev local)
+    if ((CFG.build || location.hostname === 'localhost') && 'serviceWorker' in navigator) {
+      try {
+        navigator.serviceWorker.register('sw.js').catch(() => { /* facultatif */ });
+        navigator.serviceWorker.addEventListener('message', ev => {
+          const d = ev.data || {};
+          if (d.type === 'open' && d.url) openFromUrl(d.url);
+          else if (d.type === 'push') { scheduleHub(); if (app.mode === 'online' && app.gameId) refresh(); }
+        });
+      } catch (e) { /* facultatif */ }
+    }
     if (code && ONLINE_OK) { renderHome(); openOnline(code, true); }
     else renderHome();
+    if (acct.me) {
+      startHub(); Push.sync();
+      if (app.pendingFriend) { const c = app.pendingFriend; app.pendingFriend = null; addFriend(c); }
+    } else ensureAccount();
   }
-  root.HarmoniesApp = { boot, app, render, act, endTurn, refresh, Sfx, chat, sendChat, openChat, acct, Notif };
+  root.HarmoniesApp = { boot, app, render, act, endTurn, refresh, Sfx, chat, sendChat, openChat, acct, hub, Notif, Push, loadHub, skipBots, openOnline, goHome };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })(typeof self !== 'undefined' ? self : this);
 

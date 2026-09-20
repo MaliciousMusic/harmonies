@@ -284,3 +284,17 @@ test('limite de 4 cartes et une carte par tour', () => {
   state.cur.cardTaken = false;
   assert.equal(E.canTakeCard(state), false, 'esprit + 3 cartes = 4 actives');
 });
+
+test('abandon : la partie se termine, le joueur qui abandonne ne gagne jamais', () => {
+  const st = E.newGame({ side: 'A' }, [{ token: 'a', name: 'A' }, { token: 'b', name: 'B' }]);
+  // A construit un peu de paysage pour être devant au score
+  st.players[0].board[0].s = [3, 3, 4];
+  E.resign(st, 0);
+  assert.equal(st.status, 'finished');
+  assert.equal(st.endReason, 'resign');
+  assert.equal(st.resigned, 0);
+  assert.equal(st.cur, null);
+  assert.deepEqual(st.result.winners, [1]);
+  assert.equal(st.result.scores.length, 2);
+  assert.throws(() => E.resign(st, 1), /over/);
+});

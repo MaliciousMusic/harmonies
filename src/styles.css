@@ -536,3 +536,52 @@ input[type=tel]:focus, input[type=password]:focus { outline: none; border-color:
 input[type=password] { letter-spacing: 4px; }
 .chat-pop.invite { border-color: var(--teal-l); }
 .chat-pop.invite .btn.small { flex: none; }
+
+/* ---------- Accueil façon tableau de bord : profil, cloche, liste des parties, amis, nouvelle partie ---------- */
+.profile .me-row { align-items: center; }
+.bell { flex: none; border: 2px solid var(--line); background: #fff; color: var(--muted); border-radius: 14px; min-height: 46px; padding: 4px 10px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: pointer; font-family: var(--display); font-weight: 600; font-size: 10.5px; line-height: 1; min-width: 58px; }
+.bell .ic { width: 20px; height: 20px; margin: 0; }
+.bell.on { border-color: var(--teal-l); background: #dff2ec; color: var(--teal-d); }
+.bell:disabled { opacity: .5; }
+.icon-btn.light { color: var(--teal); background: transparent; width: 32px; height: 32px; }
+.gsec { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .4px; text-transform: uppercase; color: var(--muted); margin: 10px 0 2px; display: flex; align-items: center; gap: 8px; }
+.gsec.mine { color: var(--orange-d); }
+.gsec em { font-style: normal; background: var(--orange); color: #fff; border-radius: 999px; min-width: 20px; height: 20px; display: inline-grid; place-items: center; font-size: 12px; padding: 0 6px; }
+.games { list-style: none; margin: 0; padding: 0; }
+.games .grow { display: flex; align-items: center; gap: 10px; padding: 9px 4px; border-top: 1px solid var(--line); cursor: pointer; border-radius: 12px; }
+.games .grow:first-child { border-top: 0; }
+.games .grow:active { background: #f3ecdc; }
+.games .grow.mine { background: #fff4e3; border: 2px solid #f8d9b4; border-radius: 16px; padding: 9px 10px; margin: 4px 0; }
+.games .grow.mine + .grow.mine { border-top: 2px solid #f8d9b4; }
+.games .grow.done { opacity: .78; }
+.stack-av { display: inline-flex; flex: none; min-width: 42px; }
+.stack-av .avatar { margin-left: -12px; box-shadow: 0 0 0 2px var(--seat), 0 0 0 4px #fff; }
+.stack-av .avatar:first-child { margin-left: 0; }
+.stack-av.phone { width: 38px; height: 38px; border-radius: 50%; background: #eee6d4; color: var(--navy); display: grid; place-items: center; }
+.stack-av.phone .ic { width: 20px; height: 20px; margin: 0; }
+.g-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.g-txt b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--display); font-weight: 600; font-size: 15.5px; color: var(--navy); }
+.g-txt span { font-size: 12.5px; color: var(--muted); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.g-txt .yt { color: var(--orange-d); }
+.grow .chev { width: 20px; height: 20px; color: var(--muted); flex: none; }
+.hide-btn { flex: none; border: 0; background: transparent; color: var(--muted); width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; padding: 0; line-height: 0; }
+.hide-btn .ic { width: 16px; height: 16px; margin: 0; }
+.friends .f-txt .note .on { color: #2f9e5b; }
+.mycode { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line); flex-wrap: wrap; }
+.mycode .note { margin: 0; }
+.mycode b { font-family: var(--display); font-weight: 600; font-size: 20px; letter-spacing: 3px; color: var(--navy); flex: 1; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chips .chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px 5px 6px; font-size: 14px; }
+.chips .chip.on { border-color: var(--teal); background: #dff2ec; color: var(--teal-d); }
+.chips .chip.me { cursor: default; }
+.chips .chip.bot { border-color: #d9c9a8; background: #fff8ea; color: var(--orange-d); padding-left: 10px; }
+.chips .chip:disabled { opacity: .45; cursor: default; }
+.chips .chip .ic.inl { margin: 0; }
+.chip-sel { font: inherit; font-family: var(--display); font-weight: 500; font-size: 14px; padding: 6px 10px; border-radius: 999px; border: 2px dashed var(--line); background: #fff; color: var(--muted); }
+.modal .actions.col { flex-direction: column; }
+.menu li.danger { color: var(--coral); }
+.menu li.danger .ic { color: var(--coral); }
+.home-content .row .btn.ghost.light { flex: 1; }
+.modal ol { padding-left: 20px; margin: 6px 0; }
+.modal ol li { margin: 4px 0; }
+.btn.small .ic { width: 16px; height: 16px; }

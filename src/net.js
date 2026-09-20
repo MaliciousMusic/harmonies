@@ -1,5 +1,7 @@
 // Transport des parties : Supabase (en ligne) ou localStorage (même téléphone).
-// Interface commune : createGame, loadGame, saveGame (verrou optimiste), subscribe ; en ligne, aussi le chat (loadChat, sendChat, subscribeChat).
+// Interface commune : createGame, loadGame, saveGame (verrou optimiste), subscribe ; en ligne, aussi le chat (loadChat, sendChat,
+// subscribeChat), les fonctions SQL des profils (rpc), le canal d'événements du joueur (subscribeAccount / pushEvent),
+// la présence globale (subscribeOnline) et le suivi de plusieurs parties (subscribeGames).
 (function (root) {
   'use strict';
 
@@ -13,6 +15,13 @@
       realtime: { params: { eventsPerSecond: 5 } },
       auth: { persistSession: false, autoRefreshToken: false },
     });
+    // envoi HTTP d'un message broadcast (sans rejoindre le canal)
+    async function broadcast(topic, event, payload) {
+      try { if (client.realtime && client.realtime.setAuth) await client.realtime.setAuth(); } catch (e) { /* ignore */ }
+      const ch = client.channel(topic);
+      try { return await ch.send({ type: 'broadcast', event, payload }); }
+      finally { try { client.removeChannel(ch); } catch (e) { /* ignore */ } }
+    }
     return {
       mode: 'online',
       chat: true,
@@ -46,25 +55,36 @@
         });
         return () => { client.removeChannel(channel); };
       },
-      // ---- comptes, amis, invitations : fonctions SQL (SECURITY DEFINER) ----
+      // Suivi de plusieurs parties (liste de l'accueil) : onChange(id) à chaque mise à jour de l'une d'elles.
+      subscribeGames(ids, onChange) {
+        ids = (ids || []).filter(id => /^[A-Z0-9]+$/.test(id)).slice(0, 30);
+        if (!ids.length) return () => {};
+        const channel = client.channel('games-' + ids.join('-').slice(0, 60) + '-' + Math.random().toString(36).slice(2, 6))
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: TABLE, filter: 'id=in.(' + ids.join(',') + ')' }, payload => onChange(payload && payload.new ? payload.new.id : null))
+          .subscribe();
+        return () => { client.removeChannel(channel); };
+      },
+      // Présence globale : qui a l'application ouverte (pastilles « en ligne » des amis, choix des notifications)
+      subscribeOnline(pid, onSync) {
+        const channel = client.channel('harmonies-online', { config: { presence: { key: pid } } })
+          .on('presence', { event: 'sync' }, () => { try { onSync(Object.keys(channel.presenceState())); } catch (e) { /* ignore */ } });
+        channel.subscribe(async status => { if (status === 'SUBSCRIBED') { try { await channel.track({ pid, at: Date.now() }); } catch (e) { /* facultatif */ } } });
+        return () => { client.removeChannel(channel); };
+      },
+      // ---- profils, amis, notifications : fonctions SQL (SECURITY DEFINER) ----
       async rpc(name, params) {
         const { data, error } = await client.rpc(name, params);
         if (error) throw new Error(error.message || 'error');
         return data;
       },
-      subscribeInvites(phone, onInvite) {
-        const channel = client.channel('acct-' + phone, { config: { broadcast: { self: false } } })
-          .on('broadcast', { event: 'invite' }, msg => { if (msg && msg.payload) onInvite(msg.payload); })
-          .subscribe();
+      // Canal d'événements d'un joueur (acct-<pid>) : 'game' (nouvelle partie), 'turn', 'finished', 'chat', 'friend'
+      subscribeAccount(pid, onEvent) {
+        const channel = client.channel('acct-' + pid, { config: { broadcast: { self: false } } });
+        ['game', 'turn', 'finished', 'chat', 'friend'].forEach(ev => channel.on('broadcast', { event: ev }, msg => { if (msg && msg.payload) onEvent(ev, msg.payload); }));
+        channel.subscribe();
         return () => { client.removeChannel(channel); };
       },
-      // Envoi HTTP d'un message broadcast (le canal n'a pas besoin d'être rejoint)
-      async pushInvite(phone, payload) {
-        try { if (client.realtime && client.realtime.setAuth) await client.realtime.setAuth(); } catch (e) { /* ignore */ }
-        const ch = client.channel('acct-' + phone);
-        try { return await ch.send({ type: 'broadcast', event: 'invite', payload }); }
-        finally { try { client.removeChannel(ch); } catch (e) { /* ignore */ } }
-      },
+      pushEvent(pid, event, payload) { return broadcast('acct-' + pid, event, payload); },
       // ---- chat : messages persistants (les 60 derniers au chargement), diffusés par le temps réel ----
       async loadChat(id, afterId) {
         let q = client.from(CHAT).select('id, pid, name, avatar, text, created_at').eq('game', id).order('id', { ascending: false }).limit(60);
@@ -73,8 +93,9 @@
         if (error) throw new Error(error.message);
         return (data || []).reverse();
       },
+      // msg.present : joueurs actuellement connectés (ils ne reçoivent pas de notification push pour ce message)
       async sendChat(id, msg) {
-        const { data, error } = await client.from(CHAT).insert({ game: id, pid: msg.pid, name: msg.name, avatar: msg.avatar || 0, text: msg.text }).select('id, pid, name, avatar, text, created_at').single();
+        const { data, error } = await client.from(CHAT).insert({ game: id, pid: msg.pid, name: msg.name, avatar: msg.avatar || 0, text: msg.text, present: msg.present || [] }).select('id, pid, name, avatar, text, created_at').single();
         if (error) throw new Error(error.message);
         return data;
       },

@@ -383,11 +383,21 @@
       state.cur = newTurn();
     }
   }
-  function finalResult(state) {
+  // Abandon : la partie s'arrête, le joueur qui abandonne ne peut pas gagner (les autres sont départagés normalement).
+  function resign(state, seat) {
+    assert(state.status === 'playing', 'the game is over');
+    assert(state.players[seat], 'unknown player');
+    state.status = 'finished';
+    state.endReason = 'resign';
+    state.resigned = seat;
+    state.cur = null;
+    state.result = finalResult(state, seat);
+  }
+  function finalResult(state, excluded) {
     const scores = state.players.map((p, i) => Object.assign({ seat: i, name: p.name, cubes: p.cubes }, scorePlayer(p, state.opts.side)));
-    const ranked = scores.slice().sort((a, b) => b.total - a.total || b.cubes - a.cubes);
+    const ranked = scores.filter(s => s.seat !== excluded).sort((a, b) => b.total - a.total || b.cubes - a.cubes);
     const best = ranked[0];
-    const winners = ranked.filter(s => s.total === best.total && s.cubes === best.cubes).map(s => s.seat);
+    const winners = best ? ranked.filter(s => s.total === best.total && s.cubes === best.cubes).map(s => s.seat) : [];
     return { scores, winners };
   }
 
@@ -410,7 +420,7 @@
     neighborCoord, canPlace, legalCells, patternCells, stackMatches, findMatches, cubeTargets,
     components, longestRiver, riverPoints, islands, scoreLandscape, scoreSpirit, scorePlayer, cardValue,
     newGame, newTurn, current, activeCount, emptyCount, takeTokens, placeToken, discardToken,
-    canTakeCard, takeCard, chooseSpirit, placeableCubes, placeCube, turnStatus, endTurn, finalResult,
+    canTakeCard, takeCard, chooseSpirit, placeableCubes, placeCube, turnStatus, endTurn, finalResult, resign,
     describeActions, shuffle, clone, emptyBoard, treeHeight, isMountain, isBuilding, top,
   };
 });
