@@ -1,15 +1,24 @@
-// Joueurs artificiels (3 niveaux). Pur : planifie un tour complet sur une copie de l'état, sans DOM.
+// Joueurs artificiels (4 niveaux). Pur : planifie un tour complet sur une copie de l'état, sans DOM.
+// Niveaux 1-3 ici (hasard, score immédiat, préparation des habitats) ; niveau 4 « godmode » : planificateur de src/god.js.
 (function (root, factory) {
-  if (typeof module !== 'undefined' && module.exports) module.exports = factory(require('./engine.js'));
-  else root.Bot = factory(root.Engine);
-})(typeof self !== 'undefined' ? self : this, function (E) {
+  if (typeof module !== 'undefined' && module.exports) module.exports = factory(require('./engine.js'), require('./god.js'));
+  else root.Bot = factory(root.Engine, root.God);
+})(typeof self !== 'undefined' ? self : this, function (E, God) {
   'use strict';
 
   const NAMES = ['Fennec', 'Otter', 'Owl', 'Koala', 'Penguin', 'Alpaca', 'Beaver', 'Panther'];
-  const LEVELS = { 1: 'novice', 2: 'skilled', 3: 'expert' };
+  const GOD_NAMES = ['Lion', 'Crocodile', 'Wolf', 'Bear'];
+  const LEVELS = { 1: 'novice', 2: 'skilled', 3: 'expert', 4: 'godmode' };
+  const MAX_LEVEL = 4;
   // Avatar (id de carte Animal) associé à chaque nom de bot
-  const AVATARS = { Fennec: 23, Otter: 4, Owl: 36, Koala: 18, Penguin: 21, Alpaca: 28, Beaver: 40, Panther: 32 };
+  const AVATARS = { Fennec: 23, Otter: 4, Owl: 36, Koala: 18, Penguin: 21, Alpaca: 28, Beaver: 40, Panther: 32, Lion: 33, Crocodile: 1, Wolf: 19, Bear: 14 };
   const avatarFor = name => AVATARS[String(name || '').replace(/^Bot /, '')] || 26;
+  // Nom libre pour un nouveau bot (les godmode ont leurs propres noms)
+  function nameFor(taken, level) {
+    const used = new Set((taken || []).map(n => String(n).replace(/^Bot /, '')));
+    const pool = level >= 4 ? GOD_NAMES.concat(NAMES) : NAMES.concat(GOD_NAMES);
+    return pool.find(n => !used.has(n)) || 'Bot';
+  }
 
   // Pile actuelle compatible avec la pile requise (préfixe, du bas vers le haut) ?
   function compatible(cell, want) {
@@ -96,9 +105,11 @@
   }
 
   // Planifie et applique le tour du joueur courant sur `state` (mutation) ; renvoie la liste des actions.
-  function playTurn(state, level, rng) {
+  // opts (niveau 4) : budget en ms, multiplicateur d'itérations, fixed (déterministe) — voir God.playTurn.
+  function playTurn(state, level, rng, opts) {
     rng = rng || Math.random;
-    level = Math.max(1, Math.min(3, level | 0));
+    level = Math.max(1, Math.min(MAX_LEVEL, level | 0));
+    if (level >= 4) return God.playTurn(state, rng, opts);
     const actions = [];
     const p = E.current(state);
     if (p.spiritChoices) {
@@ -172,8 +183,11 @@
         if (plan.cells) {
           for (const { color, cell } of plan.cells) {
             const hi = state.cur.tokens.indexOf(color);
-            E.placeToken(state, hi, cell);
-            actions.push({ a: 'place', color, cell });
+            // un cube posé entre-temps peut avoir bloqué la case prévue : on se rabat sur une case légale
+            const target = E.canPlace(E.current(state).board[cell], color) ? cell : E.legalCells(E.current(state).board, color)[0];
+            if (target === undefined) { E.discardToken(state, hi); actions.push({ a: 'discard', color }); continue; }
+            E.placeToken(state, hi, target);
+            actions.push({ a: 'place', color, cell: target });
             placeAllCubes(state, actions, rng, level);
           }
         } else {
@@ -201,5 +215,5 @@
     return actions;
   }
 
-  return { playTurn, potential, evaluate, NAMES, LEVELS, AVATARS, avatarFor };
+  return { playTurn, potential, evaluate, NAMES, GOD_NAMES, LEVELS, MAX_LEVEL, AVATARS, avatarFor, nameFor };
 });

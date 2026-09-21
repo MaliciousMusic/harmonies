@@ -1,7 +1,7 @@
 // Service worker de la page publiée : le réseau a toujours la priorité, le cache ne sert qu'en secours (hors connexion,
 // parties locales). Les requêtes vers d'autres origines (Supabase, CDN, polices) passent directement par le réseau.
 // Reçoit aussi les notifications push (« à toi de jouer », nouvelle partie, message) envoyées par la fonction Edge.
-const CACHE = 'harmonies-20260920184627';
+const CACHE = 'harmonies-20260921144718';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png', './icon.svg'];
 
 self.addEventListener('install', e => {

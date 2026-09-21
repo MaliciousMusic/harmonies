@@ -22,7 +22,7 @@ const BUILD_ID = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
 let html = read('index.html');
 html = between(html, 'css', '<style>\n' + read('src/styles.css') + '\n</style>');
 html = between(html, 'config', '<script>window.HARMONIES_CONFIG = { url: "' + SUPABASE_URL + '", key: "' + SUPABASE_KEY + '", vapid: "' + VAPID_PUBLIC + '", build: "' + BUILD_ID + '" };</script>');
-const js = ['src/cards.js', 'src/animals.js', 'src/icons.js', 'src/engine.js', 'src/bot.js', 'src/render.js', 'src/net.js', 'src/app.js'].map(f => '<script>\n' + read(f) + '\n</script>').join('\n');
+const js = ['src/cards.js', 'src/animals.js', 'src/icons.js', 'src/engine.js', 'src/god.js', 'src/bot.js', 'src/render.js', 'src/net.js', 'src/app.js'].map(f => '<script>\n' + read(f) + '\n</script>').join('\n');
 html = between(html, 'js', js);
 html = html.replace('<title>Harmonies</title>', '<title>Harmonies</title>\n<link rel="manifest" href="manifest.webmanifest">\n<link rel="apple-touch-icon" href="apple-touch-icon.png">\n<link rel="icon" type="image/svg+xml" href="icon.svg">\n<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">');
 

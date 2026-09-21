@@ -9,12 +9,13 @@
   const ONLINE_OK = !!(CFG.url && CFG.key && !CFG.url.startsWith('__') && root.supabase);
   const SEAT_COLORS = ['#2a8f8a', '#e8873a', '#6b4fa0', '#d96a8e'];
   const SIDE_LABEL = { A: 'Side A · river', B: 'Side B · islands' };
-  const BOT_LABEL = { 1: 'Novice bot', 2: 'Skilled bot', 3: 'Expert bot' };
-  const BOT_OPTIONS = [[0, 'Human'], [1, 'Novice bot'], [2, 'Skilled bot'], [3, 'Expert bot']];
+  const BOT_LABEL = { 1: 'Novice bot', 2: 'Skilled bot', 3: 'Expert bot', 4: 'Godmode bot' };
+  const BOT_OPTIONS = [[0, 'Human'], [1, 'Novice bot'], [2, 'Skilled bot'], [3, 'Expert bot'], [4, 'Godmode bot']];
+  const BOT_SELECT = sel => [1, 2, 3, 4].map(l => '<option value="' + l + '"' + (l === sel ? ' selected' : '') + '>' + BOT_LABEL[l] + '</option>').join('');
   const QUICK_CHAT = ['👋 Hi!', 'GG!', 'Nice move!', 'Your turn 😉', 'One sec…', 'Well played!'];
   const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const STANDALONE = !!(navigator.standalone || (root.matchMedia && root.matchMedia('(display-mode: standalone)').matches));
-  const botName = (players, level) => { const used = new Set(players.map(p => p.name)); void level; return Bot.NAMES.find(n => !used.has('Bot ' + n) && !used.has(n)) || 'Bot'; };
+  const botName = (players, level) => Bot.nameFor(players.map(p => p.name), level);
   const BANNER = ['#f2c94c', '#e8873a', '#5cc2b7', '#2a8f8a', '#2c4a8a', '#1e2a5a'];
   const wait = ms => new Promise(r => setTimeout(r, ms));
   const plural = (n, word) => n + ' ' + word + (n > 1 ? 's' : '');
@@ -670,7 +671,7 @@
         '<span class="chip on me">' + avatarHTML({ avatar: myAvatar(), name: myName() }, 0, 'xs') + esc(myName()) + '</span>' +
         hub.friends.map(f => '<button type="button" class="chip' + (chosen(f) ? ' on' : '') + '" data-friend="' + esc(f.pid) + '" ' + (!chosen(f) && count >= 4 ? 'disabled' : '') + '>' + avatarHTML(f, -1, 'xs') + esc(f.name) + (chosen(f) ? ic('check', 'inl') : '') + '</button>').join('') +
         setup.bots.map((lvl, i) => '<button type="button" class="chip on bot" data-bot="' + i + '" title="Remove">' + ic('cpu', 'inl') + esc(BOT_LABEL[lvl]) + ic('x', 'inl') + '</button>').join('') +
-        (count < 4 ? '<select class="chip-sel" id="ng-addbot"><option value="">+ bot…</option><option value="1">Novice bot</option><option value="2">Skilled bot</option><option value="3">Expert bot</option></select>' : '') +
+        (count < 4 ? '<select class="chip-sel" id="ng-addbot"><option value="">+ bot…</option>' + BOT_SELECT(0) + '</select>' : '') +
         '</div>' + (hub.friends.length ? '<p class="note">Tap friends to add them: they are seated right away and notified.</p>' : '<p class="note">No friends yet — add them from the Friends panel to challenge them here.</p>') + '</div>' +
         '<div class="actions col"><button class="btn primary big" id="ng-start" ' + (count >= 2 ? '' : 'disabled') + '>' + ic('play') + 'Start now</button>' +
         '<button class="btn secondary" id="ng-lobby">' + ic('globe') + 'Waiting room with a code</button></div>', { cls: 'sheet' });
@@ -722,7 +723,7 @@
     let players = ls.get('harmonies.localPlayers', null);
     if (!players) players = [{ name: myName() || 'Player 1', bot: 0, avatar: myAvatar() }, { name: 'Bot Fennec', bot: 2 }];
     if (players[0] && !players[0].bot) { players[0].avatar = myAvatar(); if (myName()) players[0].name = myName(); }
-    modal('<h2>' + ic('phone', 'h') + 'Game on this phone</h2><p class="note">Humans and bots; humans pass the phone around. Three bot levels: novice (random), skilled (goes for immediate points), expert (also prepares its habitats).</p>' +
+    modal('<h2>' + ic('phone', 'h') + 'Game on this phone</h2><p class="note">Humans and bots; humans pass the phone around. Four bot levels: novice (random), skilled (goes for immediate points), expert (also prepares its habitats), godmode (plans its whole game ahead — token odds, upcoming animals, optimal placements — and blocks you).</p>' +
       '<div id="prows">' + players.map(playerRow).join('') + '</div>' +
       '<div class="row"><button class="btn secondary small" id="m-add">' + ic('plus') + 'player</button><button class="btn secondary small" id="m-del">' + ic('minus') + 'player</button></div>' +
       '<div class="actions"><button class="btn secondary" id="m-cancel">Cancel</button><button class="btn primary" id="m-go">Start</button></div>');
@@ -995,19 +996,24 @@
     const p = E.current(s);
     if (!p.bot) { app.botRunning = false; return; }
     const version = app.version;
-    const planned = E.clone(s);
-    let actions;
-    try { actions = Bot.playTurn(planned, p.bot); E.endTurn(planned); }
-    catch (e) { app.botRunning = false; toast('Bot error: ' + e.message, true); return; }
-    stamp(planned);
     const fast = app.fast;
     let token = null, aborted = fast;
     if (!fast) {
+      // bannière et plateau du bot affichés avant le calcul (le godmode réfléchit environ une seconde)
       const vis = E.clone(s);
       token = { state: vis, seat: s.turn, abort: false, bot: true };
       app.replay = token; app.viewSeat = s.turn; app.stage = 'choose'; app.stageManual = false;
       renderGame();
-      showBanner(ic('dice', 'inl') + ' ' + esc(p.name) + ' (' + BOT_LABEL[p.bot].toLowerCase() + ') is playing…', skipBots, ic('skip') + 'Skip');
+      showBanner(ic('dice', 'inl') + ' ' + esc(p.name) + ' (' + BOT_LABEL[p.bot].toLowerCase() + ') is ' + (p.bot >= 4 ? 'thinking' : 'playing') + '…', skipBots, ic('skip') + 'Skip');
+      if (p.bot >= 4) await wait(40);
+    }
+    const planned = E.clone(s);
+    let actions;
+    try { actions = Bot.playTurn(planned, p.bot); E.endTurn(planned); }
+    catch (e) { if (token && app.replay === token) app.replay = null; hideBanner(); app.botRunning = false; toast('Bot error: ' + e.message, true); return; }
+    stamp(planned);
+    if (!fast) {
+      if (p.bot >= 4) showBanner(ic('dice', 'inl') + ' ' + esc(p.name) + ' (' + BOT_LABEL[p.bot].toLowerCase() + ') is playing…', skipBots, ic('skip') + 'Skip');
       await pause(600, token);
       for (const a of actions) {
         if (token.abort) break;
@@ -1091,7 +1097,7 @@
         '<span class="spacer"></span>' +
         (!p.bot && p.pid !== myPid() && acct.me && !friendOf(p.pid) ? '<button class="btn small secondary" data-befriend="' + esc(p.pid) + '">' + ic('user-plus') + 'Add friend</button>' : '') +
         (host && p.pid !== myPid() ? '<button class="btn small secondary icon" data-rm="' + i + '" title="Remove">' + ic('x') + '</button>' : '') + '</li>').join('') + '</ul>' +
-      (host && s.players.length < 4 ? '<div class="row" style="margin-top:8px"><select id="botlvl" class="sel"><option value="1">Novice bot</option><option value="2" selected>Skilled bot</option><option value="3">Expert bot</option></select><button class="btn secondary small" id="addbot">' + ic('plus') + 'Add a bot</button></div>' : '') +
+      (host && s.players.length < 4 ? '<div class="row" style="margin-top:8px"><select id="botlvl" class="sel">' + BOT_SELECT(2) + '</select><button class="btn secondary small" id="addbot">' + ic('plus') + 'Add a bot</button></div>' : '') +
       (inGame ? '' : '<div class="field" style="margin-top:10px"><label>Your name and animal</label><div class="me-row">' + avatarBtnHTML(myAvatar(), 'avatar-btn') + '<input type="text" id="jname" maxlength="16" value="' + esc(myName()) + '" placeholder="Your name"></div></div><button class="btn primary block" id="joinbtn">Join the game</button>') +
       '</div>' +
       (host && acct.me ? '<div class="panel glass"><h2>' + ic('users', 'h') + 'Invite friends</h2>' + (invitable.length ? '<ul class="friends">' + invitable.map(f => '<li>' + avatarHTML(f, -1, 'md') + '<div class="f-txt"><b>' + esc(f.name) + '</b><span class="note">' + (isOnline(f.pid) ? 'online' : (f.last_seen ? 'seen ' + ago(f.last_seen) : '')) + '</span></div>' +
